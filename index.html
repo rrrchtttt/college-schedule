@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang="ru" class="light">
+<html lang="ru" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Расписание | БГО-101</title>
-
-    <!-- PWA / Apple Web App Meta Tags -->
+    <title>Расписание & Академический Трекер</title>
+    
+    <!-- PWA / iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="БГО-101">
-    <meta name="theme-color" content="#f0f4f8" id="theme-color-meta">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/512/calendar.png">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Расписание">
+    <meta name="theme-color" content="#f8fafc">
 
-    <!-- Tailwind CSS CDN & Configuration -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -20,623 +19,869 @@
             theme: {
                 extend: {
                     colors: {
-                        pastelBgLight: '#f0f4f8',
-                        pastelBgDark: '#0f172a',
-                        pastelCardLight: 'rgba(255, 255, 255, 0.85)',
-                        pastelCardDark: 'rgba(30, 41, 59, 0.85)',
+                        pastel: {
+                            blue: '#e0f2fe',
+                            accent: '#0284c7',
+                            darkBg: '#0f172a',
+                            darkCard: '#1e293b',
+                            darkBorder: '#334155'
+                        }
+                    },
+                    borderRadius: {
+                        '3xl': '1.5rem',
+                        '4xl': '2rem'
                     }
                 }
             }
         }
     </script>
 
-    <!-- Google Fonts (Inter) & Lucide Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .fade-in {
-            animation: fadeIn 0.25s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Custom Smooth Scrollbar & Tap Highlight Removal */
+        * { -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        .glass-header {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
     </style>
 </head>
-<body class="bg-pastelBgLight dark:bg-pastelBgDark text-slate-800 dark:text-slate-100 min-h-screen pb-12 flex flex-col items-center">
+<body class="h-full bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 font-sans transition-colors duration-200 antialiased flex flex-col selection:bg-sky-200 dark:selection:bg-sky-900">
 
-    <!-- Главный контейнер -->
-    <div class="w-full max-w-2xl px-4 pt-4 space-y-5">
-
-        <!-- Верхняя панель (Шапка) -->
-        <header class="flex items-center justify-between bg-white/70 dark:bg-slate-800/70 backdrop-blur-md p-4 sm:p-5 rounded-3xl shadow-sm border border-white/60 dark:border-slate-700/60">
-            <div>
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-100 dark:border-blue-900/50">МЭИ • БГО-101</span>
-                <h1 class="text-xl sm:text-2xl font-bold mt-1">Расписание</h1>
-            </div>
-
-            <!-- Кнопки управления шапки -->
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-30 glass-header bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 px-4 py-3">
+        <div class="max-w-5xl mx-auto flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
-                <!-- Переключатель темы -->
-                <button onclick="toggleDarkMode()" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95" title="Переключить тему">
-                    <i data-lucide="moon" id="themeIcon" class="w-4 h-4"></i>
-                </button>
-                <!-- Настройки / Данные -->
-                <button onclick="openDataModal()" class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95" title="Экспорт/Импорт">
-                    <i data-lucide="hard-drive" class="w-4 h-4"></i>
-                </button>
-                <!-- Сегодня -->
-                <button onclick="goToToday()" class="flex items-center gap-1.5 bg-blue-500 hover:bg-blue-600 text-white font-medium px-3.5 py-2.5 rounded-2xl transition-all shadow-sm active:scale-95 text-xs sm:text-sm">
-                    <i data-lucide="calendar" class="w-4 h-4"></i>
-                    <span>Сегодня</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- Виджет «Следующая пара» -->
-        <div id="nextPairWidget" class="hidden bg-gradient-to-r from-blue-500 to-indigo-500 text-white p-4 rounded-3xl shadow-md border border-blue-400/30 space-y-1 fade-in">
-            <!-- Динамический контент из JS -->
-        </div>
-
-        <!-- Поиск и фильтрация -->
-        <div class="relative">
-            <i data-lucide="search" class="w-4 h-4 absolute left-4 top-3.5 text-slate-400"></i>
-            <input 
-                type="text" 
-                id="searchInput" 
-                placeholder="Поиск по предмету, ауд. или препу..." 
-                oninput="onSearchInput(this.value)"
-                class="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-2xl border border-white/60 dark:border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-blue-400 text-slate-800 dark:text-slate-100 placeholder-slate-400 shadow-sm"
-            />
-        </div>
-
-        <!-- Панель выбора недели и дней -->
-        <section class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-3.5 sm:p-4 rounded-3xl shadow-sm border border-white/60 dark:border-slate-700/60 space-y-3">
-            <div class="flex items-center justify-between px-2">
-                <button onclick="changeWeek(-1)" class="p-2 rounded-2xl bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95">
-                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                </button>
-                <div class="text-center">
-                    <div id="weekLabel" class="text-xs sm:text-sm font-semibold"></div>
-                    <div id="dateRangeLabel" class="text-[11px] text-slate-400 font-medium mt-0.5"></div>
+                <div class="p-2 bg-sky-500 text-white rounded-2xl shadow-md shadow-sky-500/20">
+                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
                 </div>
-                <button onclick="changeWeek(1)" class="p-2 rounded-2xl bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95">
-                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight">Расписание</h1>
+                    <p id="subHeaderDate" class="text-xs text-slate-500 dark:text-slate-400">Загрузка...</p>
+                </div>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-1.5">
+                <button onclick="toggleTheme()" class="p-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors" title="Переключить тему">
+                    <i id="themeIcon" data-lucide="moon" class="w-5 h-5"></i>
                 </button>
-            </div>
-
-            <!-- Сетка дней недели -->
-            <div id="daysContainer" class="grid grid-cols-7 gap-1 sm:gap-2">
-                <!-- Генерируется из JS -->
-            </div>
-        </section>
-
-        <!-- Заголовок выбранного дня -->
-        <div class="flex items-center justify-between px-2 pt-1">
-            <h2 id="selectedDayTitle" class="text-base sm:text-lg font-bold flex items-center gap-2"></h2>
-            <span id="pairsCount" class="text-xs font-medium text-slate-400"></span>
-        </div>
-
-        <!-- Список пар -->
-        <main id="scheduleContainer" class="space-y-3.5 fade-in">
-            <!-- Карточки генерируются из JS -->
-        </main>
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО ЗАМЕТОК -->
-    <div id="noteModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 fade-in">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-md shadow-xl border border-white/40 dark:border-slate-700 space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 id="noteModalTitle" class="text-base font-bold">Заметка</h3>
-                <button onclick="closeNoteModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+                <button onclick="exportData()" class="p-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors" title="Экспорт данных">
+                    <i data-lucide="download" class="w-5 h-5"></i>
                 </button>
-            </div>
-            <textarea id="noteInput" rows="4" placeholder="Напишите важное (аудитория, контакты, сдать реферат...)" class="w-full text-xs sm:text-sm p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-slate-800 dark:text-slate-100"></textarea>
-            <div class="flex justify-end gap-2">
-                <button onclick="closeNoteModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Отмена</button>
-                <button onclick="saveNote()" class="px-4 py-2 rounded-xl text-xs font-medium bg-blue-500 hover:bg-blue-600 text-white shadow-sm">Сохранить</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО ДАННЫХ (Экспорт / Импорт) -->
-    <div id="dataModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 fade-in">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-md shadow-xl border border-white/40 dark:border-slate-700 space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 class="text-base font-bold">Управление данными</h3>
-                <button onclick="closeDataModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Сохраните резервную копию заметок и домашних заданий или загрузите готовый файл от одногруппников.</p>
-            <div class="space-y-2 pt-2">
-                <button onclick="exportData()" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50 rounded-2xl text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span>Скачать резервную копию (JSON)</span>
-                </button>
-                <label class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 rounded-2xl text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer">
-                    <i data-lucide="upload" class="w-4 h-4"></i>
-                    <span>Загрузить данные из файла</span>
-                    <input type="file" id="importFile" accept=".json" onchange="importData(event)" class="hidden" />
+                <label class="p-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer" title="Импорт данных">
+                    <i data-lucide="upload" class="w-5 h-5"></i>
+                    <input type="file" id="importFileInput" onchange="importData(event)" class="hidden" accept=".json">
                 </label>
             </div>
         </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 sticky top-[61px] z-20">
+        <div class="max-w-5xl mx-auto flex space-x-1 overflow-x-auto py-2 no-scrollbar">
+            <button onclick="switchTab('schedule')" id="tab-schedule" class="nav-tab active flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-2xl transition-all whitespace-nowrap bg-sky-500 text-white shadow-sm">
+                <i data-lucide="clock" class="w-4 h-4"></i> Расписание
+            </button>
+            <button onclick="switchTab('calendar')" id="tab-calendar" class="nav-tab flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
+                <i data-lucide="calendar" class="w-4 h-4"></i> Календарь
+            </button>
+            <button onclick="switchTab('attendance')" id="tab-attendance" class="nav-tab flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
+                <i data-lucide="users" class="w-4 h-4"></i> Посещаемость
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 space-y-6">
+
+        <!-- Widget: Next Pair Status -->
+        <div id="nextPairWidget" class="bg-gradient-to-r from-sky-500 to-indigo-500 text-white rounded-3xl p-5 shadow-lg shadow-sky-500/15 relative overflow-hidden hidden">
+            <div class="absolute -right-6 -bottom-6 opacity-15">
+                <i data-lucide="bell" class="w-36 h-36"></i>
+            </div>
+            <div class="relative z-10">
+                <div class="flex items-center justify-between mb-2">
+                    <span id="nextPairStatusBadge" class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider">Прямо сейчас</span>
+                    <span id="nextPairTime" class="text-sm font-medium opacity-90">--:--</span>
+                </div>
+                <h3 id="nextPairSubject" class="text-xl font-bold">Название предмета</h3>
+                <p id="nextPairMeta" class="text-sm opacity-90 mt-1 flex items-center gap-3">
+                    <span><i data-lucide="map-pin" class="w-3.5 h-3.5 inline mr-1"></i><span id="nextPairRoom">---</span></span>
+                    <span><i data-lucide="user" class="w-3.5 h-3.5 inline mr-1"></i><span id="nextPairTeacher">---</span></span>
+                </p>
+            </div>
+        </div>
+
+        <!-- TAB 1: SCHEDULE VIEW -->
+        <div id="view-schedule" class="space-y-5">
+            <!-- Search & Filters -->
+            <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
+                <!-- Date Switcher -->
+                <div class="flex items-center justify-between w-full sm:w-auto bg-white dark:bg-slate-800 p-1.5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
+                    <button onclick="navigateWeek(-1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors text-slate-600 dark:text-slate-300">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-3 py-1.5 text-xs font-bold bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 rounded-xl hover:bg-sky-100 transition-colors">
+                        Сегодня
+                    </button>
+                    <button onclick="navigateWeek(1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors text-slate-600 dark:text-slate-300">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative w-full sm:w-64">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="searchInput" oninput="renderSchedule()" placeholder="Поиск предмета..." class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/50 transition-all">
+                </div>
+            </div>
+
+            <!-- Days Navigation Ribbon -->
+            <div id="weekRibbon" class="grid grid-cols-7 gap-1.5 bg-white dark:bg-slate-800 p-2 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-700 text-center">
+                <!-- JS Generated Days Buttons -->
+            </div>
+
+            <!-- Timeline / Schedule Container -->
+            <div id="scheduleTimeline" class="space-y-3">
+                <!-- Pairs JS Generated -->
+            </div>
+        </div>
+
+        <!-- TAB 2: CALENDAR VIEW -->
+        <div id="view-calendar" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-sm border border-slate-200/80 dark:border-slate-700">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 id="calendarMonthLabel" class="text-lg font-bold">Месяц Год</h2>
+                    <div class="flex items-center gap-1">
+                        <button onclick="navigateMonth(-1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-slate-600 dark:text-slate-300"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                        <button onclick="navigateMonth(1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-slate-600 dark:text-slate-300"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+
+                <!-- Days of week header -->
+                <div class="grid grid-cols-7 text-center text-xs font-semibold text-slate-400 mb-2">
+                    <div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div>
+                </div>
+
+                <!-- Month Grid -->
+                <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-sm">
+                    <!-- JS Generated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ATTENDANCE VIEW -->
+        <div id="view-attendance" class="hidden space-y-4">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-sm border border-slate-200/80 dark:border-slate-700 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Журнал посещаемости</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Отмечайте студентов и отправляйте отчеты</p>
+                    </div>
+                    <button onclick="copyAttendanceReport()" class="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-xs font-bold shadow-md shadow-emerald-500/20 transition-all active:scale-95">
+                        <i data-lucide="send" class="w-4 h-4"></i> Скопировать для Telegram
+                    </button>
+                </div>
+
+                <!-- Select Subject & Date -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Предмет</label>
+                        <select id="attendanceSubjectSelect" onchange="renderAttendance()" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:outline-none">
+                            <!-- JS Populated -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Дата</label>
+                        <input type="date" id="attendanceDateInput" onchange="renderAttendance()" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Attendance Stats Banner -->
+                <div class="p-4 bg-sky-50 dark:bg-sky-950/40 rounded-2xl border border-sky-100 dark:border-sky-900/50 flex justify-around text-center">
+                    <div>
+                        <div id="statPresent" class="text-xl font-bold text-emerald-600 dark:text-emerald-400">0</div>
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Присутствуют</div>
+                    </div>
+                    <div>
+                        <div id="statAbsent" class="text-xl font-bold text-rose-600 dark:text-rose-400">0</div>
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Отсутствуют</div>
+                    </div>
+                    <div>
+                        <div id="statRate" class="text-xl font-bold text-sky-600 dark:text-sky-400">100%</div>
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Посещаемость</div>
+                    </div>
+                </div>
+
+                <!-- Student List -->
+                <div class="divide-y divide-slate-100 dark:divide-slate-700/50 pt-2" id="studentList">
+                    <!-- JS Populated -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL: PAIR DETAILS & TRELLO KANBAN -->
+    <div id="pairModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200/80 dark:border-slate-700 p-6 space-y-6">
+            
+            <!-- Modal Header -->
+            <div class="flex items-start justify-between">
+                <div>
+                    <span id="modalTypeBadge" class="px-2.5 py-1 bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 rounded-xl text-xs font-bold uppercase tracking-wider">Лекция</span>
+                    <h2 id="modalSubjectTitle" class="text-2xl font-bold mt-2">Предмет</h2>
+                    <p id="modalMetaInfo" class="text-sm text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap gap-4">
+                        <span><i data-lucide="clock" class="w-4 h-4 inline mr-1"></i><span id="modalTime">---</span></span>
+                        <span><i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i><span id="modalRoom">---</span></span>
+                        <span><i data-lucide="user" class="w-4 h-4 inline mr-1"></i><span id="modalTeacher">---</span></span>
+                    </p>
+                </div>
+                <button onclick="closeModal()" class="p-2 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+
+            <hr class="border-slate-100 dark:border-slate-700/60">
+
+            <!-- Notes Section -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Заметки к лекции / Преподавателю</label>
+                <textarea id="modalNotesInput" rows="2" placeholder="Например: Вход с правого крыла, сдать реферат..." class="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/50"></textarea>
+            </div>
+
+            <!-- Trello Kanban Board -->
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Доска заданий (Trello)</label>
+                    <button onclick="addKanbanTaskPrompt()" class="text-xs font-bold text-sky-500 hover:underline flex items-center gap-1">+ Добавить ДЗ</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <!-- Column 1: TODO -->
+                    <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-2xl space-y-2 border border-slate-100 dark:border-slate-800">
+                        <div class="text-xs font-bold text-slate-500 flex items-center justify-between">
+                            <span>НАДО СДЕЛАТЬ</span>
+                            <span id="count-todo" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded-full text-[10px]">0</span>
+                        </div>
+                        <div id="kanban-todo" class="space-y-2 min-h-[100px]"></div>
+                    </div>
+
+                    <!-- Column 2: IN PROGRESS -->
+                    <div class="bg-amber-50/50 dark:bg-amber-950/20 p-3 rounded-2xl space-y-2 border border-amber-100/50 dark:border-amber-900/30">
+                        <div class="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between">
+                            <span>В ПРОЦЕССЕ</span>
+                            <span id="count-progress" class="px-2 py-0.5 bg-amber-100 dark:bg-amber-950 rounded-full text-[10px]">0</span>
+                        </div>
+                        <div id="kanban-progress" class="space-y-2 min-h-[100px]"></div>
+                    </div>
+
+                    <!-- Column 3: DONE -->
+                    <div class="bg-emerald-50/50 dark:bg-emerald-950/20 p-3 rounded-2xl space-y-2 border border-emerald-100/50 dark:border-emerald-900/30">
+                        <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
+                            <span>СДАНО</span>
+                            <span id="count-done" class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950 rounded-full text-[10px]">0</span>
+                        </div>
+                        <div id="kanban-done" class="space-y-2 min-h-[100px]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex justify-end gap-3 pt-4">
+                <button onclick="saveModalData()" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-2xl text-sm font-bold shadow-md shadow-sky-500/20 transition-all">Сохранить</button>
+            </div>
+        </div>
     </div>
 
-    <!-- JAVASCRIPT ЛОГИКА -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // БАЗА ДАННЫХ РАСПИСАНИЯ
-        const baseSchedule = {
-            1: { // Неделя 1
-                1: [
-                    { num: 3, time: "12:40 – 14:10", endTime: "14:10", name: "Физическая культура и спорт", type: "Лекция", room: "409", teacher: "Фирсин С.А." },
-                    { num: 4, time: "14:20 – 15:50", endTime: "15:50", name: "День самоподготовки", type: "Самостоятельно", room: "-", teacher: "-" }
-                ],
-                2: [
-                    { num: 1, time: "09:00 – 10:30", endTime: "10:30", name: "Философия", type: "Лекция", room: "210", teacher: "Заклинский П.А." },
-                    { num: 2, time: "10:40 – 12:10", endTime: "12:10", name: "Философия", type: "Лекция", room: "210", teacher: "Заклинский П.А." }
-                ],
-                3: [
-                    { num: 1, time: "09:00 – 10:30", endTime: "10:30", name: "Основы российской государственности", type: "Лекция", room: "210", teacher: "Кузьмичева Н.В." },
-                    { num: 2, time: "10:40 – 12:10", endTime: "12:10", name: "Основы российской государственности", type: "Лекция", room: "210", teacher: "Кузьмичева Н.В." },
-                    { num: "3-4", time: "12:40 – 15:50", endTime: "15:50", name: "История России", type: "Лекция", room: "205", teacher: "Королева-Конопляная Г.И." }
-                ],
-                4: [
-                    { num: "3-4", time: "12:40 – 15:50", endTime: "15:50", name: "Основы нравственности и воспитания (НКО)", type: "Лекция", room: "210", teacher: "Волович И.Г." },
-                    { num: 5, time: "16:00 – 17:30", endTime: "17:30", name: "Философия", type: "Практика", room: "206", teacher: "Заклинский П.А." }
-                ],
-                5: [
-                    { num: "3-4", time: "12:40 – 15:50", endTime: "15:50", name: "Экономическая теория", type: "Лекция", room: "409", teacher: "Башашкина Г.Ю." },
-                    { num: 5, time: "16:00 – 17:30", endTime: "17:30", name: "Иностранный язык", type: "Лекция", room: "401", teacher: "Пенькова Е.А." }
-                ],
-                6: [], 0: []
-            },
-            2: { // Неделя 2
-                1: [
-                    { num: 2, time: "10:40 – 12:10", endTime: "12:10", name: "Физическая культура и спорт", type: "Практика", room: "409", teacher: "Фирсин С.А." },
-                    { num: 3, time: "12:40 – 14:10", endTime: "14:10", name: "Безопасность жизнедеятельности", type: "Практика", room: "205", teacher: "Макаршин И.В." }
-                ],
-                2: [
-                    { num: 1, time: "09:00 – 10:30", endTime: "10:30", name: "Философия", type: "Практика", room: "206", teacher: "Заклинский П.А." },
-                    { num: 2, time: "10:40 – 12:10", endTime: "12:10", name: "Философия", type: "Практика", room: "206", teacher: "Заклинский П.А." }
-                ],
-                3: [
-                    { num: 1, time: "09:00 – 10:30", endTime: "10:30", name: "Русский язык и культура речи", type: "Лекция", room: "210", teacher: "Кузьмичева Н.В." },
-                    { num: 2, time: "10:40 – 12:10", endTime: "12:10", name: "Русский язык и культура речи", type: "Лекция", room: "210", teacher: "Кузьмичева Н.В." },
-                    { num: "3-4", time: "12:40 – 15:50", endTime: "15:50", name: "История России", type: "Лекция", room: "205", teacher: "Королева-Конопляная Г.И." }
-                ],
-                4: [
-                    { num: "2-3", time: "10:40 – 14:10", endTime: "14:10", name: "Экономическая теория", type: "Практика", room: "401", teacher: "Башашкина Г.Ю." },
-                    { num: 4, time: "14:20 – 15:50", endTime: "15:50", name: "Основы нравственности и воспитания (НКО)", type: "Лекция", room: "210", teacher: "Волович И.Г." },
-                    { num: 5, time: "16:00 – 17:30", endTime: "17:30", name: "История России", type: "Практика", room: "205", teacher: "Королева-Конопляная Г.И." }
-                ],
-                5: [
-                    { num: 1, time: "09:00 – 10:30", endTime: "10:30", name: "Иностранный язык", type: "Практика", room: "401", teacher: "Пенькова Е.А." },
-                    { num: 2, time: "10:40 – 12:10", endTime: "12:10", name: "Безопасность жизнедеятельности", type: "Лекция", room: "210", teacher: "Макаршин И.В." },
-                    { num: 3, time: "12:40 – 14:10", endTime: "14:10", name: "Безопасность жизнедеятельности", type: "Лекция", room: "210", teacher: "Макаршин И.В." }
-                ],
-                6: [
-                    { num: "1-2", time: "09:00 – 12:10", endTime: "12:10", name: "Основы нравственности и воспитания (НКО)", type: "Практика", room: "210", teacher: "Волович И.Г." }
-                ],
-                0: []
-            }
-        };
+        // --- BASE DATA STRUCTURES ---
+        const DEMO_PAIRS = [
+            // Day 0: Monday, 1: Tuesday ... 5: Saturday
+            { id: 'p1', day: 0, timeStart: '08:30', timeEnd: '10:00', name: 'Высшая математика', type: 'Лекция', room: 'Ауд. 302', teacher: 'Иванов И.И.' },
+            { id: 'p2', day: 0, timeStart: '10:10', timeEnd: '11:40', name: 'Информатика и КТ', type: 'Практика', room: 'Лаб. 104', teacher: 'Петров В.С.' },
+            { id: 'p3', day: 0, timeStart: '11:50', timeEnd: '13:20', name: 'Информатика и КТ', type: 'Практика (Спаренная 2/2)', room: 'Лаб. 104', teacher: 'Петров В.С.' },
+            
+            { id: 'p4', day: 1, timeStart: '10:10', timeEnd: '11:40', name: 'История России', type: 'Лекция', room: 'Ауд. 410', teacher: 'Сидорова А.М.' },
+            { id: 'p5', day: 1, timeStart: '11:50', timeEnd: '13:20', name: 'Физическая культура', type: 'Практика', room: 'Спортзал', teacher: 'Смирнов К.Д.' },
 
-        // Состояние
+            { id: 'p6', day: 2, timeStart: '08:30', timeEnd: '10:00', name: 'Философия', type: 'Семинар', room: 'Ауд. 215', teacher: 'Кузнецов Н.В.' },
+            { id: 'p7', day: 2, timeStart: '10:10', timeEnd: '11:40', name: 'Иностранный язык', type: 'Практика', room: 'Ауд. 501', teacher: 'Браун Э.Т.' },
+
+            { id: 'p8', day: 3, timeStart: '11:50', timeEnd: '13:20', name: 'Базы данных', type: 'Лекция', room: 'Ауд. 308', teacher: 'Васильев П.П.' },
+            { id: 'p9', day: 3, timeStart: '13:40', timeEnd: '15:10', name: 'Базы данных', type: 'Лабораторная', room: 'Лаб. 102', teacher: 'Васильев П.П.' },
+
+            { id: 'p10', day: 4, timeStart: '08:30', timeEnd: '10:00', name: 'Экономика', type: 'Лекция', room: 'Ауд. 201', teacher: 'Павлова О.С.' }
+        ];
+
+        const DEFAULT_STUDENTS = ["Алексеев М.", "Борисов Д.", "Волкова Е.", "Григорьев А.", "Дмитриев С.", "Егорова А.", "Иванов В.", "Ковалева Н."];
+
+        // --- STATE MANAGEMENT ---
         let currentDate = new Date();
         let selectedDate = new Date();
-        let searchQuery = "";
-        let currentNoteKey = "";
+        let activeTab = 'schedule';
+        let currentModalPairId = null;
 
-        const semesterStartDate = new Date(2026, 8, 28); // 28.09.2026
-        const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
-        const fullDayNames = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+        // Horizon limit: Only allow dates within +- 14 days from Today
+        const MAX_HORIZON_DAYS = 14;
 
-        // Инициализация
-        document.addEventListener("DOMContentLoaded", () => {
+        // LocalStorage Caches
+        let appData = {
+            notes: JSON.parse(localStorage.getItem('app_notes') || '{}'),
+            kanban: JSON.parse(localStorage.getItem('app_kanban') || '{}'),
+            attendance: JSON.parse(localStorage.getItem('app_attendance') || '{}')
+        };
+
+        // --- INIT & CYCLE ---
+        window.onload = () => {
             initTheme();
-            renderApp();
-            setInterval(updateRealtime, 60000);
-        });
-
-        // ТЕМА (Dark/Light)
-        function initTheme() {
-            const savedTheme = localStorage.getItem("theme");
-            if (savedTheme === "dark" || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add("dark");
-                document.getElementById("themeIcon").setAttribute("data-lucide", "sun");
-            } else {
-                document.documentElement.classList.remove("dark");
-                document.getElementById("themeIcon").setAttribute("data-lucide", "moon");
-            }
-        }
-
-        function toggleDarkMode() {
-            const isDark = document.documentElement.classList.toggle("dark");
-            localStorage.setItem("theme", isDark ? "dark" : "light");
-            document.getElementById("themeIcon").setAttribute("data-lucide", isDark ? "sun" : "moon");
-            lucide.createIcons();
-        }
-
-        function getWeekNumber(date) {
-            const diffDays = Math.floor((date - semesterStartDate) / (1000 * 60 * 60 * 24));
-            if (diffDays < 0) return 1;
-            return (Math.floor(diffDays / 7) % 2) === 0 ? 1 : 2;
-        }
-
-        function renderApp() {
-            renderHeaderAndDays();
-            renderNextPairWidget();
+            renderSubHeader();
+            renderWeekRibbon();
             renderSchedule();
+            updateNextPairWidget();
+            populateAttendanceSelectors();
+            lucide.createIcons();
+            setInterval(updateNextPairWidget, 30000); // Check current pair every 30s
+        };
+
+        // --- THEME SYSTEM ---
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('themeIcon').setAttribute('data-lucide', 'sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('themeIcon').setAttribute('data-lucide', 'moon');
+            }
             lucide.createIcons();
         }
 
-        function renderHeaderAndDays() {
-            const weekNum = getWeekNumber(selectedDate);
-            document.getElementById("weekLabel").innerText = `Неделя ${weekNum}`;
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
 
-            const startOfWeek = new Date(selectedDate);
-            const day = startOfWeek.getDay();
-            const diffToMon = (day === 0 ? -6 : 1) - day;
-            startOfWeek.setDate(startOfWeek.getDate() + diffToMon);
+        // --- NAVIGATION TABS ---
+        function switchTab(tab) {
+            activeTab = tab;
+            ['schedule', 'calendar', 'attendance'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const view = document.getElementById(`view-${t}`);
+                if (t === tab) {
+                    btn.className = "nav-tab active flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-2xl transition-all whitespace-nowrap bg-sky-500 text-white shadow-sm";
+                    view.classList.remove('hidden');
+                } else {
+                    btn.className = "nav-tab flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-2xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap";
+                    view.classList.add('hidden');
+                }
+            });
 
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(endOfWeek.getDate() + 6);
+            if (tab === 'calendar') renderCalendar();
+            if (tab === 'attendance') renderAttendance();
+        }
 
-            const formatDateShort = (d) => `${d.getDate()} ${d.toLocaleString('ru', { month: 'short' }).replace('.', '')}`;
-            document.getElementById("dateRangeLabel").innerText = `${formatDateShort(startOfWeek)} – ${formatDateShort(endOfWeek)}`;
+        // --- DATE HELPERS ---
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
 
-            const daysContainer = document.getElementById("daysContainer");
-            daysContainer.innerHTML = "";
+        function getMonday(d) {
+            const date = new Date(d);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(date.setDate(diff));
+        }
+
+        function isWithinPlanningHorizon(targetDate) {
+            const diffTime = Math.abs(targetDate - currentDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays <= MAX_HORIZON_DAYS;
+        }
+
+        function renderSubHeader() {
+            const options = { month: 'long', day: 'numeric', weekday: 'short' };
+            document.getElementById('subHeaderDate').innerText = selectedDate.toLocaleDateString('ru-RU', options);
+        }
+
+        function navigateWeek(direction) {
+            const nextDate = new Date(selectedDate);
+            nextDate.setDate(nextDate.getDate() + (direction * 7));
+            selectedDate = nextDate;
+            renderSubHeader();
+            renderWeekRibbon();
+            renderSchedule();
+        }
+
+        function goToToday() {
+            selectedDate = new Date();
+            renderSubHeader();
+            renderWeekRibbon();
+            renderSchedule();
+        }
+
+        // --- WEEK RIBBON ---
+        function renderWeekRibbon() {
+            const ribbon = document.getElementById('weekRibbon');
+            ribbon.innerHTML = '';
+
+            const monday = getMonday(selectedDate);
+            const daysShort = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
 
             for (let i = 0; i < 7; i++) {
-                const dayDate = new Date(startOfWeek);
-                dayDate.setDate(dayDate.getDate() + i);
+                const dayDate = new Date(monday);
+                dayDate.setDate(monday.getDate() + i);
 
-                const isToday = isSameDay(dayDate, currentDate);
                 const isSelected = isSameDay(dayDate, selectedDate);
-                const dayIdx = dayDate.getDay();
+                const isToday = isSameDay(dayDate, currentDate);
 
-                const dayBtn = document.createElement("button");
-                dayBtn.onclick = () => { selectedDate = new Date(dayDate); renderApp(); };
+                const btn = document.createElement('button');
+                btn.onclick = () => {
+                    selectedDate = dayDate;
+                    renderSubHeader();
+                    renderWeekRibbon();
+                    renderSchedule();
+                };
 
-                let btnClass = "flex flex-col items-center justify-center p-1.5 sm:p-2.5 rounded-2xl transition-all cursor-pointer font-medium ";
-                if (isSelected) {
-                    btnClass += "bg-blue-500 text-white shadow-md shadow-blue-500/20 scale-105 ";
-                } else if (isToday) {
-                    btnClass += "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-700/50 ";
-                } else {
-                    btnClass += "bg-slate-100 dark:bg-slate-700/40 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 ";
-                }
+                btn.className = `p-2 rounded-2xl flex flex-col items-center justify-center transition-all ${
+                    isSelected 
+                        ? 'bg-sky-500 text-white font-bold shadow-md shadow-sky-500/20' 
+                        : isToday 
+                            ? 'bg-sky-100 dark:bg-sky-950/80 text-sky-600 dark:text-sky-400 font-bold' 
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-600 dark:text-slate-300'
+                }`;
 
-                dayBtn.className = btnClass;
-                dayBtn.innerHTML = `
-                    <span class="text-[10px] sm:text-xs opacity-75 uppercase">${dayNames[dayIdx]}</span>
-                    <span class="text-xs sm:text-base font-bold">${dayDate.getDate()}</span>
+                btn.innerHTML = `
+                    <span class="text-[10px] uppercase opacity-75">${daysShort[i]}</span>
+                    <span class="text-sm font-semibold">${dayDate.getDate()}</span>
                 `;
-                daysContainer.appendChild(dayBtn);
+                ribbon.appendChild(btn);
             }
-
-            const selIdx = selectedDate.getDay();
-            document.getElementById("selectedDayTitle").innerHTML = `
-                <span>${fullDayNames[selIdx]}</span>
-                <span class="text-xs font-normal text-slate-400 font-sans">, ${selectedDate.getDate()} ${selectedDate.toLocaleString('ru', { month: 'long' })}</span>
-            `;
         }
 
-        // Виджет «Следующая пара»
-        function renderNextPairWidget() {
-            const widget = document.getElementById("nextPairWidget");
-            const weekNum = getWeekNumber(currentDate);
-            const dayIdx = currentDate.getDay();
-            const pairs = baseSchedule[weekNum]?.[dayIdx] || [];
+        // --- RENDER SCHEDULE TIMELINE ---
+        function renderSchedule() {
+            const timeline = document.getElementById('scheduleTimeline');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            timeline.innerHTML = '';
 
-            const nowMinutes = currentDate.getHours() * 60 + currentDate.getMinutes();
-            let nextPair = null;
+            // 1. Check Horizon Planning Limit
+            if (!isWithinPlanningHorizon(selectedDate)) {
+                timeline.innerHTML = `
+                    <div class="text-center py-12 px-4 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700">
+                        <div class="inline-p-3 p-3 bg-slate-100 dark:bg-slate-700 rounded-full mb-3 text-slate-400">
+                            <i data-lucide="calendar-x" class="w-8 h-8 mx-auto"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-700 dark:text-slate-200">Расписание еще не загружено</h3>
+                        <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto">Горизонт планирования ограничен 2 неделями. Вернитесь к актуальным датам.</p>
+                        <button onclick="goToToday()" class="mt-4 px-4 py-2 bg-sky-500 text-white text-xs font-bold rounded-xl shadow-sm">Вернуться к сегодня</button>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
 
-            for (let pair of pairs) {
-                const [startStr] = pair.time.split("–").map(s => s.trim());
-                const [h, m] = startStr.split(":").map(Number);
-                if (h * 60 + m > nowMinutes) {
-                    nextPair = pair;
+            // 2. Filter pairs for selected day
+            const jsDay = selectedDate.getDay();
+            const dayIndex = jsDay === 0 ? 6 : jsDay - 1; // Convert to Mon-0, Sun-6
+
+            let dayPairs = DEMO_PAIRS.filter(p => p.day === dayIndex);
+
+            if (searchVal) {
+                dayPairs = dayPairs.filter(p => 
+                    p.name.toLowerCase().includes(searchVal) || 
+                    p.teacher.toLowerCase().includes(searchVal) || 
+                    p.room.toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (dayPairs.length === 0) {
+                timeline.innerHTML = `
+                    <div class="text-center py-12 px-4 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700">
+                        <i data-lucide="coffee" class="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600 mb-2"></i>
+                        <p class="text-sm font-semibold text-slate-500">Пар нет, можно отдыхать!</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            // Calculate current time status if today
+            const now = new Date();
+            const isToday = isSameDay(selectedDate, now);
+            const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+            dayPairs.sort((a,b) => a.timeStart.localeCompare(b.timeStart)).forEach(pair => {
+                const [hStart, mStart] = pair.timeStart.split(':').map(Number);
+                const [hEnd, mEnd] = pair.timeEnd.split(':').map(Number);
+                const startMins = hStart * 60 + mStart;
+                const endMins = hEnd * 60 + mEnd;
+
+                let stateClass = "bg-white dark:bg-slate-800 border-slate-200/80 dark:border-slate-700";
+                let badgeHTML = `<span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-medium">${pair.type}</span>`;
+
+                if (isToday) {
+                    if (nowMinutes >= startMins && nowMinutes <= endMins) {
+                        // Ongoing pair
+                        stateClass = "bg-sky-50/90 dark:bg-sky-950/40 border-sky-300 dark:border-sky-800 ring-2 ring-sky-500/30";
+                        badgeHTML = `<span class="px-2.5 py-1 bg-sky-500 text-white rounded-xl text-xs font-bold animate-pulse">Прямо сейчас</span>`;
+                    } else if (nowMinutes > endMins) {
+                        // Passed pair
+                        stateClass = "bg-white/60 dark:bg-slate-800/40 border-slate-200/50 dark:border-slate-800 opacity-60";
+                    }
+                }
+
+                // Check Kanban Tasks Count
+                const kanbanData = appData.kanban[pair.id] || { todo: [], progress: [], done: [] };
+                const pendingTasks = (kanbanData.todo?.length || 0) + (kanbanData.progress?.length || 0);
+
+                const card = document.createElement('div');
+                card.onclick = () => openModal(pair.id);
+                card.className = `p-4 rounded-3xl border transition-all hover:shadow-md cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${stateClass}`;
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="text-center sm:text-left min-w-[70px]">
+                            <div class="text-sm font-bold text-slate-800 dark:text-slate-100">${pair.timeStart}</div>
+                            <div class="text-xs text-slate-400">${pair.timeEnd}</div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                ${badgeHTML}
+                                <h4 class="font-bold text-base text-slate-800 dark:text-slate-100">${pair.name}</h4>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 flex flex-wrap gap-3 pt-1">
+                                <span><i data-lucide="map-pin" class="w-3.5 h-3.5 inline mr-1"></i>${pair.room}</span>
+                                <span><i data-lucide="user" class="w-3.5 h-3.5 inline mr-1"></i>${pair.teacher}</span>
+                            </p>
+                        </div>
+                    </div>
+                    ${pendingTasks > 0 ? `
+                        <div class="self-start sm:self-center px-3 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-xl flex items-center gap-1.5">
+                            <i data-lucide="check-square" class="w-3.5 h-3.5"></i> ${pendingTasks} ДЗ
+                        </div>
+                    ` : ''}
+                `;
+                timeline.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        // --- NEXT PAIR WIDGET LOGIC ---
+        function updateNextPairWidget() {
+            const widget = document.getElementById('nextPairWidget');
+            const now = new Date();
+            const jsDay = now.getDay();
+            const dayIndex = jsDay === 0 ? 6 : jsDay - 1;
+            const nowMins = now.getHours() * 60 + now.getMinutes();
+
+            const todaysPairs = DEMO_PAIRS.filter(p => p.day === dayIndex);
+            let currentOrNext = null;
+            let isCurrent = false;
+
+            for (let pair of todaysPairs) {
+                const [hStart, mStart] = pair.timeStart.split(':').map(Number);
+                const [hEnd, mEnd] = pair.timeEnd.split(':').map(Number);
+                const startMins = hStart * 60 + mStart;
+                const endMins = hEnd * 60 + mEnd;
+
+                if (nowMins >= startMins && nowMins <= endMins) {
+                    currentOrNext = pair;
+                    isCurrent = true;
+                    break;
+                } else if (nowMins < startMins) {
+                    currentOrNext = pair;
+                    isCurrent = false;
                     break;
                 }
             }
 
-            if (nextPair) {
-                widget.classList.remove("hidden");
-                widget.innerHTML = `
-                    <div class="flex items-center justify-between text-xs opacity-90">
-                        <span class="font-semibold flex items-center gap-1"><i data-lucide="zap" class="w-3.5 h-3.5"></i> Следующая пара сегодня:</span>
-                        <span class="bg-white/20 px-2 py-0.5 rounded-lg">${nextPair.time}</span>
-                    </div>
-                    <div class="text-sm font-bold">${nextPair.name}</div>
-                    <div class="text-xs opacity-80">Аудитория: ${nextPair.room} • ${nextPair.teacher}</div>
-                `;
+            if (currentOrNext) {
+                widget.classList.remove('hidden');
+                document.getElementById('nextPairStatusBadge').innerText = isCurrent ? "Прямо сейчас" : "Следующая пара";
+                document.getElementById('nextPairTime').innerText = `${currentOrNext.timeStart} - ${currentOrNext.timeEnd}`;
+                document.getElementById('nextPairSubject').innerText = currentOrNext.name;
+                document.getElementById('nextPairRoom').innerText = currentOrNext.room;
+                document.getElementById('nextPairTeacher').innerText = currentOrNext.teacher;
             } else {
-                widget.classList.add("hidden");
+                widget.classList.add('hidden');
             }
         }
 
-        // Рендер пар
-        function renderSchedule() {
-            const container = document.getElementById("scheduleContainer");
-            container.innerHTML = "";
+        // --- CALENDAR VIEW ---
+        let calMonth = new Date().getMonth();
+        let calYear = new Date().getFullYear();
 
-            const weekNum = getWeekNumber(selectedDate);
-            const dayIdx = selectedDate.getDay();
-            let pairs = baseSchedule[weekNum]?.[dayIdx] || [];
+        function renderCalendar() {
+            const label = document.getElementById('calendarMonthLabel');
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
 
-            // Фильтрация при поиске
-            if (searchQuery) {
-                const q = searchQuery.toLowerCase();
-                pairs = pairs.filter(p => 
-                    p.name.toLowerCase().includes(q) || 
-                    p.room.toLowerCase().includes(q) || 
-                    p.teacher.toLowerCase().includes(q)
-                );
+            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            label.innerText = `${monthNames[calMonth]} ${calYear}`;
+
+            const firstDay = new Date(calYear, calMonth, 1);
+            const lastDay = new Date(calYear, calMonth + 1, 0);
+
+            let startingDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+
+            // Empty slots for previous month
+            for (let i = 0; i < startingDay; i++) {
+                grid.appendChild(document.createElement('div'));
             }
 
-            document.getElementById("pairsCount").innerText = pairs.length ? `${pairs.length} пары` : "Нет пар";
+            // Days of current month
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const cellDate = new Date(calYear, calMonth, day);
+                const cellBtn = document.createElement('button');
 
-            if (pairs.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-3xl p-8 text-center border border-white/60 dark:border-slate-700/60 shadow-sm space-y-2">
-                        <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/60 rounded-2xl flex items-center justify-center mx-auto text-blue-500">
-                            <i data-lucide="coffee" class="w-5 h-5"></i>
-                        </div>
-                        <p class="text-sm font-semibold">${searchQuery ? 'Ничего не найдено' : 'На этот день пар нет!'}</p>
-                        <p class="text-xs text-slate-400">Свободное время для отдыха или задач.</p>
+                const isToday = isSameDay(cellDate, currentDate);
+                const isSelected = isSameDay(cellDate, selectedDate);
+
+                cellBtn.onclick = () => {
+                    selectedDate = cellDate;
+                    switchTab('schedule');
+                    renderWeekRibbon();
+                    renderSchedule();
+                };
+
+                cellBtn.className = `h-12 rounded-2xl flex flex-col items-center justify-center transition-all ${
+                    isSelected 
+                        ? 'bg-sky-500 text-white font-bold' 
+                        : isToday 
+                            ? 'bg-sky-100 dark:bg-sky-950 text-sky-600 font-bold' 
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-200'
+                }`;
+
+                cellBtn.innerHTML = `<span>${day}</span>`;
+                grid.appendChild(cellBtn);
+            }
+        }
+
+        function navigateMonth(dir) {
+            calMonth += dir;
+            if (calMonth < 0) { calMonth = 11; calYear--; }
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            renderCalendar();
+        }
+
+        // --- ATTENDANCE VIEW ---
+        function populateAttendanceSelectors() {
+            const select = document.getElementById('attendanceSubjectSelect');
+            select.innerHTML = '';
+            
+            // Unique subjects
+            const uniqueSubjects = [...new Set(DEMO_PAIRS.map(p => p.name))];
+            uniqueSubjects.forEach(sub => {
+                const opt = document.createElement('option');
+                opt.value = sub;
+                opt.innerText = sub;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('attendanceDateInput').value = new Date().toISOString().split('T')[0];
+        }
+
+        function renderAttendance() {
+            const subject = document.getElementById('attendanceSubjectSelect').value;
+            const date = document.getElementById('attendanceDateInput').value;
+            const studentList = document.getElementById('studentList');
+            studentList.innerHTML = '';
+
+            const key = `${date}_${subject}`;
+            const currentAttendance = appData.attendance[key] || {};
+
+            let presentCount = 0;
+            let absentCount = 0;
+
+            DEFAULT_STUDENTS.forEach((student, idx) => {
+                const status = currentAttendance[student] || 'present'; // 'present', 'absent', 'late', 'excused'
+                if (status === 'present') presentCount++;
+                else absentCount++;
+
+                const item = document.createElement('div');
+                item.className = "py-3 flex items-center justify-between gap-2";
+                item.innerHTML = `
+                    <span class="text-sm font-medium text-slate-800 dark:text-slate-200">${idx + 1}. ${student}</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="setAttendanceStatus('${key}', '${student}', 'present')" class="px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${status === 'present' ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}">Был</button>
+                        <button onclick="setAttendanceStatus('${key}', '${student}', 'absent')" class="px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${status === 'absent' ? 'bg-rose-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}">Н/Б</button>
+                        <button onclick="setAttendanceStatus('${key}', '${student}', 'late')" class="px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${status === 'late' ? 'bg-amber-500 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}">Опоздал</button>
                     </div>
                 `;
-                return;
+                studentList.appendChild(item);
+            });
+
+            document.getElementById('statPresent').innerText = presentCount;
+            document.getElementById('statAbsent').innerText = absentCount;
+            const rate = DEFAULT_STUDENTS.length ? Math.round((presentCount / DEFAULT_STUDENTS.length) * 100) : 100;
+            document.getElementById('statRate').innerText = `${rate}%`;
+        }
+
+        function setAttendanceStatus(key, student, status) {
+            if (!appData.attendance[key]) appData.attendance[key] = {};
+            appData.attendance[key][student] = status;
+            localStorage.setItem('app_attendance', JSON.stringify(appData.attendance));
+            renderAttendance();
+        }
+
+        function copyAttendanceReport() {
+            const subject = document.getElementById('attendanceSubjectSelect').value;
+            const date = document.getElementById('attendanceDateInput').value;
+            const key = `${date}_${subject}`;
+            const currentAttendance = appData.attendance[key] || {};
+
+            const absentList = DEFAULT_STUDENTS.filter(s => currentAttendance[s] === 'absent');
+            const lateList = DEFAULT_STUDENTS.filter(s => currentAttendance[s] === 'late');
+
+            let report = `📊 *Рапортичка посещаемости*\n📅 Дата: ${date}\n📚 Предмет: ${subject}\n\n`;
+            
+            if (absentList.length > 0) {
+                report += `❌ *Отсутствуют (${absentList.length}):*\n` + absentList.map(s => `• ${s}`).join('\n') + '\n\n';
+            } else {
+                report += `✅ *Отсутствующих нет!*\n\n`;
             }
 
-            pairs.forEach((pair, index) => {
-                const pairId = `hw_w${weekNum}_d${dayIdx}_p${pair.num}_${index}`;
-                const savedHw = localStorage.getItem(pairId) || "";
-                const isDone = localStorage.getItem(`${pairId}_done`) === "true";
+            if (lateList.length > 0) {
+                report += `⚠️ *Опоздали (${lateList.length}):*\n` + lateList.map(s => `• ${s}`).join('\n');
+            }
 
-                const teacherNote = localStorage.getItem(`note_t_${pair.teacher}`) || "";
-                const roomNote = localStorage.getItem(`note_r_${pair.room}`) || "";
-
-                const status = getPairStatus(pair, selectedDate);
-                const daysLeft = getDaysUntilTargetDate(selectedDate);
-
-                const card = document.createElement("div");
-                let cardStyle = "bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 shadow-sm border transition-all space-y-3 relative ";
-
-                if (status === "current") {
-                    cardStyle += "border-blue-400 ring-4 ring-blue-400/20 bg-blue-50/20 dark:bg-blue-900/10 ";
-                } else if (status === "passed") {
-                    cardStyle += "border-slate-100 dark:border-slate-800 opacity-60 bg-slate-50/40 dark:bg-slate-900/30 ";
-                } else {
-                    cardStyle += "border-white/80 dark:border-slate-700/70 hover:shadow-md ";
-                }
-
-                card.className = cardStyle;
-
-                let badgeStyle = "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300";
-                if (pair.type === "Лекция") badgeStyle = "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50";
-                if (pair.type === "Практика") badgeStyle = "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50";
-
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <span class="text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-xl ${badgeStyle}">${pair.type}</span>
-                                ${status === "current" ? `
-                                    <span class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded-xl animate-pulse">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Идет сейчас
-                                    </span>
-                                ` : ''}
-                            </div>
-                            <h3 class="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 pt-0.5">${pair.name}</h3>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <span class="text-[11px] font-bold text-slate-400 block">№ ${pair.num}</span>
-                            <span class="text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-lg border border-blue-100 dark:border-blue-900/50 mt-0.5 inline-block">до ${pair.endTime}</span>
-                        </div>
-                    </div>
-
-                    <!-- Детали (Аудитория / Преподаватель) -->
-                    <div class="grid grid-cols-2 gap-2 text-xs text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-700/50">
-                        <div class="flex items-center gap-1.5">
-                            <i data-lucide="clock" class="w-3.5 h-3.5 opacity-60"></i>
-                            <span>${pair.time}</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 cursor-pointer hover:text-blue-500 transition-colors" onclick="openNoteModal('note_r_${pair.room}', 'Аудитория ${pair.room}')">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5 opacity-60"></i>
-                            <span>Ауд. <strong class="text-slate-700 dark:text-slate-200">${pair.room}</strong></span>
-                            ${roomNote ? '<i data-lucide="sticky-note" class="w-3 h-3 text-amber-500 ml-1"></i>' : ''}
-                        </div>
-                        ${pair.teacher !== "-" ? `
-                            <div class="flex items-center gap-1.5 col-span-2 cursor-pointer hover:text-blue-500 transition-colors" onclick="openNoteModal('note_t_${pair.teacher}', '${pair.teacher}')">
-                                <i data-lucide="user" class="w-3.5 h-3.5 opacity-60"></i>
-                                <span>${pair.teacher}</span>${teacherNote ? '<i data-lucide="sticky-note" class="w-3 h-3 text-amber-500 ml-1"></i>' : ''}
-                            </div>
-                        ` : ''}
-                    </div>
-
-                    <!-- Поле Домашнего Задания -->
-                    <div class="pt-2 border-t border-slate-100 dark:border-slate-700/50 space-y-1.5">
-                        <div class="flex items-center gap-2">
-                            <input 
-                                type="checkbox" 
-                                ${isDone ? 'checked' : ''} 
-                                onchange="toggleHwDone('${pairId}', this.checked)"
-                                class="w-4 h-4 rounded-md text-blue-500 focus:ring-0 cursor-pointer accent-blue-500"
-                            />
-                            <input 
-                                type="text" 
-                                id="${pairId}"
-                                value="${escapeHtml(savedHw)}"
-                                placeholder="Добавить домашку..."
-                                onblur="saveHomework('${pairId}', this.value)"
-                                onkeypress="if(event.key==='Enter') this.blur()"
-                                class="w-full text-xs bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-900 focus:bg-white dark:focus:bg-slate-900 text-slate-700 dark:text-slate-200 placeholder-slate-400 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 focus:border-blue-400 focus:outline-none transition-all ${isDone ? 'line-through opacity-50' : ''}"
-                            />
-                        </div>
-
-                        <!-- Вывод дедлайна сдачи -->
-                        ${savedHw ? `
-                            <div class="flex items-center justify-between text-[10px] text-slate-400 px-1">
-                                <span class="flex items-center gap-1">
-                                    <i data-lucide="timer" class="w-3 h-3"></i> Сдача: ${formatDeadlineText(daysLeft)}
-                                </span>
-                                <span>${isDone ? '✓ Выполнено' : 'В процессе'}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-
-                container.appendChild(card);
+            navigator.clipboard.writeText(report).then(() => {
+                alert("Отчёт о посещаемости скопирован в буфер обмена!");
             });
         }
 
-        // ЛОГИКА ДЗ И ДЕДЛАЙНОВ
-        function saveHomework(id, text) {
-            if (text.trim()) {
-                localStorage.setItem(id, text.trim());
-            } else {
-                localStorage.removeItem(id);
-                localStorage.removeItem(`${id}_done`);
+        // --- MODAL & TRELLO KANBAN ---
+        function openModal(pairId) {
+            currentModalPairId = pairId;
+            const pair = DEMO_PAIRS.find(p => p.id === pairId);
+            if (!pair) return;
+
+            document.getElementById('modalTypeBadge').innerText = pair.type;
+            document.getElementById('modalSubjectTitle').innerText = pair.name;
+            document.getElementById('modalTime').innerText = `${pair.timeStart} - ${pair.timeEnd}`;
+            document.getElementById('modalRoom').innerText = pair.room;
+            document.getElementById('modalTeacher').innerText = pair.teacher;
+
+            document.getElementById('modalNotesInput').value = appData.notes[pairId] || '';
+
+            renderKanbanBoard(pairId);
+            document.getElementById('pairModal').classList.remove('hidden');
+            document.getElementById('pairModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('pairModal').classList.add('hidden');
+            document.getElementById('pairModal').classList.remove('flex');
+            currentModalPairId = null;
+        }
+
+        function saveModalData() {
+            if (!currentModalPairId) return;
+            const noteText = document.getElementById('modalNotesInput').value;
+            appData.notes[currentModalPairId] = noteText;
+            localStorage.setItem('app_notes', JSON.stringify(appData.notes));
+            closeModal();
+            renderSchedule();
+        }
+
+        function renderKanbanBoard(pairId) {
+            const data = appData.kanban[pairId] || { todo: [], progress: [], done: [] };
+
+            ['todo', 'progress', 'done'].forEach(col => {
+                const container = document.getElementById(`kanban-${col}`);
+                const countBadge = document.getElementById(`count-${col}`);
+                container.innerHTML = '';
+                
+                const tasks = data[col] || [];
+                countBadge.innerText = tasks.length;
+
+                tasks.forEach((task, idx) => {
+                    const card = document.createElement('div');
+                    card.className = "p-2.5 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 text-xs space-y-2";
+                    
+                    const isDone = col === 'done';
+                    card.innerHTML = `
+                        <div class="font-medium text-slate-800 dark:text-slate-200 ${isDone ? 'line-through opacity-60' : ''}">${task.title}</div>
+                        <div class="flex justify-between items-center text-[10px] text-slate-400">
+                            <span>${task.date || 'Без дедлайна'}</span>
+                            <div class="flex gap-1">
+                                ${col !== 'todo' ? `<button onclick="moveKanbanTask('${pairId}', '${col}', 'todo',${idx})" class="hover:text-sky-500">←</button>` : ''}
+                                ${col !== 'progress' ? `<button onclick="moveKanbanTask('${pairId}', '${col}', 'progress',${idx})" class="hover:text-amber-500">⏳</button>` : ''}
+                                ${col !== 'done' ? `<button onclick="moveKanbanTask('${pairId}', '${col}', 'done',${idx})" class="hover:text-emerald-500">✓</button>` : ''}
+                                <button onclick="deleteKanbanTask('${pairId}', '${col}', ${idx})" class="hover:text-rose-500 ml-1">✕</button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function addKanbanTaskPrompt() {
+            if (!currentModalPairId) return;
+            const title = prompt("Введите описание задания (ДЗ):");
+            if (!title) return;
+
+            if (!appData.kanban[currentModalPairId]) {
+                appData.kanban[currentModalPairId] = { todo: [], progress: [], done: [] };
             }
-            renderSchedule();
-            lucide.createIcons();
+
+            appData.kanban[currentModalPairId].todo.push({
+                title: title,
+                date: new Date().toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' })
+            });
+
+            localStorage.setItem('app_kanban', JSON.stringify(appData.kanban));
+            renderKanbanBoard(currentModalPairId);
         }
 
-        function toggleHwDone(id, isChecked) {
-            localStorage.setItem(`${id}_done`, isChecked);
-            renderSchedule();
-            lucide.createIcons();
+        function moveKanbanTask(pairId, fromCol, toCol, index) {
+            const task = appData.kanban[pairId][fromCol].splice(index, 1)[0];
+            appData.kanban[pairId][toCol].push(task);
+            localStorage.setItem('app_kanban', JSON.stringify(appData.kanban));
+            renderKanbanBoard(pairId);
         }
 
-        function getDaysUntilTargetDate(targetDate) {
-            const today = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-            const target = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
-            const diffTime = target - today;
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        function deleteKanbanTask(pairId, col, index) {
+            appData.kanban[pairId][col].splice(index, 1);
+            localStorage.setItem('app_kanban', JSON.stringify(appData.kanban));
+            renderKanbanBoard(pairId);
         }
 
-        function formatDeadlineText(days) {
-            if (days < 0) return "Срок прошёл";
-            if (days === 0) return "Сегодня!";
-            if (days === 1) return "Завтра";
-            return `через ${days} дн.`;
-        }
-
-        // МОДАЛЬНОЕ ОКНО ЗАМЕТОК
-        function openNoteModal(key, title) {
-            currentNoteKey = key;
-            document.getElementById("noteModalTitle").innerText = `Заметка: ${title}`;
-            document.getElementById("noteInput").value = localStorage.getItem(key) || "";
-            document.getElementById("noteModal").classList.remove("hidden");
-        }
-
-        function closeNoteModal() {
-            document.getElementById("noteModal").classList.add("hidden");
-        }
-
-        function saveNote() {
-            const val = document.getElementById("noteInput").value.trim();
-            if (val) {
-                localStorage.setItem(currentNoteKey, val);
-            } else {
-                localStorage.removeItem(currentNoteKey);
-            }
-            closeNoteModal();
-            renderSchedule();
-            lucide.createIcons();
-        }
-
-        // ЭКСПОРТ И ИМПОРТ ДАННЫХ
-        function openDataModal() { document.getElementById("dataModal").classList.remove("hidden"); }
-        function closeDataModal() { document.getElementById("dataModal").classList.add("hidden"); }
-
+        // --- EXPORT / IMPORT DATA ---
         function exportData() {
-            const data = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                data[key] = localStorage.getItem(key);
-            }
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `schedule_backup_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `schedule_backup_${new Date().toISOString().split('T')[0]}.json`);
+            dlAnchorElem.click();
         }
 
-        function importData(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
                 try {
-                    const data = JSON.parse(evt.target.result);
-                    Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
-                    alert("Данные успешно загружены!");
-                    closeDataModal();
-                    renderApp();
-                } catch(err) {
-                    alert("Ошибка чтения файла данных.");
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.notes) localStorage.setItem('app_notes', JSON.stringify(imported.notes));
+                    if (imported.kanban) localStorage.setItem('app_kanban', JSON.stringify(imported.kanban));
+                    if (imported.attendance) localStorage.setItem('app_attendance', JSON.stringify(imported.attendance));
+                    alert("Данные успешно импортированы!");
+                    location.reload();
+                } catch (err) {
+                    alert("Ошибка при импорте файла.");
                 }
             };
-            reader.readAsText(file);
-        }
-
-        // ПОИСК, НАВИГАЦИЯ И ВСПОМОГАТЕЛЬНЫЕ
-        function onSearchInput(val) {
-            searchQuery = val;
-            renderSchedule();
-            lucide.createIcons();
-        }
-
-        function getPairStatus(pair, targetDate) {
-            if (!isSameDay(targetDate, currentDate)) return "future";
-            const nowMin = currentDate.getHours() * 60 + currentDate.getMinutes();
-            const [startStr, endStr] = pair.time.split("–").map(s => s.trim());
-            const [sh, sm] = startStr.split(":").map(Number);
-            const [eh, em] = endStr.split(":").map(Number);
-
-            const startMin = sh * 60 + sm;
-            const endMin = eh * 60 + em;
-
-            if (nowMin >= startMin && nowMin <= endMin) return "current";
-            if (nowMin > endMin) return "passed";
-            return "future";
-        }
-
-        function changeWeek(dir) {
-            selectedDate.setDate(selectedDate.getDate() + (dir * 7));
-            renderApp();
-        }
-
-        function goToToday() {
-            currentDate = new Date();
-            selectedDate = new Date();
-            renderApp();
-        }
-
-        function updateRealtime() {
-            currentDate = new Date();
-            renderApp();
-        }
-
-        function isSameDay(d1, d2) {
-            return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
-        }
-
-        function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+            fileReader.readAsText(event.target.files[0]);
         }
     </script>
 </body>
