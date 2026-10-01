@@ -1,910 +1,774 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="antialiased">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Студенческий Портал — Расписание & Трекер</title>
-  
-  <!-- PWA & Mobile settings -->
-  <meta name="theme-color" content="#4f46e5">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Расписание">
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
-  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Планнер Вити</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#F0F4F8" id="meta-theme-color">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%233B82F6%22 width=%22100%22 height=%22100%22 rx=%2220%22/><text y=%2250%22 x=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>В</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%233B82F6%22 width=%22100%22 height=%22100%22 rx=%2220%22/><text y=%2250%22 x=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>В</text></svg>">
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f7ff',
-              100: '#e0f0fe',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8'
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        lightBg: '#F0F4F8',
+                        darkBg: '#0F172A',
+                        cardLight: '#FFFFFF',
+                        cardDark: '#1E293B',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  </script>
-  
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    body {
-      font-family: 'Inter', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .scrollbar-none::-webkit-scrollbar {
-      display: none;
-    }
-    .scrollbar-none {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-  </style>
-</head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen pb-24 transition-colors duration-200">
+    </script>
+    
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- ШАПКА / NAVIGATION TOP -->
-  <header class="sticky top-0 z-30 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/80 dark:border-slate-800/80 px-4 py-3">
-    <div class="max-w-5xl mx-auto flex items-center justify-between gap-2">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="p-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl">
-            <i data-lucide="graduation-cap" class="w-6 h-6"></i>
-          </span>
-          <h1 class="text-xl font-bold tracking-tight">Расписание & СтудПортал</h1>
-        </div>
-        <p id="headerFullDate" class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 capitalize">
-          <!-- Заполняется из JS (например: Понедельник, 12 Октября) -->
-        </p>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button onclick="toggleMonthCalendar()" title="Календарь на месяц" class="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
-          <i data-lucide="calendar" class="w-5 h-5"></i>
-        </button>
-        <button onclick="toggleTheme()" title="Переключить тему" class="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
-          <i id="themeIcon" data-lucide="moon" class="w-5 h-5"></i>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-5xl mx-auto px-4 pt-4 space-y-6">
-
-    <!-- ТАБЫ (ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК) -->
-    <div class="flex p-1 bg-slate-200/70 dark:bg-slate-900 rounded-2xl gap-1">
-      <button id="tabScheduleBtn" onclick="switchTab('schedule')" class="flex-1 py-2.5 rounded-xl font-semibold text-sm transition text-blue-600 dark:text-blue-400 bg-white dark:bg-slate-800 shadow-sm flex justify-center items-center gap-2">
-        <i data-lucide="clock" class="w-4 h-4"></i> Расписание
-      </button>
-      <button id="tabAttendanceBtn" onclick="switchTab('attendance')" class="flex-1 py-2.5 rounded-xl font-semibold text-sm transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex justify-center items-center gap-2">
-        <i data-lucide="user-check" class="w-4 h-4"></i> Посещаемость
-      </button>
-      <button id="tabSettingsBtn" onclick="switchTab('settings')" class="flex-1 py-2.5 rounded-xl font-semibold text-sm transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex justify-center items-center gap-2">
-        <i data-lucide="settings" class="w-4 h-4"></i> Опции & Бэкап
-      </button>
-    </div>
-
-    <!-- 1. ВКЛАДКА: РАСПИСАНИЕ -->
-    <section id="tabSchedule" class="space-y-5">
-
-      <!-- МОДАЛКА КАЛЕНДАРЯ НА МЕСЯЦ (СКРЫТА ПО УМОЛЧАНИЮ) -->
-      <div id="monthCalendarWrapper" class="hidden bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl transition-all">
-        <div class="flex justify-between items-center mb-3">
-          <h3 id="calendarMonthTitle" class="font-bold text-lg capitalize">Месяц Год</h3>
-          <div class="flex gap-1">
-            <button onclick="changeCalendarMonth(-1)" class="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-            <button onclick="changeCalendarMonth(1)" class="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
-          </div>
-        </div>
-        <div class="grid grid-cols-7 text-center text-xs font-semibold text-slate-400 mb-2">
-          <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
-        </div>
-        <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
-      </div>
-
-      <!-- ВИДЖЕТ: СЛЕДУЮЩАЯ ПАРА / ТЕКУЩИЙ СТАТУС -->
-      <div id="nextLessonWidget" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 rounded-3xl shadow-lg shadow-blue-500/10 flex items-center justify-between">
-        <!-- Динамически заполняется -->
-      </div>
-
-      <!-- ПОИСК И ФИЛЬТРАЦИЯ -->
-      <div class="relative">
-        <i data-lucide="search" class="w-5 h-5 absolute left-3.5 top-3 text-slate-400"></i>
-        <input type="text" id="searchInput" oninput="renderSchedule()" placeholder="Поиск по предмету, аудитории или преподавателю..." 
-               class="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm shadow-sm">
-      </div>
-
-      <!-- ЛЕНТА ДНЕЙ С УКАЗАНИЕМ МЕСЯЦА И ДНЯ НЕДЕЛИ -->
-      <div id="daysStrip" class="flex gap-2 overflow-x-auto scrollbar-none pb-1">
-        <!-- Генерируется из JS -->
-      </div>
-
-      <!-- СПИСОК ПАР НА ВЫБРАННЫЙ ДЕНЬ -->
-      <div id="scheduleContainer" class="space-y-4">
-        <!-- Карточки пар или Заглушка -->
-      </div>
-    </section>
-
-    <!-- 2. ВКЛАДКА: ЖУРНАЛ ПОСЕЩАЕМОСТИ -->
-    <section id="tabAttendance" class="hidden space-y-5">
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <h2 class="text-lg font-bold flex items-center gap-2">
-          <i data-lucide="clipboard-check" class="text-blue-500"></i> Журнал посещаемости
-        </h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Выбрать дату:</label>
-            <input type="date" id="attendanceDate" onchange="renderAttendance()" class="w-full p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Предмет (Выбор из текущих 5 дисциплин):</label>
-            <select id="attendanceSubject" onchange="renderAttendance()" class="w-full p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="Философия">Философия</option>
-              <option value="История">История</option>
-              <option value="Организация волонтёрской деятельности">Организация волонтёрской деятельности</option>
-              <option value="Основы российской государственности">Основы российской государственности</option>
-              <option value="Физическая культура">Физическая культура</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-800">
-          <div class="text-sm">
-            Общая посещаемость за день: <span id="attendanceStats" class="font-bold text-blue-600 dark:text-blue-400">100%</span>
-          </div>
-          <button onclick="copyMissingToTelegram()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-2xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
-            <i data-lucide="send" class="w-3.5 h-3.5"></i> Скопировать в Telegram
-          </button>
-        </div>
-      </div>
-
-      <!-- Список группы -->
-      <div id="studentsList" class="space-y-2">
-        <!-- Рендерится JS -->
-      </div>
-    </section>
-
-    <!-- 3. ВКЛАДКА: ОПЦИИ И БЭКАП -->
-    <section id="tabSettings" class="hidden space-y-5">
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <h2 class="text-lg font-bold flex items-center gap-2">
-          <i data-lucide="database" class="text-blue-500"></i> Управление данными и бэкап
-        </h2>
-        <p class="text-sm text-slate-500">Все ваши задачи, домашние задания, посещаемость и настройки хранятся локально в браузере. Вы можете экспортировать их в JSON файл или восстановить.</p>
-
-        <div class="flex flex-wrap gap-3">
-          <button onclick="exportData()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium text-sm flex items-center gap-2 shadow-sm transition">
-            <i data-lucide="download" class="w-4 h-4"></i> Экспорт данных (JSON)
-          </button>
-          <label class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl font-medium text-sm flex items-center gap-2 cursor-pointer transition">
-            <i data-lucide="upload" class="w-4 h-4"></i> Импорт данных
-            <input type="file" id="importFileInput" onchange="importData(event)" class="hidden" accept=".json">
-          </label>
-          <button onclick="resetData()" class="px-4 py-2.5 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 rounded-2xl font-medium text-sm flex items-center gap-2 transition ml-auto">
-            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Сброс к базовым
-          </button>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- МОДАЛЬНОЕ ОКНО ПРЕДМЕТА, КАНБАН-ДОСКИ И ДЗ -->
-  <div id="subjectModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
-    <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-      
-      <!-- Шапка модалки -->
-      <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start bg-slate-50/50 dark:bg-slate-800/30">
-        <div>
-          <span id="modalSubjectType" class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
-            Лекция
-          </span>
-          <h2 id="modalSubjectTitle" class="text-xl font-bold mt-2">Название предмета</h2>
-          <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 space-y-0.5">
-            <p id="modalSubjectTeacher" class="flex items-center gap-1.5"><i data-lucide="user" class="w-3.5 h-3.5"></i> <span>Преподаватель</span></p>
-            <p id="modalSubjectRoom" class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> <span>Аудитория</span></p>
-          </div>
-        </div>
-        <button onclick="closeModal()" class="p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <!-- Содержимое модалки: Табы (Канбан / ДЗ / Заметки) -->
-      <div class="p-5 overflow-y-auto space-y-6">
+    <style>
+        /* Скрываем скроллбар для эстетики Apple/Notion */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        * { scrollbar-width: none; }
         
-        <!-- Секция 1: Домашние задания -->
-        <div>
-          <h3 class="font-bold text-sm text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-            <i data-lucide="check-square" class="w-4 h-4 text-blue-500"></i> Домашние задания
-          </h3>
-          <div class="flex gap-2 mb-3">
-            <input type="text" id="newHwText" placeholder="Что нужно сделать?" class="flex-1 p-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <input type="date" id="newHwDeadline" class="p-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-            <button onclick="addHomework()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition">
-              Добавить
-            </button>
-          </div>
-          <div id="homeworkList" class="space-y-2">
-            <!-- Список ДЗ -->
-          </div>
-        </div>
+        /* Плавные переходы для тем */
+        body, .card-transition { transition: background-color 0.3s ease, color 0.3s ease; }
+        
+        /* Стили для зачеркнутого текста (выполненные задачи) */
+        .task-done { text-decoration: line-through; opacity: 0.5; }
+        
+        /* Кастомный чекбокс */
+        .custom-checkbox {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #CBD5E1;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .dark .custom-checkbox { border-color: #475569; }
+        .custom-checkbox:checked {
+            background-color: #3B82F6;
+            border-color: #3B82F6;
+        }
+        .custom-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen p-4 md:p-8 selection:bg-blue-200 dark:selection:bg-blue-900 pb-24">
 
-        <!-- Секция 2: Канбан Доска (Trello стиль) -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <h3 class="font-bold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
-              <i data-lucide="kanban" class="w-4 h-4 text-indigo-500"></i> Трекер задач (Канбан)
-            </h3>
-            <button onclick="addKanbanTask()" class="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline">+ Новая задача</button>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <!-- Надо сделать -->
-            <div class="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-2xl">
-              <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex justify-between">
-                <span>Надо сделать</span>
-                <span id="kanbanCountTodo" class="bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[10px]">0</span>
-              </h4>
-              <div id="kanbanColTodo" class="space-y-2 min-h-[60px]"></div>
+    <!-- Привет, Витя! Джим позаботился о том, чтобы интерфейс был максимально удобным и красивым. -->
+    
+    <div class="max-w-3xl mx-auto space-y-8">
+        
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 id="header-date" class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Загрузка...</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-4 h-4"></i> Планнер Вити
+                </p>
             </div>
-            <!-- В процессе -->
-            <div class="bg-amber-50/50 dark:bg-amber-950/20 p-3 rounded-2xl border border-amber-200/30">
-              <h4 class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-2 flex justify-between">
-                <span>В процессе</span>
-                <span id="kanbanCountDoing" class="bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded text-[10px]">0</span>
-              </h4>
-              <div id="kanbanColDoing" class="space-y-2 min-h-[60px]"></div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="toggleCalendar()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition">
+                    <i data-lucide="calendar" class="w-5 h-5 text-blue-500"></i>
+                </button>
+                <div class="flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1">
+                    <button onclick="exportData()" class="p-2 text-slate-500 hover:text-blue-500 transition" title="Экспорт бэкапа">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                    </button>
+                    <label class="p-2 text-slate-500 hover:text-blue-500 transition cursor-pointer" title="Импорт бэкапа">
+                        <i data-lucide="upload" class="w-5 h-5"></i>
+                        <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
+                    </label>
+                </div>
+                <button onclick="toggleTheme()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition">
+                    <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-slate-700 dark:text-amber-400"></i>
+                </button>
             </div>
-            <!-- Сдано -->
-            <div class="bg-emerald-50/50 dark:bg-emerald-950/20 p-3 rounded-2xl border border-emerald-200/30">
-              <h4 class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2 flex justify-between">
-                <span>Сдано</span>
-                <span id="kanbanCountDone" class="bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded text-[10px]">0</span>
-              </h4>
-              <div id="kanbanColDone" class="space-y-2 min-h-[60px]"></div>
+        </header>
+
+        <!-- WIDGET: Ближайшее занятие -->
+        <section id="next-class-widget" class="bg-gradient-to-r from-blue-500 to-sky-400 rounded-3xl p-6 text-white shadow-md relative overflow-hidden">
+            <!-- Абстрактный декор -->
+            <div class="absolute top-0 right-0 opacity-10 translate-x-1/4 -translate-y-1/4">
+                <i data-lucide="clock" class="w-48 h-48"></i>
             </div>
-          </div>
-        </div>
+            
+            <div class="relative z-10">
+                <p id="widget-status" class="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2">Анализ расписания...</p>
+                <h2 id="widget-title" class="text-2xl font-bold mb-1">Свободное время</h2>
+                <p id="widget-details" class="text-blue-50 flex items-center gap-2 opacity-90">
+                    Отдыхайте или занимайтесь своими делами
+                </p>
+            </div>
+        </section>
 
-        <!-- Секция 3: Заметки по преподавателю / предмету -->
-        <div>
-          <h3 class="font-bold text-sm text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-            <i data-lucide="file-text" class="w-4 h-4 text-emerald-500"></i> Заметки и контакты
-          </h3>
-          <textarea id="modalNotes" rows="3" onchange="saveSubjectNotes()" placeholder="Добавьте важную информацию о дисциплине, контакты преподавателя или требования к зачёту..." 
-                    class="w-full p-3 text-sm rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-        </div>
+        <!-- CALENDAR DROPDOWN -->
+        <section id="calendar-dropdown" class="hidden bg-white dark:bg-cardDark rounded-3xl shadow-soft p-6 card-transition transition-all duration-300">
+            <div class="flex justify-between items-center mb-4">
+                <button onclick="changeMonth(-1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                <h3 id="calendar-month-year" class="font-semibold text-lg"></h3>
+                <button onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+            </div>
+            <div class="grid grid-cols-7 gap-2 text-center text-sm mb-2 text-slate-400 font-medium">
+                <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+            </div>
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
+        </section>
 
-      </div>
+        <!-- SCHEDULE LIST -->
+        <section>
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <i data-lucide="list" class="w-5 h-5 text-blue-500"></i> Расписание
+                </h2>
+                <span id="schedule-date-badge" class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
+                    Сегодня
+                </span>
+            </div>
+            
+            <div id="schedule-list" class="space-y-4">
+                <!-- Карточки генерируются JS -->
+            </div>
+        </section>
     </div>
-  </div>
 
-  <!-- JAVASCRIPT ЛОГИКА -->
-  <script>
-    // 1. ИСХОДНОЕ РАСПИСАНИЕ И НАСТРОЙКИ
-    const START_DATE = new Date('2026-10-12'); // Опорный понедельник (Октябрь 2026)
-    const MAX_DAYS = 14; // Ограничение горизонта планирования (2 недели)
+    <!-- MODAL: ДЕТАЛИ ПРЕДМЕТА И КАНБАН -->
+    <div id="class-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-end md:items-center justify-center p-0 md:p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-cardDark w-full max-w-2xl h-[85vh] md:h-[80vh] md:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col transform translate-y-full md:translate-y-0 transition-transform duration-300" id="modal-content">
+            
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-start sticky top-0 bg-white dark:bg-cardDark md:rounded-t-3xl rounded-t-3xl z-10">
+                <div>
+                    <span id="modal-type" class="text-xs font-bold uppercase tracking-wider text-blue-500 mb-1 block">Лекция</span>
+                    <h2 id="modal-title" class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Название предмета</h2>
+                    <p id="modal-time-room" class="text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-3 text-sm">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4"></i> <span id="modal-time">10:00 - 11:30</span></span>
+                        <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> <span id="modal-room">Ауд. 101</span></span>
+                        <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> <span id="modal-teacher">Преподаватель</span></span>
+                    </p>
+                </div>
+                <button onclick="closeModal()" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
 
-    // Исходная база предметов, аудиторий и преподавателей
-    const BASE_SCHEDULE = {
-      1: [ // Понедельник
-        {
-          id: 'p1_1', name: 'Философия', type: 'Лекция', room: 'Ауд. 302', teacher: 'доц. Смирнов А.В.',
-          timeSlots: [{ num: 1, start: '10:00', end: '11:30' }, { num: 2, start: '11:40', end: '13:10' }]
-        },
-        {
-          id: 'p1_2', name: 'История', type: 'Практика', room: 'Ауд. 410', teacher: 'проф. Иванов И.И.',
-          timeSlots: [{ num: 3, start: '13:40', end: '15:10' }]
-        }
-      ],
-      2: [ // Вторник
-        {
-          id: 'p2_1', name: 'Основы российской государственности', type: 'Лекция', room: 'Ауд. 105', teacher: 'доц. Петрова Е.М.',
-          timeSlots: [{ num: 1, start: '10:00', end: '11:30' }]
-        },
-        {
-          id: 'p2_2', name: 'Организация волонтёрской деятельности', type: 'Практика', room: 'Ауд. 215', teacher: 'ст. преп. Кузнецов С.Н.',
-          timeSlots: [{ num: 2, start: '11:40', end: '13:10' }, { num: 3, start: '13:40', end: '15:10' }]
-        }
-      ],
-      3: [ // Среда
-        {
-          id: 'p3_1', name: 'Физическая культура', type: 'Практика', room: 'Спорткомплекс', teacher: 'Соколов Д.А.',
-          timeSlots: [{ num: 1, start: '10:00', end: '11:30' }]
-        },
-        {
-          id: 'p3_2', name: 'Философия', type: 'Практика', room: 'Ауд. 302', teacher: 'доц. Смирнов А.В.',
-          timeSlots: [{ num: 2, start: '11:40', end: '13:10' }]
-        }
-      ],
-      4: [ // Четверг
-        {
-          id: 'p4_1', name: 'История', type: 'Лекция', room: 'Акутовый Зал', teacher: 'проф. Иванов И.И.',
-          timeSlots: [{ num: 1, start: '10:00', end: '11:30' }, { num: 2, start: '11:40', end: '13:10' }]
-        }
-      ],
-      5: [ // Пятница
-        {
-          id: 'p5_1', name: 'Основы российской государственности', type: 'Практика', room: 'Ауд. 105', teacher: 'доц. Петрова Е.М.',
-          timeSlots: [{ num: 2, start: '11:40', end: '13:10' }]
-        },
-        {
-          id: 'p5_2', name: 'Организация волонтёрской деятельности', type: 'Лекция', room: 'Ауд. 215', teacher: 'ст. преп. Кузнецов С.Н.',
-          timeSlots: [{ num: 3, start: '13:40', end: '15:10' }]
-        }
-      ]
-    };
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-8">
+                
+                <!-- Notes -->
+                <section>
+                    <h3 class="text-lg font-semibold mb-3 flex items-center gap-2"><i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i> Заметки</h3>
+                    <textarea id="modal-notes" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl p-4 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500 resize-none outline-none h-32 transition" placeholder="Важные мысли, ссылки или напоминания по предмету..."></textarea>
+                    <p class="text-xs text-slate-400 mt-2 text-right" id="notes-status">Автосохранение...</p>
+                </section>
 
-    const STUDENTS = [
-      'Андрианкин Витя', 'Белов Максим', 'Васильева Анна', 'Григорьев Артем',
-      'Дмитриева Елена', 'Иванов Егор', 'Ковалева Мария', 'Морозов Дмитрий',
-      'Николаева Ольга', 'Павлов Сергей'
-    ];
+                <!-- Kanban / Homework -->
+                <section>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="kanban" class="w-5 h-5 text-emerald-500"></i> Задачи и ДЗ</h3>
+                    </div>
 
-    // СОСТОЯНИЕ ПРИЛОЖЕНИЯ (STORE)
-    let state = {
-      selectedDateStr: formatDateKey(new Date()),
-      currentCalendarDate: new Date(),
-      activeSubjectId: null,
-      homework: {}, // { subjectId: [{ id, text, deadline, done }] }
-      kanban: {}, // { subjectId: [{ id, text, status }] }
-      notes: {}, // { subjectId: "string" }
-      attendance: {} // { "YYYY-MM-DD_Subject": { studentName: "Был"|"Н/Б"|"Опоздал"|"Уважительная" } }
-    };
+                    <!-- Add Task Form -->
+                    <div class="flex gap-2 mb-6 bg-slate-50 dark:bg-slate-800 p-2 rounded-2xl">
+                        <input type="text" id="new-task-text" placeholder="Что нужно сделать?" class="flex-1 bg-transparent border-none outline-none px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
+                        <input type="date" id="new-task-date" class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-xl px-2 py-1 outline-none border-none cursor-pointer">
+                        <button onclick="addTask()" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-xl transition shadow-md">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                    </div>
 
-    // ИНИЦИАЛИЗАЦИЯ
-    window.addEventListener('DOMContentLoaded', () => {
-      loadStorage();
-      initTheme();
-      updateHeaderDate();
-      renderDaysStrip();
-      renderSchedule();
-      renderAttendance();
-      lucide.createIcons();
-    });
+                    <!-- Kanban Columns -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        <!-- TODO -->
+                        <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-medium text-sm text-slate-500 dark:text-slate-400">Надо сделать</h4>
+                                <span class="bg-slate-200 dark:bg-slate-700 text-xs px-2 py-1 rounded-full" id="count-todo">0</span>
+                            </div>
+                            <div id="col-todo" class="space-y-3 min-h-[5rem]"></div>
+                        </div>
 
-    // ХРАНИЛИЩЕ LOCALSTORAGE
-    function loadStorage() {
-      const saved = localStorage.getItem('stud_portal_data');
-      if (saved) {
-        try {
-          state = { ...state, ...JSON.parse(saved) };
-        } catch(e) { console.error('Ошибка загрузки данных', e); }
-      }
-    }
+                        <!-- IN PROGRESS -->
+                        <div class="bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-4 border border-blue-100 dark:border-blue-900/30">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-medium text-sm text-blue-500">В процессе</h4>
+                                <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 text-xs px-2 py-1 rounded-full" id="count-progress">0</span>
+                            </div>
+                            <div id="col-progress" class="space-y-3 min-h-[5rem]"></div>
+                        </div>
 
-    function saveStorage() {
-      localStorage.setItem('stud_portal_data', JSON.stringify(state));
-    }
+                        <!-- DONE -->
+                        <div class="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/30">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-medium text-sm text-emerald-600 dark:text-emerald-500">Сдано</h4>
+                                <span class="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 text-xs px-2 py-1 rounded-full" id="count-done">0</span>
+                            </div>
+                            <div id="col-done" class="space-y-3 min-h-[5rem]"></div>
+                        </div>
 
-    // ТЕМА
-    function initTheme() {
-      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.getElementById('themeIcon').setAttribute('data-lucide', 'sun');
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.getElementById('themeIcon').setAttribute('data-lucide', 'moon');
-      }
-    }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
 
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.theme = isDark ? 'dark' : 'light';
-      document.getElementById('themeIcon').setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-      lucide.createIcons();
-    }
-
-    // ВКЛАДКИ
-    function switchTab(tab) {
-      ['Schedule', 'Attendance', 'Settings'].forEach(t => {
-        document.getElementById(`tab${t}`).classList.add('hidden');
-        const btn = document.getElementById(`tab${t}Btn`);
-        btn.classList.remove('text-blue-600', 'dark:text-blue-400', 'bg-white', 'dark:bg-slate-800', 'shadow-sm');
-        btn.classList.add('text-slate-600', 'dark:text-slate-400');
-      });
-
-      document.getElementById(`tab${capitalize(tab)}`).classList.remove('hidden');
-      const activeBtn = document.getElementById(`tab${capitalize(tab)}Btn`);
-      activeBtn.classList.add('text-blue-600', 'dark:text-blue-400', 'bg-white', 'dark:bg-slate-800', 'shadow-sm');
-      activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
-    }
-
-    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
-    // ФОРМАТИРОВАНИЕ ДАТЫ
-    function formatDateKey(date) {
-      return date.toISOString().split('T')[0];
-    }
-
-    function updateHeaderDate() {
-      const now = new Date();
-      const options = { weekday: 'long', day: 'numeric', month: 'long' };
-      document.getElementById('headerFullDate').innerText = now.toLocaleDateString('ru-RU', options);
-    }
-
-    // РЕНДЕР ЛЕНТИ ДНЕЙ (2 НЕДЕЛИ)
-    function renderDaysStrip() {
-      const strip = document.getElementById('daysStrip');
-      strip.innerHTML = '';
-
-      for (let i = 0; i < MAX_DAYS; i++) {
-        const d = new Date(START_DATE);
-        d.setDate(d.getDate() + i);
-        const dateStr = formatDateKey(d);
-
-        const dayName = d.toLocaleDateString('ru-RU', { weekday: 'short' });
-        const monthName = d.toLocaleDateString('ru-RU', { month: 'short' });
-        const dayNum = d.getDate();
-
-        const isSelected = dateStr === state.selectedDateStr;
-        const isToday = formatDateKey(new Date()) === dateStr;
-
-        const card = document.createElement('button');
-        card.onclick = () => {
-          state.selectedDateStr = dateStr;
-          renderDaysStrip();
-          renderSchedule();
+    <script>
+        /**
+         * БАЗА ДАННЫХ И СОСТОЯНИЕ (LocalStorage)
+         * Архитектура данных:
+         * appData = {
+         *   theme: 'light' | 'dark',
+         *   subjectsData: { 
+         *      'subjectId': { notes: '', tasks: [{id, text, status, deadline}] }
+         *   }
+         * }
+         */
+        
+        const defaultData = {
+            theme: 'light',
+            subjectsData: {}
         };
 
-        card.className = `flex-shrink-0 w-20 py-3 rounded-2xl border text-center transition flex flex-col items-center gap-0.5 ${
-          isSelected 
-            ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20' 
-            : isToday 
-              ? 'bg-blue-50 dark:bg-slate-800 border-blue-300 text-blue-600 dark:text-blue-400' 
-              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
-        }`;
-
-        card.innerHTML = `
-          <span class="text-[11px] font-medium uppercase tracking-wider ${isSelected ? 'text-blue-100' : 'text-slate-400'}">${dayName}</span>
-          <span class="text-lg font-bold leading-none">${dayNum}</span>
-          <span class="text-[10px] ${isSelected ? 'text-blue-200' : 'text-slate-400'}">${monthName}</span>
-        `;
-        strip.appendChild(card);
-      }
-    }
-
-    // РЕНДЕР РАСПИСАНИЯ
-    function renderSchedule() {
-      const container = document.getElementById('scheduleContainer');
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      container.innerHTML = '';
-
-      const selDate = new Date(state.selectedDateStr);
-      const diffDays = Math.floor((selDate - START_DATE) / (1000 * 60 * 60 * 24));
-
-      // Умная заглушка если вышли за рамки 2 недель
-      if (diffDays < 0 || diffDays >= MAX_DAYS) {
-        container.innerHTML = `
-          <div class="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6">
-            <i data-lucide="calendar-x" class="w-12 h-12 mx-auto text-slate-300 mb-3"></i>
-            <h3 class="font-bold text-slate-700 dark:text-slate-300">Расписание на этот период ещё не загружено</h3>
-            <p class="text-xs text-slate-400 mt-1">Обычно расписание публикуется на 2 недели вперёд.</p>
-          </div>
-        `;
-        renderNextLessonWidget(null);
-        lucide.createIcons();
-        return;
-      }
-
-      let dayOfWeek = selDate.getDay(); // 0 = Вс, 1 = Пн...
-      const lessons = BASE_SCHEDULE[dayOfWeek] || [];
-
-      // Фильтрация поиска
-      const filtered = lessons.filter(l => 
-        l.name.toLowerCase().includes(search) || 
-        l.teacher.toLowerCase().includes(search) || 
-        l.room.toLowerCase().includes(search)
-      );
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-10 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
-            <p class="text-slate-400 text-sm">Занятий на этот день не найдено</p>
-          </div>
-        `;
-        renderNextLessonWidget(null);
-        lucide.createIcons();
-        return;
-      }
-
-      // Вывод пар
-      filtered.forEach(lesson => {
-        const card = document.createElement('div');
-        card.onclick = () => openModal(lesson);
-        card.className = "bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition cursor-pointer space-y-3";
-
-        const timeHtml = lesson.timeSlots.map(ts => `
-          <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl">
-            <span>${ts.num}-я пара:</span>
-            <span class="text-slate-800 dark:text-slate-200">${ts.start} – ${ts.end}</span>
-          </div>
-        `).join('');
-
-        // Проверка ДЗ
-        const hwList = state.homework[lesson.id] || [];
-        const pendingHw = hwList.filter(h => !h.done).length;
-
-        card.innerHTML = `
-          <div class="flex justify-between items-start gap-2">
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${
-                lesson.type === 'Лекция' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300' : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300'
-              }">${lesson.type}</span>
-              <h3 class="font-bold text-base mt-1.5 group-hover:text-blue-600 transition">${lesson.name}</h3>
-            </div>
-            ${pendingHw > 0 ? `<span class="bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs px-2.5 py-1 rounded-xl font-bold flex items-center gap-1"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> ДЗ: ${pendingHw}</span>` : ''}
-          </div>
-
-          <div class="flex flex-wrap gap-2">
-            ${timeHtml}
-          </div>
-
-          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-            <span class="flex items-center gap-1"><i data-lucide="user" class="w-3.5 h-3.5"></i> ${lesson.teacher}</span>
-            <span class="flex items-center gap-1 font-medium text-slate-700 dark:text-slate-300"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-500"></i> ${lesson.room}</span>
-          </div>
-        `;
-
-        container.appendChild(card);
-      });
-
-      renderNextLessonWidget(filtered[0]);
-      lucide.createIcons();
-    }
-
-    // ВИДЖЕТ «СЛЕДУЮЩАЯ ПАРА»
-    function renderNextLessonWidget(nextLesson) {
-      const widget = document.getElementById('nextLessonWidget');
-      if (!nextLesson) {
-        widget.innerHTML = `
-          <div class="flex items-center gap-3">
-            <div class="p-2.5 bg-white/20 rounded-2xl"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
-            <div>
-              <div class="text-xs text-blue-100">Статус</div>
-              <div class="font-bold text-sm">Пар на сегодня больше нет!</div>
-            </div>
-          </div>
-        `;
-      } else {
-        widget.innerHTML = `
-          <div class="flex items-center gap-3">
-            <div class="p-2.5 bg-white/20 rounded-2xl"><i data-lucide="clock" class="w-5 h-5"></i></div>
-            <div>
-              <div class="text-xs text-blue-100">Ближайшее занятие</div>
-              <div class="font-bold text-sm">${nextLesson.name} (${nextLesson.timeSlots[0].start})</div>
-            </div>
-          </div>
-          <div class="text-xs bg-white/20 px-3 py-1.5 rounded-xl font-medium">${nextLesson.room}</div>
-        `;
-      }
-    }
-
-    // МОДАЛЬНОЕ ОКНО ПРЕДМЕТА, КАНБАН И ДЗ
-    function openModal(lesson) {
-      state.activeSubjectId = lesson.id;
-      document.getElementById('modalSubjectTitle').innerText = lesson.name;
-      document.getElementById('modalSubjectType').innerText = lesson.type;
-      document.getElementById('modalSubjectTeacher').querySelector('span').innerText = lesson.teacher;
-      document.getElementById('modalSubjectRoom').querySelector('span').innerText = lesson.room;
-      document.getElementById('modalNotes').value = state.notes[lesson.id] || '';
-
-      renderHomework();
-      renderKanban();
-
-      document.getElementById('subjectModal').classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    function closeModal() {
-      document.getElementById('subjectModal').classList.add('hidden');
-    }
-
-    // ДОМАШНИЕ ЗАДАНИЯ
-    function addHomework() {
-      const text = document.getElementById('newHwText').value.trim();
-      const deadline = document.getElementById('newHwDeadline').value;
-      if (!text) return;
-
-      const subId = state.activeSubjectId;
-      if (!state.homework[subId]) state.homework[subId] = [];
-
-      state.homework[subId].push({
-        id: Date.now(),
-        text: text,
-        deadline: deadline,
-        done: false
-      });
-
-      document.getElementById('newHwText').value = '';
-      saveStorage();
-      renderHomework();
-      renderSchedule();
-    }
-
-    function toggleHw(id) {
-      const subId = state.activeSubjectId;
-      const hw = state.homework[subId].find(h => h.id === id);
-      if (hw) {
-        hw.done = !hw.done;
-        saveStorage();
-        renderHomework();
-        renderSchedule();
-      }
-    }
-
-    function renderHomework() {
-      const list = document.getElementById('homeworkList');
-      const subId = state.activeSubjectId;
-      const hwItems = state.homework[subId] || [];
-
-      list.innerHTML = '';
-      if (hwItems.length === 0) {
-        list.innerHTML = '<p class="text-xs text-slate-400 py-2">Нет активных домашних заданий.</p>';
-        return;
-      }
-
-      hwItems.forEach(item => {
-        let daysLeftText = '';
-        if (item.deadline) {
-          const days = Math.ceil((new Date(item.deadline) - new Date()) / (1000 * 60 * 60 * 24));
-          daysLeftText = days < 0 ? ' (Просрочено)' : ` (${days} дн.)`;
-        }
-
-        const el = document.createElement('div');
-        el.className = "flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 text-sm";
-        el.innerHTML = `
-          <label class="flex items-center gap-2.5 cursor-pointer flex-1">
-            <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleHw(${item.id})" class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500">
-            <span class="${item.done ? 'line-through text-slate-400' : 'font-medium'}">${item.text}</span>
-          </label>
-          ${item.deadline ? `<span class="text-xs ${item.done ? 'text-slate-400' : 'text-blue-500 font-semibold'}">${item.deadline}${daysLeftText}</span>` : ''}
-        `;
-        list.appendChild(el);
-      });
-    }
-
-    // КАНБАН ДОСКА
-    function addKanbanTask() {
-      const title = prompt('Введите название задачи:');
-      if (!title) return;
-
-      const subId = state.activeSubjectId;
-      if (!state.kanban[subId]) state.kanban[subId] = [];
-
-      state.kanban[subId].push({
-        id: Date.now(),
-        text: title,
-        status: 'todo' // todo, doing, done
-      });
-
-      saveStorage();
-      renderKanban();
-    }
-
-    function moveKanban(id, newStatus) {
-      const subId = state.activeSubjectId;
-      const task = state.kanban[subId].find(k => k.id === id);
-      if (task) {
-        task.status = newStatus;
-        saveStorage();
-        renderKanban();
-      }
-    }
-
-    function renderKanban() {
-      const subId = state.activeSubjectId;
-      const tasks = state.kanban[subId] || [];
-
-      ['todo', 'doing', 'done'].forEach(status => {
-        const col = document.getElementById(`kanbanCol${capitalize(status)}`);
-        const count = document.getElementById(`kanbanCount${capitalize(status)}`);
-        const filtered = tasks.filter(t => t.status === status);
-
-        count.innerText = filtered.length;
-        col.innerHTML = '';
-
-        filtered.forEach(t => {
-          const card = document.createElement('div');
-          card.className = "bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-xs space-y-2";
-          
-          let nextBtn = '';
-          if (status === 'todo') nextBtn = `<button onclick="moveKanban(${t.id}, 'doing')" class="text-amber-500 font-bold hover:underline">В процесс →</button>`;
-          if (status === 'doing') nextBtn = `<button onclick="moveKanban(${t.id}, 'done')" class="text-emerald-500 font-bold hover:underline">Сдано ✓</button>`;
-
-          card.innerHTML = `
-            <p class="font-medium text-slate-800 dark:text-slate-200">${t.text}</p>
-            <div class="flex justify-end gap-2 text-[10px]">${nextBtn}</div>
-          `;
-          col.appendChild(card);
-        });
-      });
-    }
-
-    // ЗАМЕТКИ
-    function saveSubjectNotes() {
-      const subId = state.activeSubjectId;
-      state.notes[subId] = document.getElementById('modalNotes').value;
-      saveStorage();
-    }
-
-    // 2. ЖУРНАЛ ПОСЕЩАЕМОСТИ
-    function renderAttendance() {
-      const dateVal = document.getElementById('attendanceDate').value || formatDateKey(new Date());
-      if (!document.getElementById('attendanceDate').value) {
-        document.getElementById('attendanceDate').value = dateVal;
-      }
-
-      const subjectVal = document.getElementById('attendanceSubject').value;
-      const key = `${dateVal}_${subjectVal}`;
-      const records = state.attendance[key] || {};
-
-      const list = document.getElementById('studentsList');
-      list.innerHTML = '';
-
-      let presentCount = 0;
-
-      STUDENTS.forEach(student => {
-        const currentStatus = records[student] || 'Был';
-        if (currentStatus === 'Был') presentCount++;
-
-        const item = document.createElement('div');
-        item.className = "flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm";
-
-        item.innerHTML = `
-          <span class="font-medium text-sm">${student}</span>
-          <select onchange="changeAttendance('${key}', '${student}', this.value)" class="text-xs p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border-none font-semibold focus:ring-2 focus:ring-blue-500">
-            <option value="Был" ${currentStatus === 'Был' ? 'selected' : ''}>Был</option>
-            <option value="Н/Б" ${currentStatus === 'Н/Б' ? 'selected' : ''}>Н/Б (Отсутствовал)</option>
-            <option value="Опоздал" ${currentStatus === 'Опоздал' ? 'selected' : ''}>Опоздал</option>
-            <option value="Уважительная" ${currentStatus === 'Уважительная' ? 'selected' : ''}>Уважительная</option>
-          </select>
-        `;
-        list.appendChild(item);
-      });
-
-      const percent = Math.round((presentCount / STUDENTS.length) * 100);
-      document.getElementById('attendanceStats').innerText = `${percent}%`;
-    }
-
-    function changeAttendance(key, student, status) {
-      if (!state.attendance[key]) state.attendance[key] = {};
-      state.attendance[key][student] = status;
-      saveStorage();
-      renderAttendance();
-    }
-
-    function copyMissingToTelegram() {
-      const dateVal = document.getElementById('attendanceDate').value;
-      const subjectVal = document.getElementById('attendanceSubject').value;
-      const key = `${dateVal}_${subjectVal}`;
-      const records = state.attendance[key] || {};
-
-      const missing = STUDENTS.filter(s => records[s] === 'Н/Б' || records[s] === 'Опоздал' || records[s] === 'Уважительная');
-
-      let text = `📌 **Рапорт посещаемости**\n📅 Дата: ${dateVal}\n📚 Предмет: ${subjectVal}\n\n`;
-      if (missing.length === 0) {
-        text += "✅ Все присутствуют!";
-      } else {
-        text += "❌ **Отсутствуют / Опоздали:**\n";
-        missing.forEach(m => {
-          text += `• ${m} (${records[m] || 'Н/Б'})\n`;
-        });
-      }
-
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Список отсутствующих скопирован в буфер обмена! Вставьте его в Telegram.');
-      });
-    }
-
-    // ИНТЕРАКТИВНЫЙ КАЛЕНДАРЬ НА МЕСЯЦ
-    function toggleMonthCalendar() {
-      const wrapper = document.getElementById('monthCalendarWrapper');
-      wrapper.classList.toggle('hidden');
-      if (!wrapper.classList.contains('hidden')) {
-        renderCalendarGrid();
-      }
-    }
-
-    function changeCalendarMonth(delta) {
-      state.currentCalendarDate.setMonth(state.currentCalendarDate.getMonth() + delta);
-      renderCalendarGrid();
-    }
-
-    function renderCalendarGrid() {
-      const grid = document.getElementById('calendarGrid');
-      const title = document.getElementById('calendarMonthTitle');
-      grid.innerHTML = '';
-
-      const d = state.currentCalendarDate;
-      title.innerText = d.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
-
-      const year = d.getFullYear();
-      const month = d.getMonth();
-
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-
-      let startingDay = firstDay.getDay() - 1; 
-      if (startingDay === -1) startingDay = 6; // Коррекция для Воскресенья
-
-      // Пустые ячейки в начале
-      for (let i = 0; i < startingDay; i++) {
-        grid.appendChild(document.createElement('div'));
-      }
-
-      // Дни месяца
-      for (let day = 1; day <= lastDay.getDate(); day++) {
-        const dateObj = new Date(year, month, day);
-        const dateStr = formatDateKey(dateObj);
-
-        const cell = document.createElement('button');
-        cell.onclick = () => {
-          state.selectedDateStr = dateStr;
-          toggleMonthCalendar();
-          renderDaysStrip();
-          renderSchedule();
+        // Заглушка расписания (шаблон на неделю)
+        // Для демонстрации привяжем предметы к дням недели
+        const scheduleTemplate = {
+            1: [ // Понедельник
+                { id: 'm1', subjectId: 'math', name: 'Математический анализ', type: 'Лекция', room: 'Ауд. 301', teacher: 'Иванов И.И.', start: '10:00', end: '11:30' },
+                { id: 'm2', subjectId: 'physics', name: 'Физика', type: 'Практика', room: 'Лаб. 12', teacher: 'Петров П.П.', start: '11:40', end: '13:10' }
+            ],
+            2: [ // Вторник
+                { id: 't1', subjectId: 'cs', name: 'Алгоритмы и СД', type: 'Лекция', room: 'Ауд. 405', teacher: 'Смирнов А.В.', start: '09:00', end: '10:30' },
+                { id: 't2', subjectId: 'english', name: 'Иностранный язык', type: 'Семинар', room: 'Ауд. 210', teacher: 'White J.', start: '10:40', end: '12:10' },
+                { id: 't3', subjectId: 'math', name: 'Математический анализ', type: 'Семинар', room: 'Ауд. 302', teacher: 'Иванов И.И.', start: '13:20', end: '14:50' }
+            ],
+            3: [ // Среда
+                { id: 'w1', subjectId: 'history', name: 'История', type: 'Лекция', room: 'Ауд. 101', teacher: 'Кузнецов В.Н.', start: '11:40', end: '13:10' },
+                { id: 'w2', subjectId: 'physics', name: 'Физика', type: 'Лабораторная', room: 'Лаб. 14', teacher: 'Петров П.П.', start: '13:20', end: '14:50' }
+            ],
+            4: [ // Четверг
+                { id: 'th1', subjectId: 'cs', name: 'Алгоритмы и СД', type: 'Практика', room: 'Комп. класс 3', teacher: 'Смирнов А.В.', start: '10:00', end: '11:30' }
+            ],
+            5: [ // Пятница
+                { id: 'f1', subjectId: 'philosophy', name: 'Философия', type: 'Лекция', room: 'Ауд. 200', teacher: 'Сидорова А.А.', start: '09:00', end: '10:30' },
+                { id: 'f2', subjectId: 'english', name: 'Иностранный язык', type: 'Семинар', room: 'Ауд. 210', teacher: 'White J.', start: '10:40', end: '12:10' }
+            ],
+            6: [], // Суббота
+            0: []  // Воскресенье
         };
 
-        const isSelected = dateStr === state.selectedDateStr;
-        cell.className = `p-2 rounded-xl text-center font-medium transition ${
-          isSelected 
-            ? 'bg-blue-600 text-white font-bold' 
-            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
-        }`;
-        cell.innerText = day;
-        grid.appendChild(cell);
-      }
-    }
+        // Глобальное состояние
+        let appData = JSON.parse(localStorage.getItem('vityaPlannerData')) || defaultData;
+        let selectedDate = new Date(); // Изначально сегодня
+        let currentModalSubjectId = null;
+        let notesTimeout = null;
 
-    // 3. БЭКАП И ЭКСПОРТ ДАННЫХ
-    function exportData() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-      const dlAnchor = document.createElement('a');
-      dlAnchor.setAttribute("href", dataStr);
-      dlAnchor.setAttribute("download", `stud_portal_backup_${formatDateKey(new Date())}.json`);
-      document.body.appendChild(dlAnchor);
-      dlAnchor.click();
-      dlAnchor.remove();
-    }
+        // Инициализация
+        function init() {
+            applyTheme(appData.theme);
+            renderHeaderDate();
+            renderSchedule();
+            updateNextClassWidget();
+            setInterval(updateNextClassWidget, 60000); // Обновление виджета раз в минуту
+            
+            // Инициализация иконок
+            lucide.createIcons();
 
-    function importData(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          state = { ...state, ...imported };
-          saveStorage();
-          location.reload();
-        } catch(err) {
-          alert('Ошибка при импорте файла. Убедитесь, что это валидный JSON.');
+            // Автосохранение заметок
+            document.getElementById('modal-notes').addEventListener('input', function(e) {
+                const status = document.getElementById('notes-status');
+                status.textContent = 'Сохранение...';
+                clearTimeout(notesTimeout);
+                notesTimeout = setTimeout(() => {
+                    saveNotes(e.target.value);
+                    status.textContent = 'Сохранено';
+                    setTimeout(() => { status.textContent = ''; }, 2000);
+                }, 1000);
+            });
         }
-      };
-      reader.readAsText(file);
-    }
 
-    function resetData() {
-      if (confirm('Вы уверены, что хотите сбросить все сохранённые данные к начальным настройкам?')) {
-        localStorage.removeItem('stud_portal_data');
-        location.reload();
-      }
-    }
-  </script>
+        // --- УТИЛИТЫ ---
+
+        function saveData() {
+            localStorage.setItem('vityaPlannerData', JSON.stringify(appData));
+        }
+
+        function ensureSubjectDataExists(subjectId) {
+            if (!appData.subjectsData[subjectId]) {
+                appData.subjectsData[subjectId] = { notes: '', tasks: [] };
+            }
+        }
+
+        function getActiveTasksCount(subjectId) {
+            if (!appData.subjectsData[subjectId]) return 0;
+            return appData.subjectsData[subjectId].tasks.filter(t => t.status !== 'done').length;
+        }
+
+        // --- ТЕМЫ ---
+
+        function toggleTheme() {
+            appData.theme = appData.theme === 'light' ? 'dark' : 'light';
+            applyTheme(appData.theme);
+            saveData();
+        }
+
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            const metaColor = document.getElementById('meta-theme-color');
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                metaColor.setAttribute('content', '#0F172A');
+                themeIcon.setAttribute('data-lucide', 'sun');
+                themeIcon.classList.remove('text-slate-700');
+                themeIcon.classList.add('text-amber-400');
+            } else {
+                html.classList.remove('dark');
+                metaColor.setAttribute('content', '#F0F4F8');
+                themeIcon.setAttribute('data-lucide', 'moon');
+                themeIcon.classList.add('text-slate-700');
+                themeIcon.classList.remove('text-amber-400');
+            }
+            lucide.createIcons();
+        }
+
+        // --- ДАТЫ И РАСПИСАНИЕ ---
+
+        const monthsRu = ['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+        const daysRu = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+
+        function renderHeaderDate() {
+            const headerDate = document.getElementById('header-date');
+            const dayName = daysRu[selectedDate.getDay()];
+            const dayNum = selectedDate.getDate();
+            const monthName = monthsRu[selectedDate.getMonth()];
+            
+            headerDate.textContent = `${dayName}, ${dayNum} ${monthName}`;
+
+            const badge = document.getElementById('schedule-date-badge');
+            const today = new Date();
+            if (selectedDate.toDateString() === today.toDateString()) {
+                badge.textContent = 'Сегодня';
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function getScheduleForDate(date) {
+            const dayOfWeek = date.getDay();
+            return scheduleTemplate[dayOfWeek] || [];
+        }
+
+        function renderSchedule() {
+            const container = document.getElementById('schedule-list');
+            const classes = getScheduleForDate(selectedDate);
+            container.innerHTML = '';
+
+            if (classes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-white dark:bg-cardDark rounded-3xl shadow-soft">
+                        <i data-lucide="coffee" class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3"></i>
+                        <h3 class="text-lg font-medium text-slate-500">Занятий нет!</h3>
+                        <p class="text-sm text-slate-400">Можно расслабиться.</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            classes.forEach((cls, index) => {
+                const activeTasks = getActiveTasksCount(cls.subjectId);
+                const badgeHtml = activeTasks > 0 ? 
+                    `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm"><i data-lucide="alert-circle" class="w-3 h-3"></i> ДЗ: ${activeTasks}</span>` : '';
+
+                const cardHtml = `
+                    <div onclick='openModal(${JSON.stringify(cls)})' class="group bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-100 dark:hover:border-slate-700 flex flex-col sm:flex-row sm:items-center gap-4">
+                        <!-- Время -->
+                        <div class="flex-shrink-0 bg-slate-50 dark:bg-slate-800 rounded-2xl p-3 text-center sm:w-28 shadow-inner border border-slate-100 dark:border-slate-700">
+                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">${index + 1}-я пара</span>
+                            <span class="block text-lg font-bold text-slate-800 dark:text-slate-200">${cls.start}</span>
+                            <span class="block text-xs text-slate-500">${cls.end}</span>
+                        </div>
+                        
+                        <!-- Инфо -->
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-xs font-bold uppercase tracking-wider text-blue-500">${cls.type}</span>
+                                ${badgeHtml}
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-500 transition">${cls.name}</h3>
+                            <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                                <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> ${cls.room}</span>
+                                <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${cls.teacher}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="hidden sm:flex text-slate-300 dark:text-slate-600 group-hover:text-blue-500 transition">
+                            <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+            lucide.createIcons();
+        }
+
+        // --- ВИДЖЕТ: БЛИЖАЙШЕЕ ЗАНЯТИЕ ---
+        
+        function updateNextClassWidget() {
+            const today = new Date();
+            // Показываем виджет только если выбрана сегодняшняя дата
+            const widget = document.getElementById('next-class-widget');
+            if (selectedDate.toDateString() !== today.toDateString()) {
+                widget.style.display = 'none';
+                return;
+            } else {
+                widget.style.display = 'block';
+            }
+
+            const classes = getScheduleForDate(today);
+            const nowTime = today.getHours() * 60 + today.getMinutes();
+            
+            let currentClass = null;
+            let nextClass = null;
+
+            for (let cls of classes) {
+                const [startH, startM] = cls.start.split(':').map(Number);
+                const [endH, endM] = cls.end.split(':').map(Number);
+                const startMins = startH * 60 + startM;
+                const endMins = endH * 60 + endM;
+
+                if (nowTime >= startMins && nowTime <= endMins) {
+                    currentClass = cls;
+                    break;
+                } else if (startMins > nowTime && !nextClass) {
+                    nextClass = { cls, diff: startMins - nowTime };
+                }
+            }
+
+            const statusEl = document.getElementById('widget-status');
+            const titleEl = document.getElementById('widget-title');
+            const detailsEl = document.getElementById('widget-details');
+
+            widget.className = "rounded-3xl p-6 text-white shadow-md relative overflow-hidden transition-all duration-500";
+
+            if (currentClass) {
+                widget.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-teal-400');
+                widget.classList.remove('from-blue-500', 'to-sky-400', 'from-slate-700', 'to-slate-600');
+                statusEl.textContent = 'Идёт сейчас';
+                titleEl.textContent = currentClass.name;
+                detailsEl.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i> ${currentClass.room} (до ${currentClass.end})`;
+            } else if (nextClass) {
+                widget.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-sky-400');
+                widget.classList.remove('from-emerald-500', 'to-teal-400', 'from-slate-700', 'to-slate-600');
+                let timeStr = nextClass.diff >= 60 ? 
+                    `${Math.floor(nextClass.diff/60)} ч ${nextClass.diff%60} мин` : 
+                    `${nextClass.diff} мин`;
+                
+                statusEl.textContent = `Через ${timeStr}`;
+                titleEl.textContent = nextClass.cls.name;
+                detailsEl.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i> ${nextClass.cls.room} • Начало в ${nextClass.cls.start}`;
+            } else {
+                widget.classList.add('bg-gradient-to-r', 'from-slate-700', 'to-slate-600');
+                widget.classList.remove('from-blue-500', 'to-sky-400', 'from-emerald-500', 'to-teal-400');
+                statusEl.textContent = classes.length > 0 ? 'Пары закончились' : 'Выходной';
+                titleEl.textContent = 'Свободное время';
+                detailsEl.innerHTML = 'Отдыхайте и набирайтесь сил';
+            }
+            lucide.createIcons();
+        }
+
+        // --- КАЛЕНДАРЬ ---
+
+        let calendarDate = new Date();
+
+        function toggleCalendar() {
+            const cal = document.getElementById('calendar-dropdown');
+            if (cal.classList.contains('hidden')) {
+                cal.classList.remove('hidden');
+                calendarDate = new Date(selectedDate);
+                renderCalendar();
+            } else {
+                cal.classList.add('hidden');
+            }
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthYear = document.getElementById('calendar-month-year');
+            grid.innerHTML = '';
+            
+            const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+            monthYear.textContent = `${monthNames[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
+
+            const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
+            const lastDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
+            
+            // Сдвиг для ПН = 1
+            let startDay = firstDay.getDay();
+            if (startDay === 0) startDay = 7;
+            startDay--; 
+
+            // Пустые ячейки
+            for (let i = 0; i < startDay; i++) {
+                grid.innerHTML += `<div></div>`;
+            }
+
+            // Дни
+            const today = new Date();
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                const iterDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i);
+                const isSelected = iterDate.toDateString() === selectedDate.toDateString();
+                const isToday = iterDate.toDateString() === today.toDateString();
+                
+                let btnClass = "w-full aspect-square flex items-center justify-center rounded-xl text-sm transition ";
+                
+                if (isSelected) {
+                    btnClass += "bg-blue-500 text-white shadow-md font-bold";
+                } else if (isToday) {
+                    btnClass += "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-bold hover:bg-blue-200 dark:hover:bg-blue-800/50";
+                } else {
+                    btnClass += "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300";
+                }
+
+                grid.innerHTML += `<button onclick="selectDate(${iterDate.getTime()})" class="${btnClass}">${i}</button>`;
+            }
+        }
+
+        function selectDate(timestamp) {
+            selectedDate = new Date(timestamp);
+            document.getElementById('calendar-dropdown').classList.add('hidden');
+            renderHeaderDate();
+            renderSchedule();
+            updateNextClassWidget();
+        }
+
+        // --- МОДАЛЬНОЕ ОКНО И КАНБАН ---
+
+        function openModal(cls) {
+            currentModalSubjectId = cls.subjectId;
+            ensureSubjectDataExists(cls.subjectId);
+            
+            // Заполнение шапки
+            document.getElementById('modal-type').textContent = cls.type;
+            document.getElementById('modal-title').textContent = cls.name;
+            document.getElementById('modal-time').textContent = `${cls.start} - ${cls.end}`;
+            document.getElementById('modal-room').textContent = cls.room;
+            document.getElementById('modal-teacher').textContent = cls.teacher;
+            
+            // Загрузка заметок
+            document.getElementById('modal-notes').value = appData.subjectsData[cls.subjectId].notes || '';
+            document.getElementById('notes-status').textContent = '';
+
+            renderKanban();
+
+            const modal = document.getElementById('class-modal');
+            const content = document.getElementById('modal-content');
+            modal.classList.remove('hidden');
+            
+            // Анимация появления
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('translate-y-full');
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('class-modal');
+            const content = document.getElementById('modal-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                currentModalSubjectId = null;
+                renderSchedule(); // Обновить бейджи ДЗ
+            }, 300);
+        }
+
+        function saveNotes(text) {
+            if (currentModalSubjectId) {
+                appData.subjectsData[currentModalSubjectId].notes = text;
+                saveData();
+            }
+        }
+
+        // Kanban Logic
+        const statusMap = {
+            'todo': { next: 'progress', prev: null },
+            'progress': { next: 'done', prev: 'todo' },
+            'done': { next: null, prev: 'progress' }
+        };
+
+        function renderKanban() {
+            const tasks = appData.subjectsData[currentModalSubjectId].tasks;
+            
+            ['todo', 'progress', 'done'].forEach(status => {
+                const col = document.getElementById(`col-${status}`);
+                const count = document.getElementById(`count-${status}`);
+                col.innerHTML = '';
+                
+                const colTasks = tasks.filter(t => t.status === status);
+                count.textContent = colTasks.length;
+
+                colTasks.forEach(task => {
+                    // Расчет дней до дедлайна
+                    let deadlineHtml = '';
+                    if (task.deadline) {
+                        const today = new Date();
+                        today.setHours(0,0,0,0);
+                        const dl = new Date(task.deadline);
+                        const diffTime = dl - today;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        
+                        let dlColor = "text-slate-400";
+                        if (status !== 'done') {
+                            if (diffDays < 0) dlColor = "text-red-500 font-bold";
+                            else if (diffDays <= 2) dlColor = "text-amber-500 font-bold";
+                            else dlColor = "text-blue-500";
+                        }
+                        
+                        let dlText = diffDays === 0 ? "Сегодня" : diffDays < 0 ? "Просрочено" : `${diffDays} дн.`;
+                        deadlineHtml = `<div class="flex items-center gap-1 text-xs mt-2 ${dlColor}"><i data-lucide="clock" class="w-3 h-3"></i> ${dlText} (${dl.toLocaleDateString('ru-RU')})</div>`;
+                    }
+
+                    const isDone = status === 'done';
+                    
+                    const cardHtml = `
+                        <div class="bg-white dark:bg-cardDark p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col group relative">
+                            <div class="flex items-start gap-2">
+                                ${status === 'todo' || status === 'progress' ? 
+                                    `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-0.5 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition"></button>` : 
+                                    `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-0.5 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white"><i data-lucide="check" class="w-3 h-3"></i></button>`
+                                }
+                                <p class="text-sm flex-1 ${isDone ? 'task-done' : 'text-slate-800 dark:text-slate-200'}">${task.text}</p>
+                            </div>
+                            ${deadlineHtml}
+                            
+                            <!-- Управление (Появляется при наведении) -->
+                            <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                                ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 hover:text-blue-500"><i data-lucide="arrow-left" class="w-3 h-3"></i></button>` : ''}
+                                ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 hover:text-blue-500"><i data-lucide="arrow-right" class="w-3 h-3"></i></button>` : ''}
+                                <button onclick="deleteTask(${task.id})" class="p-1 bg-red-100 dark:bg-red-900/40 rounded text-red-500 hover:text-red-700"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                            </div>
+                        </div>
+                    `;
+                    col.insertAdjacentHTML('beforeend', cardHtml);
+                });
+            });
+            lucide.createIcons();
+        }
+
+        function addTask() {
+            const input = document.getElementById('new-task-text');
+            const dateInput = document.getElementById('new-task-date');
+            const text = input.value.trim();
+            
+            if (text && currentModalSubjectId) {
+                appData.subjectsData[currentModalSubjectId].tasks.push({
+                    id: Date.now(),
+                    text: text,
+                    status: 'todo',
+                    deadline: dateInput.value || null
+                });
+                saveData();
+                input.value = '';
+                dateInput.value = '';
+                renderKanban();
+            }
+        }
+
+        function setTaskStatus(taskId, newStatus) {
+            const task = appData.subjectsData[currentModalSubjectId].tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = newStatus;
+                saveData();
+                renderKanban();
+            }
+        }
+
+        function deleteTask(taskId) {
+            appData.subjectsData[currentModalSubjectId].tasks = appData.subjectsData[currentModalSubjectId].tasks.filter(t => t.id !== taskId);
+            saveData();
+            renderKanban();
+        }
+
+        // --- ЭКСПОРТ / ИМПОРТ ---
+
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Планнер_Бэкап_${new Date().toLocaleDateString('ru-RU')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && imported.subjectsData) {
+                        appData = imported;
+                        saveData();
+                        applyTheme(appData.theme);
+                        renderSchedule();
+                        alert('Данные успешно загружены!');
+                    } else {
+                        alert('Неверный формат файла.');
+                    }
+                } catch (err) {
+                    alert('Ошибка чтения файла.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Запуск приложения
+        window.addEventListener('DOMContentLoaded', init);
+        
+        // Закрытие модального окна по клику вне его
+        document.getElementById('class-modal').addEventListener('click', function(e) {
+            if(e.target === this) closeModal();
+        });
+
+    </script>
 </body>
 </html>
