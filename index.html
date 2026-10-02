@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мое расписание и задачи</title>
+    <title>Моё расписание и задачи</title>
     <style>
         :root {
-            --bg-color: #f4f7f6;
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #2c3e50;
-            --text-muted: #7f8c8d;
-            --accent: #3498db;
-            --accent-hover: #2980b9;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
             --border: #e2e8f0;
-            --success: #2ecc71;
+            --success: #10b981;
+            --warning: #f59e0b;
         }
 
         body {
@@ -28,7 +29,7 @@
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
         }
 
         h1 {
@@ -70,27 +71,57 @@
             background-color: var(--accent);
             color: #ffffff;
             border-color: var(--accent);
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
         }
 
-        /* Карточка расписания / заданий */
+        /* Карточки секторов */
         .card {
             background-color: var(--card-bg);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
             border: 1px solid var(--border);
         }
 
-        .day-title {
+        .section-title {
             font-size: 18px;
             font-weight: 700;
             margin-bottom: 15px;
-            color: var(--text-main);
-            border-bottom: 2px solid var(--bg-color);
-            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
+        /* Расписание */
+        .schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .lesson-time {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .lesson-name {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Домашние задания с чекбоксами */
         .task-list {
             display: flex;
             flex-direction: column;
@@ -101,16 +132,16 @@
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            padding: 12px;
-            background-color: #fafbfc;
+            padding: 12px 15px;
+            background-color: #f8fafc;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             transition: all 0.2s ease;
         }
 
         .task-item.completed {
-            background-color: #f0fdf4;
-            border-color: #bbf7d0;
+            background-color: #ecfdf5;
+            border-color: #a7f3d0;
         }
 
         .task-item.completed .task-text {
@@ -140,42 +171,57 @@
             font-size: 12px;
             color: var(--text-muted);
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .deadline {
-            color: #e67e22;
-            font-weight: 500;
+            color: var(--warning);
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Расписание и ДЗ</h1>
+        <h1>Панель управления</h1>
 
         <!-- Панелька дней недели с Пн по Вс -->
         <div class="week-nav">
-            <div class="day-btn active" onclick="selectDay('mon')">Пн</div>
-            <div class="day-btn" onclick="selectDay('tue')">Вт</div>
-            <div class="day-btn" onclick="selectDay('wed')">Ср</div>
-            <div class="day-btn" onclick="selectDay('thu')">Чт</div>
-            <div class="day-btn" onclick="selectDay('fri')">Пт</div>
-            <div class="day-btn" onclick="selectDay('sat')">Сб</div>
-            <div class="day-btn" onclick="selectDay('sun')">Вс</div>
+            <div class="day-btn active" onclick="switchDay('mon')">Пн</div>
+            <div class="day-btn" onclick="switchDay('tue')">Вт</div>
+            <div class="day-btn" onclick="switchDay('wed')">Ср</div>
+            <div class="day-btn" onclick="switchDay('thu')">Чт</div>
+            <div class="day-btn" onclick="switchDay('fri')">Пт</div>
+            <div class="day-btn" onclick="switchDay('sat')">Сб</div>
+            <div class="day-btn" onclick="switchDay('sun')">Вс</div>
         </div>
 
-        <!-- Контент выбранного дня -->
+        <!-- Блок расписания на день -->
         <div class="card">
-            <div class="day-title" id="current-day-title">Понедельник</div>
+            <div class="section-title">📅 Расписание пар (<span id="day-name">Понедельник</span>)</div>
+            <div class="schedule-list">
+                <div class="schedule-item">
+                    <span class="lesson-time">09:00 – 10:30</span>
+                    <span class="lesson-name">Государственное и муниципальное управление</span>
+                </div>
+                <div class="schedule-item">
+                    <span class="lesson-time">10:45 – 12:15</span>
+                    <span class="lesson-name">История</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Блок домашних заданий -->
+        <div class="card">
+            <div class="section-title">📝 Домашние задания</div>
             <div class="task-list">
                 
                 <div class="task-item">
                     <input type="checkbox" class="task-checkbox" onchange="toggleTask(this)">
                     <div class="task-content">
-                        <div class="task-text">Подготовить доклад по истории</div>
+                        <div class="task-text">Подготовить конспект по лекции</div>
                         <div class="task-meta">
-                            <span>Пара №2</span>
+                            <span>ГМУ</span>
                             <span class="deadline">Дедлайн: Завтра, 18:00</span>
                         </div>
                     </div>
@@ -184,9 +230,9 @@
                 <div class="task-item">
                     <input type="checkbox" class="task-checkbox" onchange="toggleTask(this)">
                     <div class="task-content">
-                        <div class="task-text">Решить практические задачи по профильной математике</div>
+                        <div class="task-text">Повторить даты по истории для семинара</div>
                         <div class="task-meta">
-                            <span>Пара №3</span>
+                            <span>История</span>
                             <span class="deadline">Дедлайн: Среда, 10:00</span>
                         </div>
                     </div>
@@ -197,11 +243,12 @@
     </div>
 
     <script>
-        // Простой скрипт для переключения дней и чекбоксов
-        function selectDay(dayId) {
+        function switchDay(dayId) {
+            // Переключение активной кнопки в панели
             document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
             event.currentTarget.classList.add('active');
             
+            // Обновление названия дня в заголовке расписания
             const titles = {
                 'mon': 'Понедельник',
                 'tue': 'Вторник',
@@ -211,7 +258,7 @@
                 'sat': 'Суббота',
                 'sun': 'Воскресенье'
             };
-            document.getElementById('current-day-title').innerText = titles[dayId];
+            document.getElementById('day-name').innerText = titles[dayId];
         }
 
         function toggleTask(checkbox) {
