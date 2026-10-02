@@ -77,7 +77,18 @@
         <!-- HEADER -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 id="header-date" class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Загрузка...</h1>
+                <div class="flex items-center gap-3">
+                    <h1 id="header-date" class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Загрузка...</h1>
+                    <div class="flex items-center bg-white dark:bg-cardDark rounded-xl shadow-soft p-1 gap-1">
+                        <button onclick="changeWeek(-1)" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition" title="Прошлая неделя">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="resetToCurrentWeek()" class="px-2 text-xs font-medium text-blue-500 hover:underline">Сегодня</button>
+                        <button onclick="changeWeek(1)" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition" title="Следующая неделя">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
                 <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
                     <i data-lucide="book-open" class="w-4 h-4"></i> Планнер Вити • Группа БГО-101 (МЭИ)
                 </p>
@@ -227,7 +238,7 @@
     <script>
         const defaultData = {
             theme: 'light',
-            subjectsData: {}
+            daysData: {} // Хранилище данных изоляции по ключу даты (YYYY-MM-DD)
         };
 
         const timetableData = {
@@ -296,8 +307,11 @@
         };
 
         let appData = JSON.parse(localStorage.getItem('vityaPlannerData')) || defaultData;
+        if (!appData.daysData) appData.daysData = {}; // миграция для старых данных
+        
         let selectedDate = new Date();
-        let currentModalSubjectId = null;
+        let weekOffset = 0; // Состояние смещения недель
+        let currentModalClassId = null;
         let notesTimeout = null;
 
         function init() {
@@ -325,15 +339,25 @@
             localStorage.setItem('vityaPlannerData', JSON.stringify(appData));
         }
 
-        function ensureSubjectDataExists(subjectId) {
-            if (!appData.subjectsData[subjectId]) {
-                appData.subjectsData[subjectId] = { notes: '', tasks: [] };
+        function getDateKey(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function ensureDayClassDataExists(dateKey, classId) {
+            if (!appData.daysData[dateKey]) {
+                appData.daysData[dateKey] = {};
+            }
+            if (!appData.daysData[dateKey][classId]) {
+                appData.daysData[dateKey][classId] = { notes: '', tasks: [] };
             }
         }
 
-        function getActiveTasksCount(subjectId) {
-            if (!appData.subjectsData[subjectId]) return 0;
-            return appData.subjectsData[subjectId].tasks.filter(t => t.status !== 'done').length;
+        function getActiveTasksCount(dateKey, classId) {
+            if (!appData.daysData[dateKey] || !appData.daysData[dateKey][classId]) return 0;
+            return appData.daysData[dateKey][classId].tasks.filter(t => t.status !== 'done').length;
         }
 
         function toggleTheme() {
@@ -364,16 +388,61 @@
         }
 
         const monthsRu = ['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+        const monthsNamesOnly = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
         const daysRu = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
         const shortDaysRu = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
+        function getMonday(d) {
+            d = new Date(d);
+            var day = d.getDay(),
+                diff = d.getDate() - day + (day == 0 ? -6: 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function changeWeek(direction) {
+            weekOffset += direction;
+            const monday = getMonday(new Date());
+            monday.setDate(monday.getDate() + (weekOffset * 7));
+            selectedDate = new Date(monday); // Автоматически переключаем на понедельник новой недели
+            renderHeaderDate();
+            renderDaysPanel();
+            renderSchedule();
+        }
+
+        function resetToCurrentWeek() {
+            weekOffset = 0;
+            selectedDate = new Date();
+            renderHeaderDate();
+            renderDaysPanel();
+            renderSchedule();
+            updateNextClassWidget();
+        }
+
         function renderHeaderDate() {
             const headerDate = document.getElementById('header-date');
-            const dayName = daysRu[selectedDate.getDay()];
-            const dayNum = selectedDate.getDate();
-            const monthName = monthsRu[selectedDate.getMonth()];
             
-            headerDate.textContent = `${dayName}, ${dayNum} ${monthName}`;
+            // Вычисляем уникальные месяцы текущей отображаемой недели (от Пн до Вс)
+            const baseMonday = getMonday(new Date());
+            baseMonday.setDate(baseMonday.getDate() + (weekOffset * 7));
+            
+            const weekMonths = new Set();
+            let weekYear = baseMonday.getFullYear();
+            
+            for(let i=0; i<7; i++) {
+                const tempDate = new Date(baseMonday);
+                tempDate.setDate(baseMonday.getDate() + i);
+                weekMonths.add(tempDate.getMonth());
+            }
+
+            let monthString = "";
+            const monthsArr = Array.from(weekMonths);
+            if(monthsArr.length === 1) {
+                monthString = `${monthsNamesOnly[monthsArr[0]]} ${weekYear}`;
+            } else {
+                monthString = `${monthsNamesOnly[monthsArr[0]]} — ${monthsNamesOnly[monthsArr[1]]} ${weekYear}`;
+            }
+            
+            headerDate.textContent = monthString;
 
             const badge = document.getElementById('schedule-date-badge');
             const today = new Date();
@@ -385,19 +454,13 @@
             }
         }
 
-        function getMonday(d) {
-            d = new Date(d);
-            var day = d.getDay(),
-                diff = d.getDate() - day + (day == 0 ? -6: 1);
-            return new Date(d.setDate(diff));
-        }
-
-        // Рендер панели дней недели (пн-вс) для текущей выбранной недели
+        // Рендер панели дней недели (пн-вс) для текущего смещения недели
         function renderDaysPanel() {
             const panel = document.getElementById('days-panel');
             panel.innerHTML = '';
 
-            const monday = getMonday(selectedDate);
+            const monday = getMonday(new Date());
+            monday.setDate(monday.getDate() + (weekOffset * 7));
             const today = new Date();
 
             for (let i = 0; i < 7; i++) {
@@ -418,7 +481,6 @@
                 const dayName = shortDaysRu[i];
                 const dayNum = iterDate.getDate();
 
-                // Индикатор для текущего дня (аккуратная точка или обводка)
                 let indicatorHtml = '';
                 if (isToday && !isSelected) {
                     indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>`;
@@ -455,6 +517,7 @@
         function renderSchedule() {
             const container = document.getElementById('schedule-list');
             const classes = getScheduleForDate(selectedDate);
+            const currentDateKey = getDateKey(selectedDate);
             container.innerHTML = '';
 
             if (classes.length === 0) {
@@ -469,7 +532,7 @@
             }
 
             classes.forEach((cls, index) => {
-                const activeTasks = getActiveTasksCount(cls.subjectId);
+                const activeTasks = getActiveTasksCount(currentDateKey, cls.id);
                 const badgeHtml = activeTasks > 0 ? 
                     `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm"><i data-lucide="alert-circle" class="w-3 h-3"></i> ДЗ: ${activeTasks}</span>` : '';
 
@@ -588,8 +651,7 @@
             const monthYear = document.getElementById('calendar-month-year');
             grid.innerHTML = '';
             
-            const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-            monthYear.textContent = `${monthNames[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
+            monthYear.textContent = `${monthsNamesOnly[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
 
             const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
             const lastDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
@@ -624,6 +686,12 @@
 
         function selectDate(timestamp) {
             selectedDate = new Date(timestamp);
+            
+            // Вычисляем weekOffset для выбранной даты, чтобы шапка недели соответствовала клику
+            const currentMonday = getMonday(new Date());
+            const targetMonday = getMonday(selectedDate);
+            weekOffset = Math.round((targetMonday - currentMonday) / (1000 * 60 * 60 * 24 * 7));
+
             document.getElementById('calendar-dropdown').classList.add('hidden');
             renderHeaderDate();
             renderDaysPanel();
@@ -632,8 +700,9 @@
         }
 
         function openModal(cls) {
-            currentModalSubjectId = cls.subjectId;
-            ensureSubjectDataExists(cls.subjectId);
+            currentModalClassId = cls.id;
+            const currentDateKey = getDateKey(selectedDate);
+            ensureDayClassDataExists(currentDateKey, cls.id);
             
             document.getElementById('modal-type').textContent = cls.type;
             document.getElementById('modal-title').textContent = cls.name;
@@ -641,7 +710,7 @@
             document.getElementById('modal-room').textContent = cls.room;
             document.getElementById('modal-teacher').textContent = cls.teacher;
             
-            document.getElementById('modal-notes').value = appData.subjectsData[cls.subjectId].notes || '';
+            document.getElementById('modal-notes').value = appData.daysData[currentDateKey][cls.id].notes || '';
             document.getElementById('notes-status').textContent = '';
 
             renderKanban();
@@ -665,14 +734,16 @@
             
             setTimeout(() => {
                 modal.classList.add('hidden');
-                currentModalSubjectId = null;
+                currentModalClassId = null;
                 renderSchedule();
             }, 300);
         }
 
         function saveNotes(text) {
-            if (currentModalSubjectId) {
-                appData.subjectsData[currentModalSubjectId].notes = text;
+            if (currentModalClassId) {
+                const currentDateKey = getDateKey(selectedDate);
+                ensureDayClassDataExists(currentDateKey, currentModalClassId);
+                appData.daysData[currentDateKey][currentModalClassId].notes = text;
                 saveData();
             }
         }
@@ -684,7 +755,9 @@
         };
 
         function renderKanban() {
-            const tasks = appData.subjectsData[currentModalSubjectId].tasks;
+            const currentDateKey = getDateKey(selectedDate);
+            ensureDayClassDataExists(currentDateKey, currentModalClassId);
+            const tasks = appData.daysData[currentDateKey][currentModalClassId].tasks;
             
             ['todo', 'progress', 'done'].forEach(status => {
                 const col = document.getElementById(`col-${status}`);
@@ -745,8 +818,10 @@
             const dateInput = document.getElementById('new-task-date');
             const text = input.value.trim();
             
-            if (text && currentModalSubjectId) {
-                appData.subjectsData[currentModalSubjectId].tasks.push({
+            if (text && currentModalClassId) {
+                const currentDateKey = getDateKey(selectedDate);
+                ensureDayClassDataExists(currentDateKey, currentModalClassId);
+                appData.daysData[currentDateKey][currentModalClassId].tasks.push({
                     id: Date.now(),
                     text: text,
                     status: 'todo',
@@ -760,7 +835,8 @@
         }
 
         function setTaskStatus(taskId, newStatus) {
-            const task = appData.subjectsData[currentModalSubjectId].tasks.find(t => t.id === taskId);
+            const currentDateKey = getDateKey(selectedDate);
+            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
             if (task) {
                 task.status = newStatus;
                 saveData();
@@ -769,7 +845,8 @@
         }
 
         function deleteTask(taskId) {
-            appData.subjectsData[currentModalSubjectId].tasks = appData.subjectsData[currentModalSubjectId].tasks.filter(t => t.id !== taskId);
+            const currentDateKey = getDateKey(selectedDate);
+            appData.daysData[currentDateKey][currentModalClassId].tasks = appData.daysData[currentDateKey][currentModalClassId].tasks.filter(t => t.id !== taskId);
             saveData();
             renderKanban();
         }
@@ -792,8 +869,9 @@
             reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if (imported && imported.subjectsData) {
+                    if (imported && (imported.daysData || imported.subjectsData)) {
                         appData = imported;
+                        if(!appData.daysData) appData.daysData = {};
                         saveData();
                         applyTheme(appData.theme);
                         renderDaysPanel();
