@@ -40,17 +40,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* Скрываем скроллбар для эстетики Apple/Notion */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         * { scrollbar-width: none; }
-        
-        /* Плавные переходы для тем */
         body, .card-transition { transition: background-color 0.3s ease, color 0.3s ease; }
-        
-        /* Стили для зачеркнутого текста (выполненные задачи) */
         .task-done { text-decoration: line-through; opacity: 0.5; }
-        
-        /* Кастомный чекбокс */
         .custom-checkbox {
             appearance: none;
             width: 1.25rem;
@@ -79,8 +72,6 @@
 </head>
 <body class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen p-4 md:p-8 selection:bg-blue-200 dark:selection:bg-blue-900 pb-24">
 
-    <!-- Привет, Витя! Джим позаботился о том, чтобы интерфейс был максимально удобным и красивым. -->
-    
     <div class="max-w-3xl mx-auto space-y-8">
         
         <!-- HEADER -->
@@ -88,12 +79,12 @@
             <div>
                 <h1 id="header-date" class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Загрузка...</h1>
                 <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
-                    <i data-lucide="book-open" class="w-4 h-4"></i> Планнер Вити
+                    <i data-lucide="book-open" class="w-4 h-4"></i> Планнер Вити • Группа БГО-101 (МЭИ)
                 </p>
             </div>
             
             <div class="flex items-center gap-3">
-                <button onclick="toggleCalendar()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition">
+                <button onclick="toggleCalendar()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Календарь">
                     <i data-lucide="calendar" class="w-5 h-5 text-blue-500"></i>
                 </button>
                 <div class="flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1">
@@ -105,7 +96,7 @@
                         <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
                     </label>
                 </div>
-                <button onclick="toggleTheme()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition">
+                <button onclick="toggleTheme()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Тема">
                     <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-slate-700 dark:text-amber-400"></i>
                 </button>
             </div>
@@ -113,11 +104,9 @@
 
         <!-- WIDGET: Ближайшее занятие -->
         <section id="next-class-widget" class="bg-gradient-to-r from-blue-500 to-sky-400 rounded-3xl p-6 text-white shadow-md relative overflow-hidden">
-            <!-- Абстрактный декор -->
             <div class="absolute top-0 right-0 opacity-10 translate-x-1/4 -translate-y-1/4">
                 <i data-lucide="clock" class="w-48 h-48"></i>
             </div>
-            
             <div class="relative z-10">
                 <p id="widget-status" class="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2">Анализ расписания...</p>
                 <h2 id="widget-title" class="text-2xl font-bold mb-1">Свободное время</h2>
@@ -144,16 +133,14 @@
         <section>
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold flex items-center gap-2">
-                    <i data-lucide="list" class="w-5 h-5 text-blue-500"></i> Расписание
+                    <i data-lucide="list" class="w-5 h-5 text-blue-500"></i> Расписание на день
                 </h2>
                 <span id="schedule-date-badge" class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
                     Сегодня
                 </span>
             </div>
             
-            <div id="schedule-list" class="space-y-4">
-                <!-- Карточки генерируются JS -->
-            </div>
+            <div id="schedule-list" class="space-y-4"></div>
         </section>
     </div>
 
@@ -166,7 +153,7 @@
                 <div>
                     <span id="modal-type" class="text-xs font-bold uppercase tracking-wider text-blue-500 mb-1 block">Лекция</span>
                     <h2 id="modal-title" class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Название предмета</h2>
-                    <p id="modal-time-room" class="text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-3 text-sm">
+                    <p id="modal-time-room" class="text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-3 text-sm flex-wrap">
                         <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4"></i> <span id="modal-time">10:00 - 11:30</span></span>
                         <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> <span id="modal-room">Ауд. 101</span></span>
                         <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> <span id="modal-teacher">Преподаватель</span></span>
@@ -177,9 +164,8 @@
                 </button>
             </div>
 
-            <!-- Modal Body (Scrollable) -->
+            <!-- Modal Body -->
             <div class="p-6 overflow-y-auto flex-1 space-y-8">
-                
                 <!-- Notes -->
                 <section>
                     <h3 class="text-lg font-semibold mb-3 flex items-center gap-2"><i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i> Заметки</h3>
@@ -193,7 +179,6 @@
                         <h3 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="kanban" class="w-5 h-5 text-emerald-500"></i> Задачи и ДЗ</h3>
                     </div>
 
-                    <!-- Add Task Form -->
                     <div class="flex gap-2 mb-6 bg-slate-50 dark:bg-slate-800 p-2 rounded-2xl">
                         <input type="text" id="new-task-text" placeholder="Что нужно сделать?" class="flex-1 bg-transparent border-none outline-none px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
                         <input type="date" id="new-task-date" class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-xl px-2 py-1 outline-none border-none cursor-pointer">
@@ -202,10 +187,7 @@
                         </button>
                     </div>
 
-                    <!-- Kanban Columns -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        
-                        <!-- TODO -->
                         <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
                             <div class="flex justify-between items-center mb-3">
                                 <h4 class="font-medium text-sm text-slate-500 dark:text-slate-400">Надо сделать</h4>
@@ -214,7 +196,6 @@
                             <div id="col-todo" class="space-y-3 min-h-[5rem]"></div>
                         </div>
 
-                        <!-- IN PROGRESS -->
                         <div class="bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-4 border border-blue-100 dark:border-blue-900/30">
                             <div class="flex justify-between items-center mb-3">
                                 <h4 class="font-medium text-sm text-blue-500">В процессе</h4>
@@ -223,7 +204,6 @@
                             <div id="col-progress" class="space-y-3 min-h-[5rem]"></div>
                         </div>
 
-                        <!-- DONE -->
                         <div class="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/30">
                             <div class="flex justify-between items-center mb-3">
                                 <h4 class="font-medium text-sm text-emerald-600 dark:text-emerald-500">Сдано</h4>
@@ -231,7 +211,6 @@
                             </div>
                             <div id="col-done" class="space-y-3 min-h-[5rem]"></div>
                         </div>
-
                     </div>
                 </section>
             </div>
@@ -239,67 +218,91 @@
     </div>
 
     <script>
-        /**
-         * БАЗА ДАННЫХ И СОСТОЯНИЕ (LocalStorage)
-         * Архитектура данных:
-         * appData = {
-         *   theme: 'light' | 'dark',
-         *   subjectsData: { 
-         *      'subjectId': { notes: '', tasks: [{id, text, status, deadline}] }
-         *   }
-         * }
-         */
-        
         const defaultData = {
             theme: 'light',
             subjectsData: {}
         };
 
-        // Заглушка расписания (шаблон на неделю)
-        // Для демонстрации привяжем предметы к дням недели
-        const scheduleTemplate = {
-            1: [ // Понедельник
-                { id: 'm1', subjectId: 'math', name: 'Математический анализ', type: 'Лекция', room: 'Ауд. 301', teacher: 'Иванов И.И.', start: '10:00', end: '11:30' },
-                { id: 'm2', subjectId: 'physics', name: 'Физика', type: 'Практика', room: 'Лаб. 12', teacher: 'Петров П.П.', start: '11:40', end: '13:10' }
-            ],
-            2: [ // Вторник
-                { id: 't1', subjectId: 'cs', name: 'Алгоритмы и СД', type: 'Лекция', room: 'Ауд. 405', teacher: 'Смирнов А.В.', start: '09:00', end: '10:30' },
-                { id: 't2', subjectId: 'english', name: 'Иностранный язык', type: 'Семинар', room: 'Ауд. 210', teacher: 'White J.', start: '10:40', end: '12:10' },
-                { id: 't3', subjectId: 'math', name: 'Математический анализ', type: 'Семинар', room: 'Ауд. 302', teacher: 'Иванов И.И.', start: '13:20', end: '14:50' }
-            ],
-            3: [ // Среда
-                { id: 'w1', subjectId: 'history', name: 'История', type: 'Лекция', room: 'Ауд. 101', teacher: 'Кузнецов В.Н.', start: '11:40', end: '13:10' },
-                { id: 'w2', subjectId: 'physics', name: 'Физика', type: 'Лабораторная', room: 'Лаб. 14', teacher: 'Петров П.П.', start: '13:20', end: '14:50' }
-            ],
-            4: [ // Четверг
-                { id: 'th1', subjectId: 'cs', name: 'Алгоритмы и СД', type: 'Практика', room: 'Комп. класс 3', teacher: 'Смирнов А.В.', start: '10:00', end: '11:30' }
-            ],
-            5: [ // Пятница
-                { id: 'f1', subjectId: 'philosophy', name: 'Философия', type: 'Лекция', room: 'Ауд. 200', teacher: 'Сидорова А.А.', start: '09:00', end: '10:30' },
-                { id: 'f2', subjectId: 'english', name: 'Иностранный язык', type: 'Семинар', room: 'Ауд. 210', teacher: 'White J.', start: '10:40', end: '12:10' }
-            ],
-            6: [], // Суббота
-            0: []  // Воскресенье
+        // Официальное расписание группы БГО-101 (МЭИ, 1 семестр 2026-2027) по неделям
+        // Ключи — даты начала недели в формате 'YYYY-MM-DD', внутри — дни недели (1-Пн ... 6-Сб)
+        const timetableData = {
+            "2026-09-21": { // Неделя 21.09.26 - 27.09.26
+                5: [ // Пятница 25.09
+                    { id: 'bgo_25_1', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Лекция', room: 'Ауд. 205', teacher: 'Макаршин И.В.', start: '09:00', end: '10:30' },
+                    { id: 'bgo_25_2', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Лекция', room: 'Ауд. 205', teacher: 'Макаршин И.В.', start: '10:40', end: '12:10' }
+                ]
+            },
+            "2026-09-28": { // Неделя 28.09.26 - 04.10.26
+                1: [ // Понедельник 28.09
+                    { id: 'bgo_28_1', subjectId: 'sport', name: 'Физическая культура и спорт', type: 'Лекция', room: 'Ауд. 409', teacher: 'Фирсин С.А.', start: '10:40', end: '12:10' },
+                    { id: 'bgo_28_2', subjectId: 'sport', name: 'Физическая культура и спорт', type: 'Практическое занятие', room: 'Ауд. 409', teacher: 'Фирсин С.А.', start: '12:40', end: '14:10' }
+                ],
+                2: [ // Вторник 29.09
+                    { id: 'bgo_29_1', subjectId: 'phil', name: 'Философия', type: 'Лекция', room: 'Ауд. 210', teacher: 'Заклинский П.А.', start: '09:00', end: '10:30' },
+                    { id: 'bgo_29_2', subjectId: 'phil', name: 'Философия', type: 'Лекция', room: 'Ауд. 210', teacher: 'Заклинский П.А.', start: '10:40', end: '12:10' }
+                ],
+                3: [ // Среда 30.09
+                    { id: 'bgo_30_1', subjectId: 'org', name: 'Основы российской государственности', type: 'Лекция', room: 'Ауд. 210', teacher: 'Кузьмичева Н.В.', start: '09:00', end: '10:30' },
+                    { id: 'bgo_30_2', subjectId: 'org', name: 'Основы российской государственности', type: 'Лекция', room: 'Ауд. 210', teacher: 'Кузьмичева Н.В.', start: '10:40', end: '12:10' },
+                    { id: 'bgo_30_3', subjectId: 'hist', name: 'История России', type: 'Лекция', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '12:40', end: '14:10' },
+                    { id: 'bgo_30_4', subjectId: 'hist', name: 'История России', type: 'Лекция', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '14:20', end: '15:50' }
+                ],
+                4: [ // Четверг 01.10
+                    { id: 'bgo_01_1', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Лекция', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '12:40', end: '14:10' },
+                    { id: 'bgo_01_2', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Лекция', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '14:30', end: '15:50' },
+                    { id: 'bgo_01_3', subjectId: 'phil', name: 'Философия', type: 'Практическое занятие', room: 'Ауд. 206', teacher: 'Заклинский П.А.', start: '16:00', end: '17:30' }
+                ],
+                5: [ // Пятница 02.10
+                    { id: 'bgo_02_1', subjectId: 'econ', name: 'Экономическая теория', type: 'Лекция', room: 'Ауд. 409', teacher: 'Башашкина Г.Ю.', start: '12:40', end: '14:10' },
+                    { id: 'bgo_02_2', subjectId: 'econ', name: 'Экономическая теория', type: 'Лекция', room: 'Ауд. 409', teacher: 'Башашкина Г.Ю.', start: '14:20', end: '15:50' },
+                    { id: 'bgo_02_3', subjectId: 'lang', name: 'Иностранный язык', type: 'Лекция', room: 'Ауд. 401', teacher: 'Пенькова Е.А.', start: '16:00', end: '17:30' }
+                ]
+            },
+            "2026-10-05": { // Неделя 05.10.26 - 11.10.26
+                1: [ // Понедельник 05.10
+                    { id: 'bgo_05_1', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Практическое занятие', room: 'Ауд. 205', teacher: 'Макаршин И.В.', start: '14:20', end: '15:50' },
+                    { id: 'bgo_05_2', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Практическое занятие', room: 'Ауд. 205', teacher: 'Макаршин И.В.', start: '16:00', end: '17:30' }
+                ],
+                2: [ // Вторник 06.10
+                    { id: 'bgo_06_1', subjectId: 'phil', name: 'Философия', type: 'Практическое занятие', room: 'Ауд. 206', teacher: 'Заклинский П.А.', start: '09:00', end: '10:30' },
+                    { id: 'bgo_06_2', subjectId: 'phil', name: 'Философия', type: 'Практическое занятие', room: 'Ауд. 206', teacher: 'Заклинский П.А.', start: '10:40', end: '12:10' }
+                ],
+                3: [ // Среда 07.10
+                    { id: 'bgo_07_1', subjectId: 'rus', name: 'Русский язык и культура речи', type: 'Лекция', room: 'Ауд. 210', teacher: 'Кузьмичева Н.В.', start: '09:00', end: '10:30' },
+                    { id: 'bgo_07_2', subjectId: 'rus', name: 'Русский язык и культура речи', type: 'Лекция', room: 'Ауд. 210', teacher: 'Кузьмичева Н.В.', start: '10:40', end: '12:10' },
+                    { id: 'bgo_07_3', subjectId: 'hist', name: 'История России', type: 'Лекция', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '12:40', end: '14:10' },
+                    { id: 'bgo_07_4', subjectId: 'hist', name: 'История России', type: 'Лекция', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '14:20', end: '15:50' }
+                ],
+                4: [ // Четверг 08.10
+                    { id: 'bgo_08_1', subjectId: 'econ', name: 'Экономическая теория', type: 'Практическое занятие', room: 'Ауд. 401', teacher: 'Баклашкина Г.Ю.', start: '09:00', end: '10:30' },
+                    { id: 'bgo_08_2', subjectId: 'econ', name: 'Экономическая теория', type: 'Практическое занятие', room: 'Ауд. 401', teacher: 'Баклашкина Г.Ю.', start: '10:40', end: '12:10' },
+                    { id: 'bgo_08_3', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Лекция', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '12:40', end: '14:10' },
+                    { id: 'bgo_08_4', subjectId: 'hist', name: 'История России', type: 'Практическое занятие', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '16:00', end: '17:30' }
+                ],
+                5: [ // Пятница 09.10
+                    { id: 'bgo_09_1', subjectId: 'lang', name: 'Иностранный язык', type: 'Практическое занятие', room: 'Ауд. 401', teacher: 'Пенькова Е.А.', start: '09:00', end: '10:30' },
+                    { id: 'bgo_09_2', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Лекция', room: 'Ауд. 210', teacher: 'Макаршин И.В.', start: '10:40', end: '12:10' }
+                ],
+                6: [ // Суббота 10.10
+                    { id: 'bgo_10_1', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Практическое занятие', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '09:00', end: '10:30' },
+                    { id: 'bgo_10_2', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Практическое занятие', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '10:40', end: '12:10' }
+                ]
+            }
         };
 
-        // Глобальное состояние
         let appData = JSON.parse(localStorage.getItem('vityaPlannerData')) || defaultData;
-        let selectedDate = new Date(); // Изначально сегодня
+        let selectedDate = new Date();
         let currentModalSubjectId = null;
         let notesTimeout = null;
 
-        // Инициализация
         function init() {
             applyTheme(appData.theme);
             renderHeaderDate();
             renderSchedule();
             updateNextClassWidget();
-            setInterval(updateNextClassWidget, 60000); // Обновление виджета раз в минуту
-            
-            // Инициализация иконок
+            setInterval(updateNextClassWidget, 60000);
             lucide.createIcons();
 
-            // Автосохранение заметок
             document.getElementById('modal-notes').addEventListener('input', function(e) {
                 const status = document.getElementById('notes-status');
                 status.textContent = 'Сохранение...';
@@ -311,8 +314,6 @@
                 }, 1000);
             });
         }
-
-        // --- УТИЛИТЫ ---
 
         function saveData() {
             localStorage.setItem('vityaPlannerData', JSON.stringify(appData));
@@ -328,8 +329,6 @@
             if (!appData.subjectsData[subjectId]) return 0;
             return appData.subjectsData[subjectId].tasks.filter(t => t.status !== 'done').length;
         }
-
-        // --- ТЕМЫ ---
 
         function toggleTheme() {
             appData.theme = appData.theme === 'light' ? 'dark' : 'light';
@@ -358,8 +357,6 @@
             lucide.createIcons();
         }
 
-        // --- ДАТЫ И РАСПИСАНИЕ ---
-
         const monthsRu = ['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'];
         const daysRu = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
 
@@ -381,9 +378,26 @@
             }
         }
 
+        function getMonday(d) {
+            d = new Date(d);
+            var day = d.getDay(),
+                diff = d.getDate() - day + (day == 0 ? -6: 1);
+            return new Date(d.setDate(diff));
+        }
+
         function getScheduleForDate(date) {
-            const dayOfWeek = date.getDay();
-            return scheduleTemplate[dayOfWeek] || [];
+            const monday = getMonday(date);
+            const year = monday.getFullYear();
+            const month = String(monday.getMonth() + 1).padStart(2, '0');
+            const day = String(monday.getDate()).padStart(2, '0');
+            const mondayStr = `${year}-${month}-${day}`;
+
+            const weekSchedule = timetableData[mondayStr];
+            if (!weekSchedule) return [];
+            
+            let dayOfWeek = date.getDay();
+            if (dayOfWeek === 0) dayOfWeek = 7; // Воскресенье
+            return weekSchedule[dayOfWeek] || [];
         }
 
         function renderSchedule() {
@@ -396,7 +410,7 @@
                     <div class="text-center py-12 bg-white dark:bg-cardDark rounded-3xl shadow-soft">
                         <i data-lucide="coffee" class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3"></i>
                         <h3 class="text-lg font-medium text-slate-500">Занятий нет!</h3>
-                        <p class="text-sm text-slate-400">Можно расслабиться.</p>
+                        <p class="text-sm text-slate-400">Отличный день для отдыха или самоподготовки.</p>
                     </div>`;
                 lucide.createIcons();
                 return;
@@ -409,14 +423,12 @@
 
                 const cardHtml = `
                     <div onclick='openModal(${JSON.stringify(cls)})' class="group bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-100 dark:hover:border-slate-700 flex flex-col sm:flex-row sm:items-center gap-4">
-                        <!-- Время -->
                         <div class="flex-shrink-0 bg-slate-50 dark:bg-slate-800 rounded-2xl p-3 text-center sm:w-28 shadow-inner border border-slate-100 dark:border-slate-700">
-                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">${index + 1}-я пара</span>
+                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Пара ${index + 1}</span>
                             <span class="block text-lg font-bold text-slate-800 dark:text-slate-200">${cls.start}</span>
                             <span class="block text-xs text-slate-500">${cls.end}</span>
                         </div>
                         
-                        <!-- Инфо -->
                         <div class="flex-1">
                             <div class="flex justify-between items-start mb-1">
                                 <span class="text-xs font-bold uppercase tracking-wider text-blue-500">${cls.type}</span>
@@ -439,11 +451,8 @@
             lucide.createIcons();
         }
 
-        // --- ВИДЖЕТ: БЛИЖАЙШЕЕ ЗАНЯТИЕ ---
-        
         function updateNextClassWidget() {
             const today = new Date();
-            // Показываем виджет только если выбрана сегодняшняя дата
             const widget = document.getElementById('next-class-widget');
             if (selectedDate.toDateString() !== today.toDateString()) {
                 widget.style.display = 'none';
@@ -504,8 +513,6 @@
             lucide.createIcons();
         }
 
-        // --- КАЛЕНДАРЬ ---
-
         let calendarDate = new Date();
 
         function toggleCalendar() {
@@ -535,17 +542,14 @@
             const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
             const lastDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
             
-            // Сдвиг для ПН = 1
             let startDay = firstDay.getDay();
             if (startDay === 0) startDay = 7;
             startDay--; 
 
-            // Пустые ячейки
             for (let i = 0; i < startDay; i++) {
                 grid.innerHTML += `<div></div>`;
             }
 
-            // Дни
             const today = new Date();
             for (let i = 1; i <= lastDay.getDate(); i++) {
                 const iterDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i);
@@ -574,20 +578,16 @@
             updateNextClassWidget();
         }
 
-        // --- МОДАЛЬНОЕ ОКНО И КАНБАН ---
-
         function openModal(cls) {
             currentModalSubjectId = cls.subjectId;
             ensureSubjectDataExists(cls.subjectId);
             
-            // Заполнение шапки
             document.getElementById('modal-type').textContent = cls.type;
             document.getElementById('modal-title').textContent = cls.name;
             document.getElementById('modal-time').textContent = `${cls.start} - ${cls.end}`;
             document.getElementById('modal-room').textContent = cls.room;
             document.getElementById('modal-teacher').textContent = cls.teacher;
             
-            // Загрузка заметок
             document.getElementById('modal-notes').value = appData.subjectsData[cls.subjectId].notes || '';
             document.getElementById('notes-status').textContent = '';
 
@@ -597,7 +597,6 @@
             const content = document.getElementById('modal-content');
             modal.classList.remove('hidden');
             
-            // Анимация появления
             requestAnimationFrame(() => {
                 modal.classList.remove('opacity-0');
                 content.classList.remove('translate-y-full');
@@ -614,7 +613,7 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
                 currentModalSubjectId = null;
-                renderSchedule(); // Обновить бейджи ДЗ
+                renderSchedule();
             }, 300);
         }
 
@@ -625,7 +624,6 @@
             }
         }
 
-        // Kanban Logic
         const statusMap = {
             'todo': { next: 'progress', prev: null },
             'progress': { next: 'done', prev: 'todo' },
@@ -644,7 +642,6 @@
                 count.textContent = colTasks.length;
 
                 colTasks.forEach(task => {
-                    // Расчет дней до дедлайна
                     let deadlineHtml = '';
                     if (task.deadline) {
                         const today = new Date();
@@ -677,7 +674,6 @@
                             </div>
                             ${deadlineHtml}
                             
-                            <!-- Управление (Появляется при наведении) -->
                             <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
                                 ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 hover:text-blue-500"><i data-lucide="arrow-left" class="w-3 h-3"></i></button>` : ''}
                                 ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 hover:text-blue-500"><i data-lucide="arrow-right" class="w-3 h-3"></i></button>` : ''}
@@ -725,15 +721,13 @@
             renderKanban();
         }
 
-        // --- ЭКСПОРТ / ИМПОРТ ---
-
         function exportData() {
             const dataStr = JSON.stringify(appData, null, 2);
             const blob = new Blob([dataStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Планнер_Бэкап_${new Date().toLocaleDateString('ru-RU')}.json`;
+            a.download = `Планнер_БГО101_Бэкап_${new Date().toLocaleDateString('ru-RU')}.json`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -761,14 +755,11 @@
             reader.readAsText(file);
         }
 
-        // Запуск приложения
         window.addEventListener('DOMContentLoaded', init);
         
-        // Закрытие модального окна по клику вне его
         document.getElementById('class-modal').addEventListener('click', function(e) {
             if(e.target === this) closeModal();
         });
-
     </script>
 </body>
 </html>
