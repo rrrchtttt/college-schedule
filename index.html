@@ -77,20 +77,9 @@
         <!-- HEADER -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <div class="flex items-center gap-3">
-                    <h1 id="header-date" class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Загрузка...</h1>
-                    <div class="flex items-center bg-white dark:bg-cardDark rounded-xl shadow-soft p-1 gap-1">
-                        <button onclick="changeWeek(-1)" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition" title="Прошлая неделя">
-                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                        </button>
-                        <button onclick="resetToCurrentWeek()" class="px-2 text-xs font-medium text-blue-500 hover:underline">Сегодня</button>
-                        <button onclick="changeWeek(1)" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition" title="Следующая неделя">
-                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Планнер Вити</h1>
                 <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
-                    <i data-lucide="book-open" class="w-4 h-4"></i> Планнер Вити • Группа БГО-101 (МЭИ)
+                    <i data-lucide="book-open" class="w-4 h-4"></i> Группа БГО-101 (МЭИ)
                 </p>
             </div>
             
@@ -127,8 +116,20 @@
             </div>
         </section>
 
-        <!-- НОВАЯ ПАНЕЛЬ ДНЕЙ НЕДЕЛИ -->
-        <section class="bg-white dark:bg-cardDark rounded-3xl shadow-soft p-4 card-transition">
+        <!-- НОВАЯ ПАНЕЛЬ ДНЕЙ НЕДЕЛИ С ШАПКОЙ МЕСЯЦА И НАВИГАЦИЕЙ -->
+        <section class="bg-white dark:bg-cardDark rounded-3xl shadow-soft p-4 card-transition space-y-4">
+            <div class="flex items-center justify-between px-2">
+                <h2 id="header-date" class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Загрузка...</h2>
+                <div class="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl shadow-inner p-1 gap-1">
+                    <button onclick="changeWeek(-1)" class="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition" title="Прошлая неделя">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="resetToCurrentWeek()" class="px-2 text-xs font-medium text-blue-500 hover:underline">Сегодня</button>
+                    <button onclick="changeWeek(1)" class="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition" title="Следующая неделя">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
             <div id="days-panel" class="grid grid-cols-7 gap-2">
                 <!-- Генерируется динамически через JS -->
             </div>
@@ -238,7 +239,7 @@
     <script>
         const defaultData = {
             theme: 'light',
-            daysData: {} // Хранилище данных изоляции по ключу даты (YYYY-MM-DD)
+            daysData: {} 
         };
 
         const timetableData = {
@@ -307,10 +308,10 @@
         };
 
         let appData = JSON.parse(localStorage.getItem('vityaPlannerData')) || defaultData;
-        if (!appData.daysData) appData.daysData = {}; // миграция для старых данных
+        if (!appData.daysData) appData.daysData = {};
         
         let selectedDate = new Date();
-        let weekOffset = 0; // Состояние смещения недель
+        let weekOffset = 0;
         let currentModalClassId = null;
         let notesTimeout = null;
 
@@ -403,7 +404,7 @@
             weekOffset += direction;
             const monday = getMonday(new Date());
             monday.setDate(monday.getDate() + (weekOffset * 7));
-            selectedDate = new Date(monday); // Автоматически переключаем на понедельник новой недели
+            selectedDate = new Date(monday);
             renderHeaderDate();
             renderDaysPanel();
             renderSchedule();
@@ -421,7 +422,6 @@
         function renderHeaderDate() {
             const headerDate = document.getElementById('header-date');
             
-            // Вычисляем уникальные месяцы текущей отображаемой недели (от Пн до Вс)
             const baseMonday = getMonday(new Date());
             baseMonday.setDate(baseMonday.getDate() + (weekOffset * 7));
             
@@ -454,7 +454,6 @@
             }
         }
 
-        // Рендер панели дней недели (пн-вс) для текущего смещения недели
         function renderDaysPanel() {
             const panel = document.getElementById('days-panel');
             panel.innerHTML = '';
@@ -687,7 +686,6 @@
         function selectDate(timestamp) {
             selectedDate = new Date(timestamp);
             
-            // Вычисляем weekOffset для выбранной даты, чтобы шапка недели соответствовала клику
             const currentMonday = getMonday(new Date());
             const targetMonday = getMonday(selectedDate);
             weekOffset = Math.round((targetMonday - currentMonday) / (1000 * 60 * 60 * 24 * 7));
