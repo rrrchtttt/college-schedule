@@ -78,6 +78,41 @@
             color: #92400E !important;
         }
 
+        /* Новая тема: «Северный лес» (Ледниковая / Сине-коричневая) */
+        body.frost-brown-theme {
+            --bg-light: #EBF2F7;
+            --bg-dark: #0B131E;
+            --card-light: #F7FAFC;
+            --card-dark: #141F2C;
+            --accent-main: #2563EB;
+        }
+        body.frost-brown-theme .bg-blue-500,
+        body.frost-brown-theme .peer-checked\:bg-blue-500:checked ~ div,
+        body.frost-brown-theme .peer-checked\:bg-blue-500 {
+            background-color: #1E40AF !important;
+        }
+        body.frost-brown-theme .text-blue-500,
+        body.frost-brown-theme .group-hover\:text-blue-500:hover {
+            color: #1E40AF !important;
+        }
+        body.frost-brown-theme .border-blue-100,
+        body.frost-brown-theme .hover\:border-blue-100:hover {
+            border-color: #CBD5E1 !important;
+        }
+        body.frost-brown-theme .bg-blue-50 {
+            background-color: #E2E8F0 !important;
+        }
+        body.frost-brown-theme .bg-blue-100 {
+            background-color: #CBD5E1 !important;
+            color: #1E293B !important;
+        }
+        /* Древесно-коричневые акценты для карточек и элементов управления в теме «Северный лес» */
+        body.frost-brown-theme .card-transition,
+        body.frost-brown-theme header,
+        body.frost-brown-theme section {
+            border-color: rgba(146, 64, 14, 0.15);
+        }
+
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         * { scrollbar-width: none; }
         body, .card-transition { transition: background-color 0.3s ease, color 0.3s ease; }
@@ -107,7 +142,7 @@
             font-size: 0.75rem;
         }
 
-        /* Анимация падающих листьев */
+        /* Анимация падающих листьев (осенний режим) */
         #leaves-container {
             position: fixed;
             top: 0;
@@ -132,22 +167,46 @@
             animation: fall linear infinite;
         }
         @keyframes fall {
-            0% {
-                transform: translateY(-10vh) translateX(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(50vh) translateX(40px) rotate(180deg);
-            }
-            100% {
-                transform: translateY(110vh) translateX(-30px) rotate(360deg);
-            }
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); }
+            50% { transform: translateY(50vh) translateX(40px) rotate(180deg); }
+            100% { transform: translateY(110vh) translateX(-30px) rotate(360deg); }
+        }
+
+        /* Анимация частиц льда / северного сияния (тема «Северный лес») */
+        #frost-particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 99;
+            display: none;
+        }
+        body.frost-brown-theme #frost-particles-container {
+            display: block;
+        }
+        .frost-particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(59,130,246,0.6) 0%, rgba(180,83,9,0.3) 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float-particle linear infinite;
+        }
+        @keyframes float-particle {
+            0% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
     </style>
 </head>
 <body class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen p-4 md:p-8 selection:bg-blue-200 dark:selection:bg-blue-900 pb-24">
 
-    <!-- Контейнер для падающих листьев -->
+    <!-- Контейнеры фоновых эффектов -->
     <div id="leaves-container"></div>
+    <div id="frost-particles-container"></div>
 
     <div class="max-w-3xl mx-auto space-y-8">
         
@@ -267,11 +326,12 @@
                 <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
                     <div>
                         <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Тема оформления</h4>
-                        <p class="text-xs text-slate-400">Классическая или Осенний вайб</p>
+                        <p class="text-xs text-slate-400">Выберите стиль интерфейса</p>
                     </div>
                     <select id="setting-theme-mode" onchange="changeThemeMode(this.value)" class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-xl px-3 py-1.5 outline-none border border-slate-200 dark:border-slate-600 cursor-pointer">
                         <option value="classic">Классическая</option>
                         <option value="autumn">Осенний режим</option>
+                        <option value="frost-brown">Северный лес</option>
                     </select>
                 </div>
 
@@ -378,7 +438,7 @@
     <script>
         const defaultData = {
             theme: 'light',
-            themeMode: 'classic', // 'classic' или 'autumn'
+            themeMode: 'classic', // 'classic', 'autumn' или 'frost-brown'
             settings: {
                 showWidget: true,
                 compactTasks: false
@@ -471,6 +531,7 @@
             renderSchedule();
             updateNextClassWidget();
             initFallingLeaves();
+            initFrostParticles();
             setInterval(updateNextClassWidget, 60000);
             lucide.createIcons();
 
@@ -520,13 +581,19 @@
             
             if (theme === 'dark') {
                 html.classList.add('dark');
-                if (appData.themeMode !== 'autumn') metaColor.setAttribute('content', '#0F172A');
+                if (appData.themeMode === 'autumn') metaColor.setAttribute('content', '#1C1512');
+                else if (appData.themeMode === 'frost-brown') metaColor.setAttribute('content', '#0B131E');
+                else metaColor.setAttribute('content', '#0F172A');
+                
                 themeIcon.setAttribute('data-lucide', 'sun');
                 themeIcon.classList.remove('text-slate-700');
                 themeIcon.classList.add('text-amber-400');
             } else {
                 html.classList.remove('dark');
-                if (appData.themeMode !== 'autumn') metaColor.setAttribute('content', '#F0F4F8');
+                if (appData.themeMode === 'autumn') metaColor.setAttribute('content', '#FDF8F2');
+                else if (appData.themeMode === 'frost-brown') metaColor.setAttribute('content', '#EBF2F7');
+                else metaColor.setAttribute('content', '#F0F4F8');
+                
                 themeIcon.setAttribute('data-lucide', 'moon');
                 themeIcon.classList.add('text-slate-700');
                 themeIcon.classList.remove('text-amber-400');
@@ -537,6 +604,7 @@
         function changeThemeMode(mode) {
             appData.themeMode = mode;
             applyThemeMode(mode);
+            applyTheme(appData.theme);
             saveData();
         }
 
@@ -545,37 +613,55 @@
             const select = document.getElementById('setting-theme-mode');
             if (select) select.value = mode;
 
+            body.classList.remove('autumn-theme', 'frost-brown-theme');
+
             if (mode === 'autumn') {
                 body.classList.add('autumn-theme');
-            } else {
-                body.classList.remove('autumn-theme');
+            } else if (mode === 'frost-brown') {
+                body.classList.add('frost-brown-theme');
             }
         }
 
-        // Исправленная генерация падающих листьев
+        // Генерация падающих листьев
         function initFallingLeaves() {
             const container = document.getElementById('leaves-container');
             container.innerHTML = '';
-            
             const leafColors = ['#D97706', '#B45309', '#92400E', '#EA580C', '#C2410C'];
             
             for (let i = 0; i < 15; i++) {
                 const leaf = document.createElement('div');
                 leaf.className = 'leaf';
-                
                 const color = leafColors[Math.floor(Math.random() * leafColors.length)];
                 const leafSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${encodeURIComponent(color)}"><path d="M17.8 2.8c-2.5-.5-5.5.6-7.8 2.5-3.5 3-5.2 7.2-4.5 10.5l-3 3 1.4 1.4 3-3c3.3.7 7.5-1 10.5-4.5 1.9-2.3 3-5.3 2.5-7.8-.3-1.6-1.5-2.8-3.1-3.1z"/></svg>`;
-                
                 leaf.style.backgroundImage = `url("${leafSvg}")`;
                 
-                const size = Math.floor(Math.random() * 18) + 16; // от 16 до 34px
+                const size = Math.floor(Math.random() * 18) + 16;
                 leaf.style.width = `${size}px`;
                 leaf.style.height = `${size}px`;
                 leaf.style.left = `${Math.random() * 100}vw`;
-                leaf.style.animationDuration = `${Math.random() * 7 + 5}s`; // от 5 до 12 секунд
+                leaf.style.animationDuration = `${Math.random() * 7 + 5}s`;
                 leaf.style.animationDelay = `${Math.random() * 6}s`;
-                
                 container.appendChild(leaf);
+            }
+        }
+
+        // Генерация фоновых ледяных микрочастиц для темы «Северный лес»
+        function initFrostParticles() {
+            const container = document.getElementById('frost-particles-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'frost-particle';
+                
+                const size = Math.floor(Math.random() * 6) + 3; // от 3 до 8px
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.animationDuration = `${Math.random() * 8 + 6}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                container.appendChild(particle);
             }
         }
 
@@ -665,9 +751,9 @@
             let monthString = "";
             const monthsArr = Array.from(weekMonths);
             if(monthsArr.length === 1) {
-                monthString = `${monthsNamesOnly[monthsArr[0]]} ${weekYear}`;
+                monthString = `${monthsNamesOnly[monthsArr[0]]}${weekYear}`;
             } else {
-                monthString = `${monthsNamesOnly[monthsArr[0]]} — ${monthsNamesOnly[monthsArr[1]]} ${weekYear}`;
+                monthString = `${monthsNamesOnly[monthsArr[0]]} — ${monthsNamesOnly[monthsArr[1]]}${weekYear}`;
             }
             headerDate.textContent = monthString;
 
@@ -790,8 +876,7 @@
                             
                             <div class="flex-1">
                                 <div class="flex justify-between items-start mb-1">
-                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-500">${cls.type}</span>
-                                    ${badgeHtml}
+                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-500">${cls.type}</span>${badgeHtml}
                                 </div>
                                 <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-500 transition">${cls.name}</h3>
                                 <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
@@ -816,7 +901,7 @@
                     const classes = getScheduleForDate(iterDate);
                     const iterDateKey = getDateKey(iterDate);
                     
-                    const dayTitle = `${daysRu[iterDate.getDay()]} (${iterDate.getDate()} ${monthsRu[iterDate.getMonth()]})`;
+                    const dayTitle = `${daysRu[iterDate.getDay()]} (${iterDate.getDate()}${monthsRu[iterDate.getMonth()]})`;
 
                     let classesHtml = '';
                     if (classes.length === 0) {
@@ -830,9 +915,8 @@
                                 <div onclick='selectDate(${iterDate.getTime()}); openModal(${JSON.stringify(cls)})' class="p-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-blue-50/50 dark:hover:bg-slate-800 rounded-2xl cursor-pointer transition flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-slate-100 dark:border-slate-700/50">
                                     <div>
                                         <div class="flex items-center gap-2 mb-1">
-                                            <span class="text-xs font-bold text-blue-500">${cls.start} - ${cls.end}</span>
-                                            <span class="text-xs text-slate-400">• ${cls.room}</span>
-                                            ${badgeHtml}
+                                            <span class="text-xs font-bold text-blue-500">${cls.start} -${cls.end}</span>
+                                            <span class="text-xs text-slate-400">• ${cls.room}</span>${badgeHtml}
                                         </div>
                                         <h4 class="font-bold text-slate-800 dark:text-slate-200">${cls.name}</h4>
                                     </div>
@@ -939,7 +1023,7 @@
             const monthYear = document.getElementById('calendar-month-year');
             grid.innerHTML = '';
             
-            monthYear.textContent = `${monthsNamesOnly[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
+            monthYear.textContent = `${monthsNamesOnly[calendarDate.getMonth()]}${calendarDate.getFullYear()}`;
 
             const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
             const lastDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
@@ -991,7 +1075,7 @@
             
             document.getElementById('modal-type').textContent = cls.type;
             document.getElementById('modal-title').textContent = cls.name;
-            document.getElementById('modal-time').textContent = `${cls.start} - ${cls.end}`;
+            document.getElementById('modal-time').textContent = `${cls.start} -${cls.end}`;
             document.getElementById('modal-room').textContent = cls.room;
             document.getElementById('modal-teacher').textContent = cls.teacher;
             
