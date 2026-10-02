@@ -96,6 +96,10 @@
                         <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
                     </label>
                 </div>
+                <!-- Кнопка Настроек в шапке -->
+                <button onclick="openSettingsModal()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Настройки">
+                    <i data-lucide="settings" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
+                </button>
                 <button onclick="toggleTheme()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Тема">
                     <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-slate-700 dark:text-amber-400"></i>
                 </button>
@@ -148,19 +152,69 @@
             <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
         </section>
 
-        <!-- SCHEDULE LIST -->
+        <!-- SCHEDULE LIST / WEEK VIEW CONTAINER -->
         <section>
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold flex items-center gap-2">
-                    <i data-lucide="list" class="w-5 h-5 text-blue-500"></i> Расписание на день
+                    <i data-lucide="list" class="w-5 h-5 text-blue-500"></i> <span id="schedule-section-title">Расписание на день</span>
                 </h2>
-                <span id="schedule-date-badge" class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
-                    Сегодня
-                </span>
+                
+                <div class="flex items-center gap-3">
+                    <span id="schedule-date-badge" class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
+                        Сегодня
+                    </span>
+                    <!-- Переключатель Вида: День / Неделя -->
+                    <div class="flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1 border border-slate-100 dark:border-slate-700">
+                        <button onclick="setScheduleView('day')" id="view-btn-day" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition">День</button>
+                        <button onclick="setScheduleView('week')" id="view-btn-week" class="px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition">Неделя</button>
+                    </div>
+                </div>
             </div>
             
             <div id="schedule-list" class="space-y-4"></div>
         </section>
+    </div>
+
+    <!-- MODAL: НАСТРОЙКИ -->
+    <div id="settings-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-cardDark w-full max-w-md rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="settings-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                    <i data-lucide="settings" class="w-5 h-5 text-blue-500"></i> Настройки
+                </h2>
+                <button onclick="closeSettingsModal()" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
+                    <div>
+                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Виджет «Ближайшее занятие»</h4>
+                        <p class="text-xs text-slate-400">Показывать блок статуса пары вверху</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="setting-widget" class="sr-only peer" onchange="updateSetting('showWidget', this.checked)">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
+                    <div>
+                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Компактный список заданий</h4>
+                        <p class="text-xs text-slate-400">Оптимизировать отступы в канбан-доске</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="setting-compact" class="sr-only peer" onchange="updateSetting('compactTasks', this.checked)">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end">
+                <button onclick="closeSettingsModal()" class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm rounded-xl transition shadow-md">Готово</button>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL: ДЕТАЛИ ПРЕДМЕТА И КАНБАН -->
@@ -239,6 +293,10 @@
     <script>
         const defaultData = {
             theme: 'light',
+            settings: {
+                showWidget: true,
+                compactTasks: false
+            },
             daysData: {} 
         };
 
@@ -309,14 +367,17 @@
 
         let appData = JSON.parse(localStorage.getItem('vityaPlannerData')) || defaultData;
         if (!appData.daysData) appData.daysData = {};
+        if (!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
         
         let selectedDate = new Date();
         let weekOffset = 0;
+        let currentScheduleView = 'day'; // 'day' или 'week'
         let currentModalClassId = null;
         let notesTimeout = null;
 
         function init() {
             applyTheme(appData.theme);
+            applySettingsToUI();
             renderHeaderDate();
             renderDaysPanel();
             renderSchedule();
@@ -388,6 +449,46 @@
             lucide.createIcons();
         }
 
+        // Функции настроек
+        function openSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            const content = document.getElementById('settings-modal-content');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            });
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            const content = document.getElementById('settings-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function applySettingsToUI() {
+            document.getElementById('setting-widget').checked = appData.settings.showWidget;
+            document.getElementById('setting-compact').checked = appData.settings.compactTasks;
+            
+            const widgetEl = document.getElementById('next-class-widget');
+            if (appData.settings.showWidget) {
+                widgetEl.style.display = 'block';
+                updateNextClassWidget();
+            } else {
+                widgetEl.style.display = 'none';
+            }
+        }
+
+        function updateSetting(key, value) {
+            appData.settings[key] = value;
+            saveData();
+            applySettingsToUI();
+        }
+
         const monthsRu = ['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'];
         const monthsNamesOnly = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
         const daysRu = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
@@ -446,7 +547,7 @@
 
             const badge = document.getElementById('schedule-date-badge');
             const today = new Date();
-            if (selectedDate.toDateString() === today.toDateString()) {
+            if (currentScheduleView === 'day' && selectedDate.toDateString() === today.toDateString()) {
                 badge.textContent = 'Сегодня';
                 badge.classList.remove('hidden');
             } else {
@@ -466,7 +567,7 @@
                 const iterDate = new Date(monday);
                 iterDate.setDate(monday.getDate() + i);
 
-                const isSelected = iterDate.toDateString() === selectedDate.toDateString();
+                const isSelected = (currentScheduleView === 'day') && (iterDate.toDateString() === selectedDate.toDateString());
                 const isToday = iterDate.toDateString() === today.toDateString();
 
                 let cardClass = "flex flex-col items-center justify-center py-3 rounded-2xl cursor-pointer transition-all relative ";
@@ -513,59 +614,132 @@
             return weekSchedule[dayOfWeek] || [];
         }
 
-        function renderSchedule() {
-            const container = document.getElementById('schedule-list');
-            const classes = getScheduleForDate(selectedDate);
-            const currentDateKey = getDateKey(selectedDate);
-            container.innerHTML = '';
-
-            if (classes.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 bg-white dark:bg-cardDark rounded-3xl shadow-soft">
-                        <i data-lucide="coffee" class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3"></i>
-                        <h3 class="text-lg font-medium text-slate-500">Занятий нет!</h3>
-                        <p class="text-sm text-slate-400">Отличный день для отдыха или самоподготовки.</p>
-                    </div>`;
-                lucide.createIcons();
-                return;
+        function setScheduleView(view) {
+            currentScheduleView = view;
+            const btnDay = document.getElementById('view-btn-day');
+            const btnWeek = document.getElementById('view-btn-week');
+            
+            if (view === 'day') {
+                btnDay.className = "px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition";
+                btnWeek.className = "px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition";
+                document.getElementById('schedule-section-title').textContent = "Расписание на день";
+            } else {
+                btnWeek.className = "px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition";
+                btnDay.className = "px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition";
+                document.getElementById('schedule-section-title').textContent = "Расписание на неделю";
             }
 
-            classes.forEach((cls, index) => {
-                const activeTasks = getActiveTasksCount(currentDateKey, cls.id);
-                const badgeHtml = activeTasks > 0 ? 
-                    `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm"><i data-lucide="alert-circle" class="w-3 h-3"></i> ДЗ: ${activeTasks}</span>` : '';
+            renderHeaderDate();
+            renderDaysPanel();
+            renderSchedule();
+        }
 
-                const cardHtml = `
-                    <div onclick='openModal(${JSON.stringify(cls)})' class="group bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-100 dark:hover:border-slate-700 flex flex-col sm:flex-row sm:items-center gap-4">
-                        <div class="flex-shrink-0 bg-slate-50 dark:bg-slate-800 rounded-2xl p-3 text-center sm:w-28 shadow-inner border border-slate-100 dark:border-slate-700">
-                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Пара ${index + 1}</span>
-                            <span class="block text-lg font-bold text-slate-800 dark:text-slate-200">${cls.start}</span>
-                            <span class="block text-xs text-slate-500">${cls.end}</span>
-                        </div>
-                        
-                        <div class="flex-1">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs font-bold uppercase tracking-wider text-blue-500">${cls.type}</span>
-                                ${badgeHtml}
+        function renderSchedule() {
+            const container = document.getElementById('schedule-list');
+            container.innerHTML = '';
+
+            if (currentScheduleView === 'day') {
+                const classes = getScheduleForDate(selectedDate);
+                const currentDateKey = getDateKey(selectedDate);
+
+                if (classes.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-12 bg-white dark:bg-cardDark rounded-3xl shadow-soft">
+                            <i data-lucide="coffee" class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3"></i>
+                            <h3 class="text-lg font-medium text-slate-500">Занятий нет!</h3>
+                            <p class="text-sm text-slate-400">Отличный день для отдыха или самоподготовки.</p>
+                        </div>`;
+                    lucide.createIcons();
+                    return;
+                }
+
+                classes.forEach((cls, index) => {
+                    const activeTasks = getActiveTasksCount(currentDateKey, cls.id);
+                    const badgeHtml = activeTasks > 0 ? 
+                        `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm"><i data-lucide="alert-circle" class="w-3 h-3"></i> ДЗ: ${activeTasks}</span>` : '';
+
+                    const cardHtml = `
+                        <div onclick='openModal(${JSON.stringify(cls)})' class="group bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-100 dark:hover:border-slate-700 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="flex-shrink-0 bg-slate-50 dark:bg-slate-800 rounded-2xl p-3 text-center sm:w-28 shadow-inner border border-slate-100 dark:border-slate-700">
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Пара ${index + 1}</span>
+                                <span class="block text-lg font-bold text-slate-800 dark:text-slate-200">${cls.start}</span>
+                                <span class="block text-xs text-slate-500">${cls.end}</span>
                             </div>
-                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-500 transition">${cls.name}</h3>
-                            <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
-                                <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> ${cls.room}</span>
-                                <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${cls.teacher}</span>
+                            
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-500">${cls.type}</span>
+                                    ${badgeHtml}
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-500 transition">${cls.name}</h3>
+                                <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                                    <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> ${cls.room}</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${cls.teacher}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="hidden sm:flex text-slate-300 dark:text-slate-600 group-hover:text-blue-500 transition">
+                                <i data-lucide="chevron-right" class="w-6 h-6"></i>
                             </div>
                         </div>
-                        
-                        <div class="hidden sm:flex text-slate-300 dark:text-slate-600 group-hover:text-blue-500 transition">
-                            <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                    `;
+                    container.insertAdjacentHTML('beforeend', cardHtml);
+                });
+            } else {
+                // Рендер Недельного Вида (сводка на 7 дней)
+                const monday = getMonday(selectedDate);
+                
+                for (let i = 0; i < 7; i++) {
+                    const iterDate = new Date(monday);
+                    iterDate.setDate(monday.getDate() + i);
+                    const classes = getScheduleForDate(iterDate);
+                    const iterDateKey = getDateKey(iterDate);
+                    
+                    const dayTitle = `${daysRu[iterDate.getDay()]} (${iterDate.getDate()} ${monthsRu[iterDate.getMonth()]})`;
+
+                    let classesHtml = '';
+                    if (classes.length === 0) {
+                        classesHtml = `<p class="text-sm text-slate-400 italic py-2">Занятий нет</p>`;
+                    } else {
+                        classes.forEach((cls, index) => {
+                            const activeTasks = getActiveTasksCount(iterDateKey, cls.id);
+                            const badgeHtml = activeTasks > 0 ? `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs px-2 py-0.5 rounded-full font-bold">ДЗ: ${activeTasks}</span>` : '';
+                            
+                            classesHtml += `
+                                <div onclick='selectDate(${iterDate.getTime()}); openModal(${JSON.stringify(cls)})' class="p-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-blue-50/50 dark:hover:bg-slate-800 rounded-2xl cursor-pointer transition flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-slate-100 dark:border-slate-700/50">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-xs font-bold text-blue-500">${cls.start} - ${cls.end}</span>
+                                            <span class="text-xs text-slate-400">• ${cls.room}</span>
+                                            ${badgeHtml}
+                                        </div>
+                                        <h4 class="font-bold text-slate-800 dark:text-slate-200">${cls.name}</h4>
+                                    </div>
+                                    <span class="text-xs text-slate-400 self-start sm:self-center">${cls.teacher}</span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    const dayCardHtml = `
+                        <div class="bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft space-y-3">
+                            <h3 class="font-bold text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-2 flex justify-between items-center">
+                                <span>${dayTitle}</span>
+                                <button onclick="selectedDate = new Date(${iterDate.getTime()}); setScheduleView('day');" class="text-xs text-blue-500 font-medium hover:underline">Открыть день</button>
+                            </h3>
+                            <div class="space-y-2">
+                                ${classesHtml}
+                            </div>
                         </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', cardHtml);
-            });
+                    `;
+                    container.insertAdjacentHTML('beforeend', dayCardHtml);
+                }
+            }
             lucide.createIcons();
         }
 
         function updateNextClassWidget() {
+            if (!appData.settings.showWidget) return;
             const today = new Date();
             const widget = document.getElementById('next-class-widget');
             if (selectedDate.toDateString() !== today.toDateString()) {
@@ -870,8 +1044,10 @@
                     if (imported && (imported.daysData || imported.subjectsData)) {
                         appData = imported;
                         if(!appData.daysData) appData.daysData = {};
+                        if(!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
                         saveData();
                         applyTheme(appData.theme);
+                        applySettingsToUI();
                         renderDaysPanel();
                         renderSchedule();
                         alert('Данные успешно загружены!');
@@ -889,6 +1065,9 @@
         
         document.getElementById('class-modal').addEventListener('click', function(e) {
             if(e.target === this) closeModal();
+        });
+        document.getElementById('settings-modal').addEventListener('click', function(e) {
+            if(e.target === this) closeSettingsModal();
         });
     </script>
 </body>
