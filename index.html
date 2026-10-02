@@ -116,6 +116,13 @@
             </div>
         </section>
 
+        <!-- НОВАЯ ПАНЕЛЬ ДНЕЙ НЕДЕЛИ -->
+        <section class="bg-white dark:bg-cardDark rounded-3xl shadow-soft p-4 card-transition">
+            <div id="days-panel" class="grid grid-cols-7 gap-2">
+                <!-- Генерируется динамически через JS -->
+            </div>
+        </section>
+
         <!-- CALENDAR DROPDOWN -->
         <section id="calendar-dropdown" class="hidden bg-white dark:bg-cardDark rounded-3xl shadow-soft p-6 card-transition transition-all duration-300">
             <div class="flex justify-between items-center mb-4">
@@ -223,67 +230,65 @@
             subjectsData: {}
         };
 
-        // Официальное расписание группы БГО-101 (МЭИ, 1 семестр 2026-2027) по неделям
-        // Ключи — даты начала недели в формате 'YYYY-MM-DD', внутри — дни недели (1-Пн ... 6-Сб)
         const timetableData = {
-            "2026-09-21": { // Неделя 21.09.26 - 27.09.26
-                5: [ // Пятница 25.09
+            "2026-09-21": {
+                5: [
                     { id: 'bgo_25_1', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Лекция', room: 'Ауд. 205', teacher: 'Макаршин И.В.', start: '09:00', end: '10:30' },
                     { id: 'bgo_25_2', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Лекция', room: 'Ауд. 205', teacher: 'Макаршин И.В.', start: '10:40', end: '12:10' }
                 ]
             },
-            "2026-09-28": { // Неделя 28.09.26 - 04.10.26
-                1: [ // Понедельник 28.09
+            "2026-09-28": {
+                1: [
                     { id: 'bgo_28_1', subjectId: 'sport', name: 'Физическая культура и спорт', type: 'Лекция', room: 'Ауд. 409', teacher: 'Фирсин С.А.', start: '10:40', end: '12:10' },
                     { id: 'bgo_28_2', subjectId: 'sport', name: 'Физическая культура и спорт', type: 'Практическое занятие', room: 'Ауд. 409', teacher: 'Фирсин С.А.', start: '12:40', end: '14:10' }
                 ],
-                2: [ // Вторник 29.09
+                2: [
                     { id: 'bgo_29_1', subjectId: 'phil', name: 'Философия', type: 'Лекция', room: 'Ауд. 210', teacher: 'Заклинский П.А.', start: '09:00', end: '10:30' },
                     { id: 'bgo_29_2', subjectId: 'phil', name: 'Философия', type: 'Лекция', room: 'Ауд. 210', teacher: 'Заклинский П.А.', start: '10:40', end: '12:10' }
                 ],
-                3: [ // Среда 30.09
+                3: [
                     { id: 'bgo_30_1', subjectId: 'org', name: 'Основы российской государственности', type: 'Лекция', room: 'Ауд. 210', teacher: 'Кузьмичева Н.В.', start: '09:00', end: '10:30' },
                     { id: 'bgo_30_2', subjectId: 'org', name: 'Основы российской государственности', type: 'Лекция', room: 'Ауд. 210', teacher: 'Кузьмичева Н.В.', start: '10:40', end: '12:10' },
                     { id: 'bgo_30_3', subjectId: 'hist', name: 'История России', type: 'Лекция', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '12:40', end: '14:10' },
                     { id: 'bgo_30_4', subjectId: 'hist', name: 'История России', type: 'Лекция', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '14:20', end: '15:50' }
                 ],
-                4: [ // Четверг 01.10
+                4: [
                     { id: 'bgo_01_1', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Лекция', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '12:40', end: '14:10' },
                     { id: 'bgo_01_2', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Лекция', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '14:30', end: '15:50' },
                     { id: 'bgo_01_3', subjectId: 'phil', name: 'Философия', type: 'Практическое занятие', room: 'Ауд. 206', teacher: 'Заклинский П.А.', start: '16:00', end: '17:30' }
                 ],
-                5: [ // Пятница 02.10
+                5: [
                     { id: 'bgo_02_1', subjectId: 'econ', name: 'Экономическая теория', type: 'Лекция', room: 'Ауд. 409', teacher: 'Башашкина Г.Ю.', start: '12:40', end: '14:10' },
                     { id: 'bgo_02_2', subjectId: 'econ', name: 'Экономическая теория', type: 'Лекция', room: 'Ауд. 409', teacher: 'Башашкина Г.Ю.', start: '14:20', end: '15:50' },
                     { id: 'bgo_02_3', subjectId: 'lang', name: 'Иностранный язык', type: 'Лекция', room: 'Ауд. 401', teacher: 'Пенькова Е.А.', start: '16:00', end: '17:30' }
                 ]
             },
-            "2026-10-05": { // Неделя 05.10.26 - 11.10.26
-                1: [ // Понедельник 05.10
+            "2026-10-05": {
+                1: [
                     { id: 'bgo_05_1', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Практическое занятие', room: 'Ауд. 205', teacher: 'Макаршин И.В.', start: '14:20', end: '15:50' },
                     { id: 'bgo_05_2', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Практическое занятие', room: 'Ауд. 205', teacher: 'Макаршин И.В.', start: '16:00', end: '17:30' }
                 ],
-                2: [ // Вторник 06.10
+                2: [
                     { id: 'bgo_06_1', subjectId: 'phil', name: 'Философия', type: 'Практическое занятие', room: 'Ауд. 206', teacher: 'Заклинский П.А.', start: '09:00', end: '10:30' },
                     { id: 'bgo_06_2', subjectId: 'phil', name: 'Философия', type: 'Практическое занятие', room: 'Ауд. 206', teacher: 'Заклинский П.А.', start: '10:40', end: '12:10' }
                 ],
-                3: [ // Среда 07.10
+                3: [
                     { id: 'bgo_07_1', subjectId: 'rus', name: 'Русский язык и культура речи', type: 'Лекция', room: 'Ауд. 210', teacher: 'Кузьмичева Н.В.', start: '09:00', end: '10:30' },
                     { id: 'bgo_07_2', subjectId: 'rus', name: 'Русский язык и культура речи', type: 'Лекция', room: 'Ауд. 210', teacher: 'Кузьмичева Н.В.', start: '10:40', end: '12:10' },
                     { id: 'bgo_07_3', subjectId: 'hist', name: 'История России', type: 'Лекция', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '12:40', end: '14:10' },
                     { id: 'bgo_07_4', subjectId: 'hist', name: 'История России', type: 'Лекция', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '14:20', end: '15:50' }
                 ],
-                4: [ // Четверг 08.10
+                4: [
                     { id: 'bgo_08_1', subjectId: 'econ', name: 'Экономическая теория', type: 'Практическое занятие', room: 'Ауд. 401', teacher: 'Баклашкина Г.Ю.', start: '09:00', end: '10:30' },
                     { id: 'bgo_08_2', subjectId: 'econ', name: 'Экономическая теория', type: 'Практическое занятие', room: 'Ауд. 401', teacher: 'Баклашкина Г.Ю.', start: '10:40', end: '12:10' },
                     { id: 'bgo_08_3', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Лекция', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '12:40', end: '14:10' },
                     { id: 'bgo_08_4', subjectId: 'hist', name: 'История России', type: 'Практическое занятие', room: 'Ауд. 205', teacher: 'Королева-Конопляная Г.И.', start: '16:00', end: '17:30' }
                 ],
-                5: [ // Пятница 09.10
+                5: [
                     { id: 'bgo_09_1', subjectId: 'lang', name: 'Иностранный язык', type: 'Практическое занятие', room: 'Ауд. 401', teacher: 'Пенькова Е.А.', start: '09:00', end: '10:30' },
                     { id: 'bgo_09_2', subjectId: 'bgd', name: 'Безопасность жизнедеятельности', type: 'Лекция', room: 'Ауд. 210', teacher: 'Макаршин И.В.', start: '10:40', end: '12:10' }
                 ],
-                6: [ // Суббота 10.10
+                6: [
                     { id: 'bgo_10_1', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Практическое занятие', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '09:00', end: '10:30' },
                     { id: 'bgo_10_2', subjectId: 'moral', name: 'Основы нравственности и воспитания (волонтерство и НКО)', type: 'Практическое занятие', room: 'Ауд. 210', teacher: 'Волович И.Г.', start: '10:40', end: '12:10' }
                 ]
@@ -298,6 +303,7 @@
         function init() {
             applyTheme(appData.theme);
             renderHeaderDate();
+            renderDaysPanel();
             renderSchedule();
             updateNextClassWidget();
             setInterval(updateNextClassWidget, 60000);
@@ -359,6 +365,7 @@
 
         const monthsRu = ['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'];
         const daysRu = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+        const shortDaysRu = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
         function renderHeaderDate() {
             const headerDate = document.getElementById('header-date');
@@ -385,6 +392,51 @@
             return new Date(d.setDate(diff));
         }
 
+        // Рендер панели дней недели (пн-вс) для текущей выбранной недели
+        function renderDaysPanel() {
+            const panel = document.getElementById('days-panel');
+            panel.innerHTML = '';
+
+            const monday = getMonday(selectedDate);
+            const today = new Date();
+
+            for (let i = 0; i < 7; i++) {
+                const iterDate = new Date(monday);
+                iterDate.setDate(monday.getDate() + i);
+
+                const isSelected = iterDate.toDateString() === selectedDate.toDateString();
+                const isToday = iterDate.toDateString() === today.toDateString();
+
+                let cardClass = "flex flex-col items-center justify-center py-3 rounded-2xl cursor-pointer transition-all relative ";
+                
+                if (isSelected) {
+                    cardClass += "bg-blue-500 text-white shadow-md font-bold scale-[1.02]";
+                } else {
+                    cardClass += "bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300";
+                }
+
+                const dayName = shortDaysRu[i];
+                const dayNum = iterDate.getDate();
+
+                // Индикатор для текущего дня (аккуратная точка или обводка)
+                let indicatorHtml = '';
+                if (isToday && !isSelected) {
+                    indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>`;
+                } else if (isToday && isSelected) {
+                    indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-white rounded-full"></span>`;
+                }
+
+                const cardHtml = `
+                    <div onclick="selectDate(${iterDate.getTime()})" class="${cardClass}">
+                        ${indicatorHtml}
+                        <span class="text-xs uppercase font-medium opacity-80 mb-1">${dayName}</span>
+                        <span class="text-lg font-bold">${dayNum}</span>
+                    </div>
+                `;
+                panel.insertAdjacentHTML('beforeend', cardHtml);
+            }
+        }
+
         function getScheduleForDate(date) {
             const monday = getMonday(date);
             const year = monday.getFullYear();
@@ -396,7 +448,7 @@
             if (!weekSchedule) return [];
             
             let dayOfWeek = date.getDay();
-            if (dayOfWeek === 0) dayOfWeek = 7; // Воскресенье
+            if (dayOfWeek === 0) dayOfWeek = 7;
             return weekSchedule[dayOfWeek] || [];
         }
 
@@ -574,6 +626,7 @@
             selectedDate = new Date(timestamp);
             document.getElementById('calendar-dropdown').classList.add('hidden');
             renderHeaderDate();
+            renderDaysPanel();
             renderSchedule();
             updateNextClassWidget();
         }
@@ -743,6 +796,7 @@
                         appData = imported;
                         saveData();
                         applyTheme(appData.theme);
+                        renderDaysPanel();
                         renderSchedule();
                         alert('Данные успешно загружены!');
                     } else {
