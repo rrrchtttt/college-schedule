@@ -107,7 +107,7 @@
             font-size: 0.75rem;
         }
 
-        /* Анимация падающих листьев */
+        /* Контейнер падающих листьев */
         #leaves-container {
             position: fixed;
             top: 0;
@@ -125,10 +125,8 @@
         .leaf {
             position: absolute;
             top: -10%;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.4;
+            user-select: none;
+            opacity: 0.55;
             animation: fall linear infinite;
         }
         @keyframes fall {
@@ -136,10 +134,10 @@
                 transform: translateY(-10vh) translateX(0) rotate(0deg);
             }
             50% {
-                transform: translateY(50vh) translateX(40px) rotate(180deg);
+                transform: translateY(50vh) translateX(30px) rotate(180deg);
             }
             100% {
-                transform: translateY(110vh) translateX(-30px) rotate(360deg);
+                transform: translateY(110vh) translateX(-20px) rotate(360deg);
             }
         }
     </style>
@@ -378,7 +376,7 @@
     <script>
         const defaultData = {
             theme: 'light',
-            themeMode: 'classic', // 'classic' или 'autumn'
+            themeMode: 'classic',
             settings: {
                 showWidget: true,
                 compactTasks: false
@@ -552,28 +550,23 @@
             }
         }
 
-        // Исправленная генерация падающих листьев
+        // Надежные падающие листочки (используем эмодзи осенних листьев)
         function initFallingLeaves() {
             const container = document.getElementById('leaves-container');
             container.innerHTML = '';
             
-            const leafColors = ['#D97706', '#B45309', '#92400E', '#EA580C', '#C2410C'];
+            const leafSymbols = ['🍁', '🍂', '🍃', '✨'];
             
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 18; i++) {
                 const leaf = document.createElement('div');
                 leaf.className = 'leaf';
+                leaf.textContent = leafSymbols[Math.floor(Math.random() * leafSymbols.length)];
                 
-                const color = leafColors[Math.floor(Math.random() * leafColors.length)];
-                const leafSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${encodeURIComponent(color)}"><path d="M17.8 2.8c-2.5-.5-5.5.6-7.8 2.5-3.5 3-5.2 7.2-4.5 10.5l-3 3 1.4 1.4 3-3c3.3.7 7.5-1 10.5-4.5 1.9-2.3 3-5.3 2.5-7.8-.3-1.6-1.5-2.8-3.1-3.1z"/></svg>`;
-                
-                leaf.style.backgroundImage = `url("${leafSvg}")`;
-                
-                const size = Math.floor(Math.random() * 18) + 16; // от 16 до 34px
-                leaf.style.width = `${size}px`;
-                leaf.style.height = `${size}px`;
+                const size = Math.floor(Math.random() * 12) + 14; // от 14 до 26px
+                leaf.style.fontSize = `${size}px`;
                 leaf.style.left = `${Math.random() * 100}vw`;
-                leaf.style.animationDuration = `${Math.random() * 7 + 5}s`; // от 5 до 12 секунд
-                leaf.style.animationDelay = `${Math.random() * 6}s`;
+                leaf.style.animationDuration = `${Math.random() * 6 + 5}s`; // от 5 до 11 секунд
+                leaf.style.animationDelay = `${Math.random() * 5}s`;
                 
                 container.appendChild(leaf);
             }
@@ -1116,7 +1109,7 @@
 
         function setTaskStatus(taskId, newStatus) {
             const currentDateKey = getDateKey(selectedDate);
-            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
+            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.prototype?.find ? ... : appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
             if (task) {
                 task.status = newStatus;
                 saveData();
