@@ -8,9 +8,9 @@
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0A0F1D" id="meta-theme-color">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%2300F2FE%22 width=%22100%22 height=%22100%22 rx=%2220%22/><text y=%2250%22 x=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>В</text></svg>">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%2300F2FE%22 width=%22100%22 height=%22100%22 rx=%2220%22/><text y=%2250%22 x=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>В</text></svg>">
+    <meta name="theme-color" content="#F0F4F8" id="meta-theme-color">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%233B82F6%22 width=%22100%22 height=%22100%22 rx=%2220%22/><text y=%2250%22 x=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>В</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%233B82F6%22 width=%22100%22 height=%22100%22 rx=%2220%22/><text y=%2250%22 x=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>В</text></svg>">
 
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,12 +27,9 @@
                         darkBg: 'var(--bg-dark)',
                         cardLight: 'var(--card-light)',
                         cardDark: 'var(--card-dark)',
-                        oceanCyan: '#00F2FE',
-                        oceanTeal: '#4FACFE',
                     },
                     boxShadow: {
                         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'neon': '0 0 15px rgba(0, 242, 254, 0.3)',
                     }
                 }
             }
@@ -43,26 +40,22 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* Переменные тем: Глубокий океан и неоновый пульс */
+        /* Переменные тем */
         :root {
-            --bg-light: #0A0F1D;
-            --bg-dark: #0A0F1D;
-            --card-light: rgba(19, 27, 46, 0.75);
-            --card-dark: rgba(19, 27, 46, 0.75);
-            --accent-main: #00F2FE;
-            --text-main: #F0F4F8;
-            --text-muted: #8892B0;
+            --bg-light: #F0F4F8;
+            --bg-dark: #0F172A;
+            --card-light: #FFFFFF;
+            --card-dark: #1E293B;
+            --accent-main: #3B82F6;
         }
 
-        /* Осенняя палитра (на случай переключения) */
+        /* Осенняя палитра */
         body.autumn-theme {
             --bg-light: #FDF8F2;
             --bg-dark: #1C1512;
             --card-light: #FFFDF9;
             --card-dark: #2A211D;
             --accent-main: #D97706;
-            --text-main: inherit;
-            --text-muted: #64748B;
         }
         body.autumn-theme .bg-blue-500,
         body.autumn-theme .peer-checked\:bg-blue-500:checked ~ div,
@@ -85,166 +78,133 @@
             color: #92400E !important;
         }
 
-        /* Северный лес */
-        body.frost-brown-theme {
-            --bg-light: #0B131E;
-            --bg-dark: #0B131E;
-            --card-light: rgba(20, 31, 44, 0.75);
-            --card-dark: rgba(20, 31, 44, 0.75);
-            --accent-main: #2563EB;
-            --text-main: #F0F4F8;
-            --text-muted: #8892B0;
-        }
-
-        /* Общие стили и Глассно-стеклянный эффект (Glassmorphism) */
-        body {
-            background: linear-gradient(135deg, #0A0F1D 0%, #131B2E 100%);
-            background-attachment: fixed;
-            color: var(--text-main);
-        }
-
-        .glass-card {
-            background: rgba(19, 27, 46, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 242, 254, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-        .glass-card:hover {
-            border-color: rgba(0, 242, 254, 0.4);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
-        }
-
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         * { scrollbar-width: none; }
         body, .card-transition { transition: background-color 0.3s ease, color 0.3s ease; }
         .task-done { text-decoration: line-through; opacity: 0.5; }
-        
         .custom-checkbox {
             appearance: none;
             width: 1.25rem;
             height: 1.25rem;
-            border: 2px solid #8892B0;
+            border: 2px solid #CBD5E1;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
         }
+        .dark .custom-checkbox { border-color: #475569; }
         .custom-checkbox:checked {
             background-color: var(--accent-main);
             border-color: var(--accent-main);
         }
         .custom-checkbox:checked::after {
             content: '✓';
-            color: #0A0F1D;
+            color: white;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 0.75rem;
-            font-weight: bold;
         }
 
-        /* Анимация падающих листьев (осенний режим) */
+        /* Контейнер падающих листьев */
         #leaves-container {
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; overflow: hidden; z-index: 99; display: none;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 99;
+            display: none;
         }
-        body.autumn-theme #leaves-container { display: block; }
+        body.autumn-theme #leaves-container {
+            display: block;
+        }
         .leaf {
-            position: absolute; top: -10%; background-size: contain; background-repeat: no-repeat; opacity: 0.4; animation: fall linear infinite;
+            position: absolute;
+            top: -10%;
+            user-select: none;
+            opacity: 0.55;
+            animation: fall linear infinite;
         }
         @keyframes fall {
-            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); }
-            50% { transform: translateY(50vh) translateX(40px) rotate(180deg); }
-            100% { transform: translateY(110vh) translateX(-30px) rotate(360deg); }
-        }
-
-        /* Амбиентные пылинки (Dust & Particles) */
-        #dust-container {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; overflow: hidden; z-index: 1;
-        }
-        .dust-particle {
-            position: absolute;
-            background: radial-gradient(circle, rgba(0,242,254,0.8) 0%, rgba(79,172,254,0) 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float-dust linear infinite;
-        }
-        @keyframes float-dust {
-            0% { transform: translateY(105vh) translateX(0) scale(0.4); opacity: 0; }
-            30% { opacity: 0.7; }
-            70% { opacity: 0.5; }
-            100% { transform: translateY(-10vh) translateX(30px) scale(1.2); opacity: 0; }
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(50vh) translateX(30px) rotate(180deg);
+            }
+            100% {
+                transform: translateY(110vh) translateX(-20px) rotate(360deg);
+            }
         }
     </style>
 </head>
-<body class="bg-lightBg dark:bg-darkBg text-[#F0F4F8] min-h-screen p-4 md:p-8 selection:bg-[#00F2FE]/30 pb-24">
+<body class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen p-4 md:p-8 selection:bg-blue-200 dark:selection:bg-blue-900 pb-24">
 
-    <!-- Фоновые частицы (Звездная пыль / Sci-fi дымка) -->
-    <div id="dust-container"></div>
+    <!-- Контейнер для падающих листьев -->
     <div id="leaves-container"></div>
 
-    <div class="max-w-3xl mx-auto space-y-8 relative z-10">
+    <div class="max-w-3xl mx-auto space-y-8">
         
         <!-- HEADER -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-3xl font-bold tracking-tight text-[#F0F4F8]">Планнер Вити</h1>
-                <p class="text-[#8892B0] mt-1 flex items-center gap-2">
-                    <i data-lucide="book-open" class="w-4 h-4 text-[#00F2FE]"></i> Группа БГО-101 (МЭИ)
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Планнер Вити</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-4 h-4"></i> Группа БГО-101 (МЭИ)
                 </p>
             </div>
             
             <div class="flex items-center gap-3">
-                <button onclick="toggleCalendar()" class="p-3 glass-card rounded-2xl hover:shadow-neon transition" title="Календарь">
-                    <i data-lucide="calendar" class="w-5 h-5 text-[#00F2FE]"></i>
+                <button onclick="toggleCalendar()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Календарь">
+                    <i data-lucide="calendar" class="w-5 h-5 text-blue-500"></i>
                 </button>
-                <div class="flex glass-card rounded-2xl p-1">
-                    <button onclick="exportData()" class="p-2 text-[#8892B0] hover:text-[#00F2FE] transition" title="Экспорт бэкапа">
+                <div class="flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1">
+                    <button onclick="exportData()" class="p-2 text-slate-500 hover:text-blue-500 transition" title="Экспорт бэкапа">
                         <i data-lucide="download" class="w-5 h-5"></i>
                     </button>
-                    <label class="p-2 text-[#8892B0] hover:text-[#00F2FE] transition cursor-pointer" title="Импорт бэкапа">
+                    <label class="p-2 text-slate-500 hover:text-blue-500 transition cursor-pointer" title="Импорт бэкапа">
                         <i data-lucide="upload" class="w-5 h-5"></i>
                         <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
                     </label>
                 </div>
-                <button onclick="openSettingsModal()" class="p-3 glass-card rounded-2xl hover:shadow-neon transition" title="Настройки">
-                    <i data-lucide="settings" class="w-5 h-5 text-[#F0F4F8]"></i>
+                <!-- Кнопка Настроек в шапке -->
+                <button onclick="openSettingsModal()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Настройки">
+                    <i data-lucide="settings" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
                 </button>
-                <button onclick="toggleTheme()" class="p-3 glass-card rounded-2xl hover:shadow-neon transition" title="Тема">
-                    <i id="theme-icon" data-lucide="sparkles" class="w-5 h-5 text-[#00F2FE]"></i>
+                <button onclick="toggleTheme()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Тема">
+                    <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-slate-700 dark:text-amber-400"></i>
                 </button>
             </div>
         </header>
 
         <!-- WIDGET: Ближайшее занятие -->
-        <section id="next-class-widget" class="bg-gradient-to-r from-[#0052D4] via-[#4364F7] to-[#6FB1FC] rounded-3xl p-6 text-white shadow-lg relative overflow-hidden border border-[#00F2FE]/30">
+        <section id="next-class-widget" class="bg-gradient-to-r from-blue-500 to-sky-400 rounded-3xl p-6 text-white shadow-md relative overflow-hidden">
             <div class="absolute top-0 right-0 opacity-10 translate-x-1/4 -translate-y-1/4">
                 <i data-lucide="clock" class="w-48 h-48"></i>
             </div>
             <div class="relative z-10">
-                <p id="widget-status" class="text-sky-200 text-sm font-medium uppercase tracking-wider mb-2">Анализ расписания...</p>
+                <p id="widget-status" class="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2">Анализ расписания...</p>
                 <h2 id="widget-title" class="text-2xl font-bold mb-1">Свободное время</h2>
-                <p id="widget-details" class="text-sky-100 flex items-center gap-2 opacity-90">
+                <p id="widget-details" class="text-blue-50 flex items-center gap-2 opacity-90">
                     Отдыхайте или занимайтесь своими делами
                 </p>
             </div>
         </section>
 
         <!-- ПАНЕЛЬ ДНЕЙ НЕДЕЛИ -->
-        <section class="glass-card rounded-3xl p-4 card-transition space-y-4">
+        <section class="bg-white dark:bg-cardDark rounded-3xl shadow-soft p-4 card-transition space-y-4">
             <div class="flex items-center justify-between px-2">
-                <h2 id="header-date" class="text-lg font-bold tracking-tight text-[#F0F4F8]">Загрузка...</h2>
-                <div class="flex items-center bg-[#0A0F1D]/60 rounded-xl shadow-inner p-1 gap-1 border border-[#00F2FE]/10">
-                    <button onclick="changeWeek(-1)" class="p-1.5 hover:bg-[#131B2E] rounded-lg transition text-[#8892B0] hover:text-[#00F2FE]" title="Прошлая неделя">
+                <h2 id="header-date" class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Загрузка...</h2>
+                <div class="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl shadow-inner p-1 gap-1">
+                    <button onclick="changeWeek(-1)" class="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition" title="Прошлая неделя">
                         <i data-lucide="chevron-left" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="resetToCurrentWeek()" class="px-2 text-xs font-medium text-[#00F2FE] hover:underline">Сегодня</button>
-                    <button onclick="changeWeek(1)" class="p-1.5 hover:bg-[#131B2E] rounded-lg transition text-[#8892B0] hover:text-[#00F2FE]" title="Следующая неделя">
+                    <button onclick="resetToCurrentWeek()" class="px-2 text-xs font-medium text-blue-500 hover:underline">Сегодня</button>
+                    <button onclick="changeWeek(1)" class="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition" title="Следующая неделя">
                         <i data-lucide="chevron-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -253,13 +213,13 @@
         </section>
 
         <!-- CALENDAR DROPDOWN -->
-        <section id="calendar-dropdown" class="hidden glass-card rounded-3xl p-6 card-transition transition-all duration-300">
+        <section id="calendar-dropdown" class="hidden bg-white dark:bg-cardDark rounded-3xl shadow-soft p-6 card-transition transition-all duration-300">
             <div class="flex justify-between items-center mb-4">
-                <button onclick="changeMonth(-1)" class="p-2 hover:bg-[#131B2E] rounded-xl transition text-[#8892B0]"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                <h3 id="calendar-month-year" class="font-semibold text-lg text-[#F0F4F8]"></h3>
-                <button onclick="changeMonth(1)" class="p-2 hover:bg-[#131B2E] rounded-xl transition text-[#8892B0]"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                <button onclick="changeMonth(-1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                <h3 id="calendar-month-year" class="font-semibold text-lg"></h3>
+                <button onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
             </div>
-            <div class="grid grid-cols-7 gap-2 text-center text-sm mb-2 text-[#8892B0] font-medium">
+            <div class="grid grid-cols-7 gap-2 text-center text-sm mb-2 text-slate-400 font-medium">
                 <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
             </div>
             <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
@@ -268,18 +228,18 @@
         <!-- SCHEDULE LIST / WEEK VIEW CONTAINER -->
         <section>
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold flex items-center gap-2 text-[#F0F4F8]">
-                    <i data-lucide="list" class="w-5 h-5 text-[#00F2FE]"></i> <span id="schedule-section-title">Расписание на день</span>
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <i data-lucide="list" class="w-5 h-5 text-blue-500"></i> <span id="schedule-section-title">Расписание на день</span>
                 </h2>
                 
                 <div class="flex items-center gap-3">
-                    <span id="schedule-date-badge" class="bg-[#00F2FE]/10 border border-[#00F2FE]/30 text-[#00F2FE] px-3 py-1 rounded-full text-sm font-medium">
+                    <span id="schedule-date-badge" class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
                         Сегодня
                     </span>
                     <!-- Переключатель Вида: День / Неделя -->
-                    <div class="flex glass-card rounded-2xl p-1">
-                        <button onclick="setScheduleView('day')" id="view-btn-day" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-[#0A0F1D] shadow-neon transition">День</button>
-                        <button onclick="setScheduleView('week')" id="view-btn-week" class="px-3 py-1.5 text-xs font-semibold rounded-xl text-[#8892B0] hover:text-[#F0F4F8] transition">Неделя</button>
+                    <div class="flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1 border border-slate-100 dark:border-slate-700">
+                        <button onclick="setScheduleView('day')" id="view-btn-day" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition">День</button>
+                        <button onclick="setScheduleView('week')" id="view-btn-week" class="px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition">Неделя</button>
                     </div>
                 </div>
             </div>
@@ -289,64 +249,75 @@
     </div>
 
     <!-- MODAL: НАСТРОЙКИ -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="glass-card w-full max-w-md rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300 border border-[#00F2FE]/30" id="settings-modal-content">
+    <div id="settings-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-cardDark w-full max-w-md rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="settings-modal-content">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold flex items-center gap-2 text-[#F0F4F8]">
-                    <i data-lucide="settings" class="w-5 h-5 text-[#00F2FE]"></i> Настройки
+                <h2 class="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                    <i data-lucide="settings" class="w-5 h-5 text-blue-500"></i> Настройки
                 </h2>
-                <button onclick="closeSettingsModal()" class="p-2 bg-[#131B2E] hover:bg-[#131B2E]/80 rounded-full transition text-[#8892B0]">
+                <button onclick="closeSettingsModal()" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
             <div class="space-y-4">
-                <div class="flex items-center justify-between p-3 bg-[#131B2E]/60 rounded-2xl border border-[#00F2FE]/10">
+                <!-- Выбор темы оформления -->
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
                     <div>
-                        <h4 class="font-medium text-sm text-[#F0F4F8]">Тема оформления</h4>
-                        <p class="text-xs text-[#8892B0]">Выберите стиль интерфейса</p>
+                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Тема оформления</h4>
+                        <p class="text-xs text-slate-400">Классическая или Осенний вайб</p>
                     </div>
-                    <select id="setting-theme-mode" onchange="changeThemeMode(this.value)" class="bg-[#0A0F1D] text-[#00F2FE] text-sm rounded-xl px-3 py-1.5 outline-none border border-[#00F2FE]/30 cursor-pointer">
-                        <option value="classic">Глубокий океан (Неон)</option>
+                    <select id="setting-theme-mode" onchange="changeThemeMode(this.value)" class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-xl px-3 py-1.5 outline-none border border-slate-200 dark:border-slate-600 cursor-pointer">
+                        <option value="classic">Классическая</option>
                         <option value="autumn">Осенний режим</option>
-                        <option value="frost-brown">Северный лес</option>
                     </select>
                 </div>
 
-                <div class="flex items-center justify-between p-3 bg-[#131B2E]/60 rounded-2xl border border-[#00F2FE]/10">
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
                     <div>
-                        <h4 class="font-medium text-sm text-[#F0F4F8]">Виджет «Ближайшее занятие»</h4>
-                        <p class="text-xs text-[#8892B0]">Показывать блок статуса пары вверху</p>
+                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Виджет «Ближайшее занятие»</h4>
+                        <p class="text-xs text-slate-400">Показывать блок статуса пары вверху</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="setting-widget" class="sr-only peer" onchange="updateSetting('showWidget', this.checked)">
-                        <div class="w-11 h-6 bg-[#0A0F1D] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00F2FE]"></div>
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
+                    <div>
+                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Компактный список заданий</h4>
+                        <p class="text-xs text-slate-400">Оптимизировать отступы в канбан-доске</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="setting-compact" class="sr-only peer" onchange="updateSetting('compactTasks', this.checked)">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                     </label>
                 </div>
             </div>
 
-            <div class="mt-6 pt-4 border-t border-[#00F2FE]/15 flex justify-end">
-                <button onclick="closeSettingsModal()" class="px-5 py-2.5 bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] hover:opacity-90 text-[#0A0F1D] font-bold text-sm rounded-xl transition shadow-neon">Готово</button>
+            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end">
+                <button onclick="closeSettingsModal()" class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm rounded-xl transition shadow-md">Готово</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL: ДЕТАЛИ ПРЕДМЕТА И КАНБАН -->
-    <div id="class-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md hidden z-50 flex items-end md:items-center justify-center p-0 md:p-4 opacity-0 transition-opacity duration-300">
-        <div class="glass-card w-full max-w-2xl h-[85vh] md:h-[80vh] md:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col transform translate-y-full md:translate-y-0 transition-transform duration-300 border border-[#00F2FE]/30" id="modal-content">
+    <div id="class-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-end md:items-center justify-center p-0 md:p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-cardDark w-full max-w-2xl h-[85vh] md:h-[80vh] md:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col transform translate-y-full md:translate-y-0 transition-transform duration-300" id="modal-content">
             
             <!-- Modal Header -->
-            <div class="p-6 border-b border-[#00F2FE]/15 flex justify-between items-start sticky top-0 bg-[#0A0F1D]/90 backdrop-blur-md md:rounded-t-3xl rounded-t-3xl z-10">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-start sticky top-0 bg-white dark:bg-cardDark md:rounded-t-3xl rounded-t-3xl z-10">
                 <div>
-                    <span id="modal-type" class="text-xs font-bold uppercase tracking-wider text-[#00F2FE] mb-1 block">Лекция</span>
-                    <h2 id="modal-title" class="text-2xl font-bold text-[#F0F4F8] leading-tight">Название предмета</h2>
-                    <p id="modal-time-room" class="text-[#8892B0] mt-2 flex items-center gap-3 text-sm flex-wrap">
-                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4 text-[#00F2FE]"></i> <span id="modal-time">10:00 - 11:30</span></span>
-                        <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4 text-[#00F2FE]"></i> <span id="modal-room">Ауд. 101</span></span>
-                        <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4 text-[#00F2FE]"></i> <span id="modal-teacher">Преподаватель</span></span>
+                    <span id="modal-type" class="text-xs font-bold uppercase tracking-wider text-blue-500 mb-1 block">Лекция</span>
+                    <h2 id="modal-title" class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Название предмета</h2>
+                    <p id="modal-time-room" class="text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-3 text-sm flex-wrap">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4"></i> <span id="modal-time">10:00 - 11:30</span></span>
+                        <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> <span id="modal-room">Ауд. 101</span></span>
+                        <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> <span id="modal-teacher">Преподаватель</span></span>
                     </p>
                 </div>
-                <button onclick="closeModal()" class="p-2 bg-[#131B2E] hover:bg-[#131B2E]/80 rounded-full transition text-[#8892B0]">
+                <button onclick="closeModal()" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -354,45 +325,45 @@
             <!-- Modal Body -->
             <div class="p-6 overflow-y-auto flex-1 space-y-8">
                 <section>
-                    <h3 class="text-lg font-semibold mb-3 flex items-center gap-2 text-[#F0F4F8]"><i data-lucide="file-text" class="w-5 h-5 text-[#00F2FE]"></i> Заметки</h3>
-                    <textarea id="modal-notes" class="w-full bg-[#131B2E]/60 border border-[#00F2FE]/20 rounded-2xl p-4 text-[#F0F4F8] focus:ring-2 focus:ring-[#00F2FE] resize-none outline-none h-32 transition" placeholder="Важные мысли, ссылки или напоминания по предмету..."></textarea>
-                    <p class="text-xs text-[#8892B0] mt-2 text-right" id="notes-status">Автосохранение...</p>
+                    <h3 class="text-lg font-semibold mb-3 flex items-center gap-2"><i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i> Заметки</h3>
+                    <textarea id="modal-notes" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl p-4 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500 resize-none outline-none h-32 transition" placeholder="Важные мысли, ссылки или напоминания по предмету..."></textarea>
+                    <p class="text-xs text-slate-400 mt-2 text-right" id="notes-status">Автосохранение...</p>
                 </section>
 
                 <section>
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold flex items-center gap-2 text-[#F0F4F8]"><i data-lucide="kanban" class="w-5 h-5 text-[#4FACFE]"></i> Задачи и ДЗ</h3>
+                        <h3 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="kanban" class="w-5 h-5 text-emerald-500"></i> Задачи и ДЗ</h3>
                     </div>
 
-                    <div class="flex gap-2 mb-6 bg-[#131B2E]/60 border border-[#00F2FE]/20 p-2 rounded-2xl">
-                        <input type="text" id="new-task-text" placeholder="Что нужно сделать?" class="flex-1 bg-transparent border-none outline-none px-3 py-2 text-sm text-[#F0F4F8] placeholder-[#8892B0]">
-                        <input type="date" id="new-task-date" class="bg-[#0A0F1D] text-[#00F2FE] text-sm rounded-xl px-2 py-1 outline-none border border-[#00F2FE]/20 cursor-pointer">
-                        <button onclick="addTask()" class="bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-[#0A0F1D] font-bold p-2 rounded-xl transition shadow-neon">
+                    <div class="flex gap-2 mb-6 bg-slate-50 dark:bg-slate-800 p-2 rounded-2xl">
+                        <input type="text" id="new-task-text" placeholder="Что нужно сделать?" class="flex-1 bg-transparent border-none outline-none px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
+                        <input type="date" id="new-task-date" class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-xl px-2 py-1 outline-none border-none cursor-pointer">
+                        <button onclick="addTask()" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-xl transition shadow-md">
                             <i data-lucide="plus" class="w-5 h-5"></i>
                         </button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-[#131B2E]/40 border border-[#00F2FE]/10 rounded-2xl p-4">
+                        <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
                             <div class="flex justify-between items-center mb-3">
-                                <h4 class="font-medium text-sm text-[#8892B0]">Надо сделать</h4>
-                                <span class="bg-[#0A0F1D] text-xs px-2 py-1 rounded-full text-[#00F2FE]" id="count-todo">0</span>
+                                <h4 class="font-medium text-sm text-slate-500 dark:text-slate-400">Надо сделать</h4>
+                                <span class="bg-slate-200 dark:bg-slate-700 text-xs px-2 py-1 rounded-full" id="count-todo">0</span>
                             </div>
                             <div id="col-todo" class="space-y-3 min-h-[5rem]"></div>
                         </div>
 
-                        <div class="bg-[#131B2E]/40 border border-blue-500/20 rounded-2xl p-4">
+                        <div class="bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-4 border border-blue-100 dark:border-blue-900/30">
                             <div class="flex justify-between items-center mb-3">
-                                <h4 class="font-medium text-sm text-[#4FACFE]">В процессе</h4>
-                                <span class="bg-[#0A0F1D] text-xs px-2 py-1 rounded-full text-[#4FACFE]" id="count-progress">0</span>
+                                <h4 class="font-medium text-sm text-blue-500">В процессе</h4>
+                                <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 text-xs px-2 py-1 rounded-full" id="count-progress">0</span>
                             </div>
                             <div id="col-progress" class="space-y-3 min-h-[5rem]"></div>
                         </div>
 
-                        <div class="bg-[#131B2E]/40 border border-emerald-500/20 rounded-2xl p-4">
+                        <div class="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/30">
                             <div class="flex justify-between items-center mb-3">
-                                <h4 class="font-medium text-sm text-emerald-400">Сдано</h4>
-                                <span class="bg-[#0A0F1D] text-xs px-2 py-1 rounded-full text-emerald-400" id="count-done">0</span>
+                                <h4 class="font-medium text-sm text-emerald-600 dark:text-emerald-500">Сдано</h4>
+                                <span class="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 text-xs px-2 py-1 rounded-full" id="count-done">0</span>
                             </div>
                             <div id="col-done" class="space-y-3 min-h-[5rem]"></div>
                         </div>
@@ -404,7 +375,7 @@
 
     <script>
         const defaultData = {
-            theme: 'dark',
+            theme: 'light',
             themeMode: 'classic',
             settings: {
                 showWidget: true,
@@ -497,7 +468,6 @@
             renderDaysPanel();
             renderSchedule();
             updateNextClassWidget();
-            initDustParticles();
             initFallingLeaves();
             setInterval(updateNextClassWidget, 60000);
             lucide.createIcons();
@@ -542,9 +512,23 @@
         }
 
         function applyTheme(theme) {
+            const html = document.documentElement;
             const metaColor = document.getElementById('meta-theme-color');
-            if (appData.themeMode === 'autumn') metaColor.setAttribute('content', '#FDF8F2');
-            else metaColor.setAttribute('content', '#0A0F1D');
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                if (appData.themeMode !== 'autumn') metaColor.setAttribute('content', '#0F172A');
+                themeIcon.setAttribute('data-lucide', 'sun');
+                themeIcon.classList.remove('text-slate-700');
+                themeIcon.classList.add('text-amber-400');
+            } else {
+                html.classList.remove('dark');
+                if (appData.themeMode !== 'autumn') metaColor.setAttribute('content', '#F0F4F8');
+                themeIcon.setAttribute('data-lucide', 'moon');
+                themeIcon.classList.add('text-slate-700');
+                themeIcon.classList.remove('text-amber-400');
+            }
             lucide.createIcons();
         }
 
@@ -559,47 +543,31 @@
             const select = document.getElementById('setting-theme-mode');
             if (select) select.value = mode;
 
-            body.classList.remove('autumn-theme', 'frost-brown-theme');
             if (mode === 'autumn') {
                 body.classList.add('autumn-theme');
-            } else if (mode === 'frost-brown') {
-                body.classList.add('frost-brown-theme');
+            } else {
+                body.classList.remove('autumn-theme');
             }
         }
 
-        // Генерация амбиентных пылинок (звездное небо / sci-fi дымка)
-        function initDustParticles() {
-            const container = document.getElementById('dust-container');
-            container.innerHTML = '';
-            for (let i = 0; i < 25; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'dust-particle';
-                const size = Math.floor(Math.random() * 4) + 2;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${Math.random() * 100}vw`;
-                particle.style.animationDuration = `${Math.random() * 10 + 6}s`;
-                particle.style.animationDelay = `${Math.random() * 6}s`;
-                container.appendChild(particle);
-            }
-        }
-
+        // Надежные падающие листочки (используем эмодзи осенних листьев)
         function initFallingLeaves() {
             const container = document.getElementById('leaves-container');
             container.innerHTML = '';
-            const leafColors = ['#D97706', '#B45309', '#92400E'];
-            for (let i = 0; i < 15; i++) {
+            
+            const leafSymbols = ['🍁', '🍂', '🍃', '✨'];
+            
+            for (let i = 0; i < 18; i++) {
                 const leaf = document.createElement('div');
                 leaf.className = 'leaf';
-                const color = leafColors[Math.floor(Math.random() * leafColors.length)];
-                const leafSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${encodeURIComponent(color)}"><path d="M17.8 2.8c-2.5-.5-5.5.6-7.8 2.5-3.5 3-5.2 7.2-4.5 10.5l-3 3 1.4 1.4 3-3c3.3.7 7.5-1 10.5-4.5 1.9-2.3 3-5.3 2.5-7.8-.3-1.6-1.5-2.8-3.1-3.1z"/></svg>`;
-                leaf.style.backgroundImage = `url("${leafSvg}")`;
-                const size = Math.floor(Math.random() * 18) + 16;
-                leaf.style.width = `${size}px`;
-                leaf.style.height = `${size}px`;
+                leaf.textContent = leafSymbols[Math.floor(Math.random() * leafSymbols.length)];
+                
+                const size = Math.floor(Math.random() * 12) + 14; // от 14 до 26px
+                leaf.style.fontSize = `${size}px`;
                 leaf.style.left = `${Math.random() * 100}vw`;
-                leaf.style.animationDuration = `${Math.random() * 7 + 5}s`;
-                leaf.style.animationDelay = `${Math.random() * 6}s`;
+                leaf.style.animationDuration = `${Math.random() * 6 + 5}s`; // от 5 до 11 секунд
+                leaf.style.animationDelay = `${Math.random() * 5}s`;
+                
                 container.appendChild(leaf);
             }
         }
@@ -624,7 +592,9 @@
 
         function applySettingsToUI() {
             document.getElementById('setting-widget').checked = appData.settings.showWidget;
+            document.getElementById('setting-compact').checked = appData.settings.compactTasks;
             document.getElementById('setting-theme-mode').value = appData.themeMode || 'classic';
+            
             const widgetEl = document.getElementById('next-class-widget');
             if (appData.settings.showWidget) {
                 widgetEl.style.display = 'block';
@@ -721,14 +691,16 @@
 
                 let cardClass = "flex flex-col items-center justify-center py-3 rounded-2xl cursor-pointer transition-all relative ";
                 if (isSelected) {
-                    cardClass += "bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-[#0A0F1D] shadow-neon font-bold scale-[1.02]";
+                    cardClass += "bg-blue-500 text-white shadow-md font-bold scale-[1.02]";
                 } else {
-                    cardClass += "bg-[#131B2E]/50 hover:bg-[#131B2E] text-[#8892B0] hover:text-[#F0F4F8]";
+                    cardClass += "bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300";
                 }
 
                 let indicatorHtml = '';
-                if (isToday) {
-                    indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-[#00F2FE] rounded-full"></span>`;
+                if (isToday && !isSelected) {
+                    indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>`;
+                } else if (isToday && isSelected) {
+                    indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-white rounded-full"></span>`;
                 }
 
                 const cardHtml = `
@@ -763,12 +735,12 @@
             const btnWeek = document.getElementById('view-btn-week');
             
             if (view === 'day') {
-                btnDay.className = "px-3 py-1.5 text-xs font-semibold rounded-xl bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-[#0A0F1D] shadow-neon transition";
-                btnWeek.className = "px-3 py-1.5 text-xs font-semibold rounded-xl text-[#8892B0] hover:text-[#F0F4F8] transition";
+                btnDay.className = "px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition";
+                btnWeek.className = "px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition";
                 document.getElementById('schedule-section-title').textContent = "Расписание на день";
             } else {
-                btnWeek.className = "px-3 py-1.5 text-xs font-semibold rounded-xl bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-[#0A0F1D] shadow-neon transition";
-                btnDay.className = "px-3 py-1.5 text-xs font-semibold rounded-xl text-[#8892B0] hover:text-[#F0F4F8] transition";
+                btnWeek.className = "px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition";
+                btnDay.className = "px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition";
                 document.getElementById('schedule-section-title').textContent = "Расписание на неделю";
             }
 
@@ -787,10 +759,10 @@
 
                 if (classes.length === 0) {
                     container.innerHTML = `
-                        <div class="text-center py-12 glass-card rounded-3xl">
-                            <i data-lucide="coffee" class="w-12 h-12 text-[#8892B0] mx-auto mb-3"></i>
-                            <h3 class="text-lg font-medium text-[#F0F4F8]">Занятий нет!</h3>
-                            <p class="text-sm text-[#8892B0]">Отличный день для отдыха или самоподготовки.</p>
+                        <div class="text-center py-12 bg-white dark:bg-cardDark rounded-3xl shadow-soft">
+                            <i data-lucide="coffee" class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3"></i>
+                            <h3 class="text-lg font-medium text-slate-500">Занятий нет!</h3>
+                            <p class="text-sm text-slate-400">Отличный день для отдыха или самоподготовки.</p>
                         </div>`;
                     lucide.createIcons();
                     return;
@@ -799,28 +771,29 @@
                 classes.forEach((cls, index) => {
                     const activeTasks = getActiveTasksCount(currentDateKey, cls.id);
                     const badgeHtml = activeTasks > 0 ? 
-                        `<span class="bg-amber-500/20 text-amber-400 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm border border-amber-500/30"><i data-lucide="alert-circle" class="w-3 h-3"></i> ДЗ: ${activeTasks}</span>` : '';
+                        `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm"><i data-lucide="alert-circle" class="w-3 h-3"></i> ДЗ: ${activeTasks}</span>` : '';
 
                     const cardHtml = `
-                        <div onclick='openModal(${JSON.stringify(cls)})' class="group glass-card rounded-3xl p-5 transition cursor-pointer flex flex-col sm:flex-row sm:items-center gap-4">
-                            <div class="flex-shrink-0 bg-[#0A0F1D]/60 rounded-2xl p-3 text-center sm:w-28 border border-[#00F2FE]/10">
-                                <span class="block text-xs font-semibold text-[#8892B0] uppercase tracking-wider mb-1">Пара ${index + 1}</span>
-                                <span class="block text-lg font-bold text-[#F0F4F8]">${cls.start}</span>
-                                <span class="block text-xs text-[#8892B0]">${cls.end}</span>
+                        <div onclick='openModal(${JSON.stringify(cls)})' class="group bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-100 dark:hover:border-slate-700 flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="flex-shrink-0 bg-slate-50 dark:bg-slate-800 rounded-2xl p-3 text-center sm:w-28 shadow-inner border border-slate-100 dark:border-slate-700">
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Пара ${index + 1}</span>
+                                <span class="block text-lg font-bold text-slate-800 dark:text-slate-200">${cls.start}</span>
+                                <span class="block text-xs text-slate-500">${cls.end}</span>
                             </div>
                             
                             <div class="flex-1">
                                 <div class="flex justify-between items-start mb-1">
-                                    <span class="text-xs font-bold uppercase tracking-wider text-[#00F2FE]">${cls.type}</span>${badgeHtml}
+                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-500">${cls.type}</span>
+                                    ${badgeHtml}
                                 </div>
-                                <h3 class="text-xl font-bold text-[#F0F4F8] mb-2 group-hover:text-[#00F2FE] transition">${cls.name}</h3>
-                                <div class="flex flex-wrap items-center gap-4 text-sm text-[#8892B0]">
-                                    <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4 text-[#00F2FE]"></i> ${cls.room}</span>
-                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4 text-[#00F2FE]"></i> ${cls.teacher}</span>
+                                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-500 transition">${cls.name}</h3>
+                                <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                                    <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-4 h-4"></i> ${cls.room}</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${cls.teacher}</span>
                                 </div>
                             </div>
                             
-                            <div class="hidden sm:flex text-[#8892B0] group-hover:text-[#00F2FE] transition">
+                            <div class="hidden sm:flex text-slate-300 dark:text-slate-600 group-hover:text-blue-500 transition">
                                 <i data-lucide="chevron-right" class="w-6 h-6"></i>
                             </div>
                         </div>
@@ -840,32 +813,33 @@
 
                     let classesHtml = '';
                     if (classes.length === 0) {
-                        classesHtml = `<p class="text-sm text-[#8892B0] italic py-2">Занятий нет</p>`;
+                        classesHtml = `<p class="text-sm text-slate-400 italic py-2">Занятий нет</p>`;
                     } else {
                         classes.forEach((cls) => {
                             const activeTasks = getActiveTasksCount(iterDateKey, cls.id);
-                            const badgeHtml = activeTasks > 0 ? `<span class="bg-amber-500/20 text-amber-400 text-xs px-2 py-0.5 rounded-full font-bold">ДЗ: ${activeTasks}</span>` : '';
+                            const badgeHtml = activeTasks > 0 ? `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs px-2 py-0.5 rounded-full font-bold">ДЗ: ${activeTasks}</span>` : '';
                             
                             classesHtml += `
-                                <div onclick='selectDate(${iterDate.getTime()}); openModal(${JSON.stringify(cls)})' class="p-3 bg-[#131B2E]/40 hover:bg-[#131B2E] rounded-2xl cursor-pointer transition flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-[#00F2FE]/10">
+                                <div onclick='selectDate(${iterDate.getTime()}); openModal(${JSON.stringify(cls)})' class="p-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-blue-50/50 dark:hover:bg-slate-800 rounded-2xl cursor-pointer transition flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-slate-100 dark:border-slate-700/50">
                                     <div>
                                         <div class="flex items-center gap-2 mb-1">
-                                            <span class="text-xs font-bold text-[#00F2FE]">${cls.start} - ${cls.end}</span>
-                                            <span class="text-xs text-[#8892B0]">• ${cls.room}</span>${badgeHtml}
+                                            <span class="text-xs font-bold text-blue-500">${cls.start} - ${cls.end}</span>
+                                            <span class="text-xs text-slate-400">• ${cls.room}</span>
+                                            ${badgeHtml}
                                         </div>
-                                        <h4 class="font-bold text-[#F0F4F8]">${cls.name}</h4>
+                                        <h4 class="font-bold text-slate-800 dark:text-slate-200">${cls.name}</h4>
                                     </div>
-                                    <span class="text-xs text-[#8892B0] self-start sm:self-center">${cls.teacher}</span>
+                                    <span class="text-xs text-slate-400 self-start sm:self-center">${cls.teacher}</span>
                                 </div>
                             `;
                         });
                     }
 
                     const dayCardHtml = `
-                        <div class="glass-card rounded-3xl p-5 space-y-3">
-                            <h3 class="font-bold text-base text-[#F0F4F8] border-b border-[#00F2FE]/15 pb-2 flex justify-between items-center">
+                        <div class="bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft space-y-3">
+                            <h3 class="font-bold text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-2 flex justify-between items-center">
                                 <span>${dayTitle}</span>
-                                <button onclick="selectedDate = new Date(${iterDate.getTime()}); setScheduleView('day');" class="text-xs text-[#00F2FE] font-medium hover:underline">Открыть день</button>
+                                <button onclick="selectedDate = new Date(${iterDate.getTime()}); setScheduleView('day');" class="text-xs text-blue-500 font-medium hover:underline">Открыть день</button>
                             </h3>
                             <div class="space-y-2">
                                 ${classesHtml}
@@ -913,21 +887,21 @@
             const titleEl = document.getElementById('widget-title');
             const detailsEl = document.getElementById('widget-details');
 
-            widget.className = "rounded-3xl p-6 text-white shadow-lg relative overflow-hidden transition-all duration-500 border border-[#00F2FE]/30";
+            widget.className = "rounded-3xl p-6 text-white shadow-md relative overflow-hidden transition-all duration-500";
 
             if (currentClass) {
-                widget.classList.add('bg-gradient-to-r', 'from-emerald-600', 'to-teal-500');
+                widget.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-teal-400');
                 statusEl.textContent = 'Идёт сейчас';
                 titleEl.textContent = currentClass.name;
                 detailsEl.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i> ${currentClass.room} (до ${currentClass.end})`;
             } else if (nextClass) {
-                widget.classList.add('bg-gradient-to-r', 'from-[#0052D4]', 'to-[#4364F7]');
+                widget.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-sky-400');
                 let timeStr = nextClass.diff >= 60 ? `${Math.floor(nextClass.diff/60)} ч ${nextClass.diff%60} мин` : `${nextClass.diff} мин`;
                 statusEl.textContent = `Через ${timeStr}`;
                 titleEl.textContent = nextClass.cls.name;
                 detailsEl.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i> ${nextClass.cls.room} • Начало в ${nextClass.cls.start}`;
             } else {
-                widget.classList.add('bg-gradient-to-r', 'from-[#131B2E]', 'from-10%');
+                widget.classList.add('bg-gradient-to-r', 'from-slate-700', 'to-slate-600');
                 statusEl.textContent = classes.length > 0 ? 'Пары закончились' : 'Выходной';
                 titleEl.textContent = 'Свободное время';
                 detailsEl.innerHTML = 'Отдыхайте и набирайтесь сил';
@@ -979,11 +953,11 @@
                 
                 let btnClass = "w-full aspect-square flex items-center justify-center rounded-xl text-sm transition ";
                 if (isSelected) {
-                    btnClass += "bg-gradient-to-r from-[#00F2FE] to-[#4FACFE] text-[#0A0F1D] shadow-neon font-bold";
+                    btnClass += "bg-blue-500 text-white shadow-md font-bold";
                 } else if (isToday) {
-                    btnClass += "bg-[#00F2FE]/20 text-[#00F2FE] font-bold border border-[#00F2FE]/40";
+                    btnClass += "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-bold hover:bg-blue-200";
                 } else {
-                    btnClass += "hover:bg-[#131B2E] text-[#F0F4F8]";
+                    btnClass += "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300";
                 }
 
                 grid.innerHTML += `<button onclick="selectDate(${iterDate.getTime()})" class="${btnClass}">${i}</button>`;
@@ -1077,11 +1051,11 @@
                         const diffTime = dl - today;
                         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                         
-                        let dlColor = "text-[#8892B0]";
+                        let dlColor = "text-slate-400";
                         if (status !== 'done') {
-                            if (diffDays < 0) dlColor = "text-red-400 font-bold";
-                            else if (diffDays <= 2) dlColor = "text-amber-400 font-bold";
-                            else dlColor = "text-[#00F2FE]";
+                            if (diffDays < 0) dlColor = "text-red-500 font-bold";
+                            else if (diffDays <= 2) dlColor = "text-amber-500 font-bold";
+                            else dlColor = "text-blue-500";
                         }
                         let dlText = diffDays === 0 ? "Сегодня" : diffDays < 0 ? "Просрочено" : `${diffDays} дн.`;
                         deadlineHtml = `<div class="flex items-center gap-1 text-xs mt-2 ${dlColor}"><i data-lucide="clock" class="w-3 h-3"></i> ${dlText} (${dl.toLocaleDateString('ru-RU')})</div>`;
@@ -1089,20 +1063,20 @@
 
                     const isDone = status === 'done';
                     const cardHtml = `
-                        <div class="bg-[#0A0F1D]/60 border border-[#00F2FE]/15 p-3 rounded-xl shadow-sm flex flex-col group relative">
+                        <div class="bg-white dark:bg-cardDark p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col group relative">
                             <div class="flex items-start gap-2">
                                 ${status === 'todo' || status === 'progress' ? 
-                                    `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-0.5 w-5 h-5 flex-shrink-0 border-2 border-[#8892B0] rounded-full hover:border-[#00F2FE] transition"></button>` : 
-                                    `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-0.5 w-5 h-5 flex-shrink-0 bg-[#00F2FE] rounded-full flex items-center justify-center text-[#0A0F1D]"><i data-lucide="check" class="w-3 h-3 stroke-[3]"></i></button>`
+                                    `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-0.5 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition"></button>` : 
+                                    `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-0.5 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white"><i data-lucide="check" class="w-3 h-3"></i></button>`
                                 }
-                                <p class="text-sm flex-1 ${isDone ? 'task-done text-[#8892B0]' : 'text-[#F0F4F8]'}">${task.text}</p>
+                                <p class="text-sm flex-1 ${isDone ? 'task-done' : 'text-slate-800 dark:text-slate-200'}">${task.text}</p>
                             </div>
                             ${deadlineHtml}
                             
                             <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                                ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1 bg-[#131B2E] rounded text-[#8892B0] hover:text-[#00F2FE]"><i data-lucide="arrow-left" class="w-3 h-3"></i></button>` : ''}
-                                ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1 bg-[#131B2E] rounded text-[#8892B0] hover:text-[#00F2FE]"><i data-lucide="arrow-right" class="w-3 h-3"></i></button>` : ''}
-                                <button onclick="deleteTask(${task.id})" class="p-1 bg-red-500/20 rounded text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                                ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 hover:text-blue-500"><i data-lucide="arrow-left" class="w-3 h-3"></i></button>` : ''}
+                                ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 hover:text-blue-500"><i data-lucide="arrow-right" class="w-3 h-3"></i></button>` : ''}
+                                <button onclick="deleteTask(${task.id})" class="p-1 bg-red-100 dark:bg-red-900/40 rounded text-red-500 hover:text-red-700"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                             </div>
                         </div>
                     `;
@@ -1135,7 +1109,7 @@
 
         function setTaskStatus(taskId, newStatus) {
             const currentDateKey = getDateKey(selectedDate);
-            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
+            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.prototype?.find ? ... : appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
             if (task) {
                 task.status = newStatus;
                 saveData();
@@ -1174,6 +1148,7 @@
                         if(!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
                         if(!appData.themeMode) appData.themeMode = 'classic';
                         saveData();
+                        applyTheme(appData.theme);
                         applyThemeMode(appData.themeMode);
                         applySettingsToUI();
                         renderDaysPanel();
