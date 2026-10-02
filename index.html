@@ -23,10 +23,10 @@
                         sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
                     },
                     colors: {
-                        lightBg: '#F0F4F8',
-                        darkBg: '#0F172A',
-                        cardLight: '#FFFFFF',
-                        cardDark: '#1E293B',
+                        lightBg: 'var(--bg-light)',
+                        darkBg: 'var(--bg-dark)',
+                        cardLight: 'var(--card-light)',
+                        cardDark: 'var(--card-dark)',
                     },
                     boxShadow: {
                         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
@@ -40,6 +40,44 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
+        /* Переменные тем */
+        :root {
+            --bg-light: #F0F4F8;
+            --bg-dark: #0F172A;
+            --card-light: #FFFFFF;
+            --card-dark: #1E293B;
+            --accent-main: #3B82F6;
+        }
+
+        /* Осенняя палитра */
+        body.autumn-theme {
+            --bg-light: #FDF8F2;
+            --bg-dark: #1C1512;
+            --card-light: #FFFDF9;
+            --card-dark: #2A211D;
+            --accent-main: #D97706;
+        }
+        body.autumn-theme .bg-blue-500,
+        body.autumn-theme .peer-checked\:bg-blue-500:checked ~ div,
+        body.autumn-theme .peer-checked\:bg-blue-500 {
+            background-color: #D97706 !important;
+        }
+        body.autumn-theme .text-blue-500,
+        body.autumn-theme .group-hover\:text-blue-500:hover {
+            color: #D97706 !important;
+        }
+        body.autumn-theme .border-blue-100,
+        body.autumn-theme .hover\:border-blue-100:hover {
+            border-color: #FDE68A !important;
+        }
+        body.autumn-theme .bg-blue-50 {
+            background-color: #FEF3C7 !important;
+        }
+        body.autumn-theme .bg-blue-100 {
+            background-color: #FDE68A !important;
+            color: #92400E !important;
+        }
+
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         * { scrollbar-width: none; }
         body, .card-transition { transition: background-color 0.3s ease, color 0.3s ease; }
@@ -56,8 +94,8 @@
         }
         .dark .custom-checkbox { border-color: #475569; }
         .custom-checkbox:checked {
-            background-color: #3B82F6;
-            border-color: #3B82F6;
+            background-color: var(--accent-main);
+            border-color: var(--accent-main);
         }
         .custom-checkbox:checked::after {
             content: '✓';
@@ -68,9 +106,47 @@
             transform: translate(-50%, -50%);
             font-size: 0.75rem;
         }
+
+        /* Анимация падающих листьев */
+        #leaves-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 999;
+            display: none;
+        }
+        body.autumn-theme #leaves-container {
+            display: block;
+        }
+        .leaf {
+            position: absolute;
+            top: -10%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.35;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(50vh) translateX(30px) rotate(180deg);
+            }
+            100% {
+                transform: translateY(110vh) translateX(-20px) rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen p-4 md:p-8 selection:bg-blue-200 dark:selection:bg-blue-900 pb-24">
+
+    <!-- Контейнер для падающих листьев -->
+    <div id="leaves-container"></div>
 
     <div class="max-w-3xl mx-auto space-y-8">
         
@@ -120,7 +196,7 @@
             </div>
         </section>
 
-        <!-- НОВАЯ ПАНЕЛЬ ДНЕЙ НЕДЕЛИ С ШАПКОЙ МЕСЯЦА И НАВИГАЦИЕЙ -->
+        <!-- ПАНЕЛЬ ДНЕЙ НЕДЕЛИ -->
         <section class="bg-white dark:bg-cardDark rounded-3xl shadow-soft p-4 card-transition space-y-4">
             <div class="flex items-center justify-between px-2">
                 <h2 id="header-date" class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Загрузка...</h2>
@@ -134,9 +210,7 @@
                     </button>
                 </div>
             </div>
-            <div id="days-panel" class="grid grid-cols-7 gap-2">
-                <!-- Генерируется динамически через JS -->
-            </div>
+            <div id="days-panel" class="grid grid-cols-7 gap-2"></div>
         </section>
 
         <!-- CALENDAR DROPDOWN -->
@@ -188,6 +262,18 @@
             </div>
 
             <div class="space-y-4">
+                <!-- Выбор темы оформления -->
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
+                    <div>
+                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Тема оформления</h4>
+                        <p class="text-xs text-slate-400">Классическая или Осенний вайб</p>
+                    </div>
+                    <select id="setting-theme-mode" onchange="changeThemeMode(this.value)" class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-xl px-3 py-1.5 outline-none border border-slate-200 dark:border-slate-600 cursor-pointer">
+                        <option value="classic">Классическая</option>
+                        <option value="autumn">Осенний режим</option>
+                    </select>
+                </div>
+
                 <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
                     <div>
                         <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Виджет «Ближайшее занятие»</h4>
@@ -239,14 +325,12 @@
 
             <!-- Modal Body -->
             <div class="p-6 overflow-y-auto flex-1 space-y-8">
-                <!-- Notes -->
                 <section>
                     <h3 class="text-lg font-semibold mb-3 flex items-center gap-2"><i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i> Заметки</h3>
                     <textarea id="modal-notes" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl p-4 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500 resize-none outline-none h-32 transition" placeholder="Важные мысли, ссылки или напоминания по предмету..."></textarea>
                     <p class="text-xs text-slate-400 mt-2 text-right" id="notes-status">Автосохранение...</p>
                 </section>
 
-                <!-- Kanban / Homework -->
                 <section>
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="kanban" class="w-5 h-5 text-emerald-500"></i> Задачи и ДЗ</h3>
@@ -293,6 +377,7 @@
     <script>
         const defaultData = {
             theme: 'light',
+            themeMode: 'classic', // 'classic' или 'autumn'
             settings: {
                 showWidget: true,
                 compactTasks: false
@@ -368,20 +453,23 @@
         let appData = JSON.parse(localStorage.getItem('vityaPlannerData')) || defaultData;
         if (!appData.daysData) appData.daysData = {};
         if (!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
+        if (!appData.themeMode) appData.themeMode = 'classic';
         
         let selectedDate = new Date();
         let weekOffset = 0;
-        let currentScheduleView = 'day'; // 'day' или 'week'
+        let currentScheduleView = 'day';
         let currentModalClassId = null;
         let notesTimeout = null;
 
         function init() {
             applyTheme(appData.theme);
+            applyThemeMode(appData.themeMode);
             applySettingsToUI();
             renderHeaderDate();
             renderDaysPanel();
             renderSchedule();
             updateNextClassWidget();
+            initFallingLeaves();
             setInterval(updateNextClassWidget, 60000);
             lucide.createIcons();
 
@@ -409,12 +497,8 @@
         }
 
         function ensureDayClassDataExists(dateKey, classId) {
-            if (!appData.daysData[dateKey]) {
-                appData.daysData[dateKey] = {};
-            }
-            if (!appData.daysData[dateKey][classId]) {
-                appData.daysData[dateKey][classId] = { notes: '', tasks: [] };
-            }
+            if (!appData.daysData[dateKey]) appData.daysData[dateKey] = {};
+            if (!appData.daysData[dateKey][classId]) appData.daysData[dateKey][classId] = { notes: '', tasks: [] };
         }
 
         function getActiveTasksCount(dateKey, classId) {
@@ -435,13 +519,13 @@
             
             if (theme === 'dark') {
                 html.classList.add('dark');
-                metaColor.setAttribute('content', '#0F172A');
+                if (appData.themeMode !== 'autumn') metaColor.setAttribute('content', '#0F172A');
                 themeIcon.setAttribute('data-lucide', 'sun');
                 themeIcon.classList.remove('text-slate-700');
                 themeIcon.classList.add('text-amber-400');
             } else {
                 html.classList.remove('dark');
-                metaColor.setAttribute('content', '#F0F4F8');
+                if (appData.themeMode !== 'autumn') metaColor.setAttribute('content', '#F0F4F8');
                 themeIcon.setAttribute('data-lucide', 'moon');
                 themeIcon.classList.add('text-slate-700');
                 themeIcon.classList.remove('text-amber-400');
@@ -449,7 +533,46 @@
             lucide.createIcons();
         }
 
-        // Функции настроек
+        // Переключение тем («Классическая» / «Осенний режим»)
+        function changeThemeMode(mode) {
+            appData.themeMode = mode;
+            applyThemeMode(mode);
+            saveData();
+        }
+
+        function applyThemeMode(mode) {
+            const body = document.body;
+            const select = document.getElementById('setting-theme-mode');
+            if (select) select.value = mode;
+
+            if (mode === 'autumn') {
+                body.classList.add('autumn-theme');
+            } else {
+                body.classList.remove('autumn-theme');
+            }
+        }
+
+        // Генерация падающих листьев для осеннего режима
+        function initFallingLeaves() {
+            const container = document.getElementById('leaves-container');
+            container.innerHTML = '';
+            // Создаем несколько элементов листочков с рандомными параметрами
+            const leafSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23D97706"><path d="M17.8 2.8c-2.5-.5-5.5.6-7.8 2.5-3.5 3-5.2 7.2-4.5 10.5l-3 3 1.4 1.4 3-3c3.3.7 7.5-1 10.5-4.5 1.9-2.3 3-5.3 2.5-7.8-.3-1.6-1.5-2.8-3.1-3.1z"/></svg>`;
+            
+            for (let i = 0; i < 12; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.style.backgroundImage = `url("${leafSvg}")`;
+                const size = Math.floor(Math.random() * 16) + 16; // от 16 до 32px
+                leaf.style.width = `${size}px`;
+                leaf.style.height = `${size}px`;
+                leaf.style.left = `${Math.random() * 100}vw`;
+                leaf.style.animationDuration = `${Math.random() * 8 + 6}s`; // от 6 до 14 секунд
+                leaf.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(leaf);
+            }
+        }
+
         function openSettingsModal() {
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-modal-content');
@@ -465,14 +588,13 @@
             const content = document.getElementById('settings-modal-content');
             modal.classList.add('opacity-0');
             content.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
 
         function applySettingsToUI() {
             document.getElementById('setting-widget').checked = appData.settings.showWidget;
             document.getElementById('setting-compact').checked = appData.settings.compactTasks;
+            document.getElementById('setting-theme-mode').value = appData.themeMode || 'classic';
             
             const widgetEl = document.getElementById('next-class-widget');
             if (appData.settings.showWidget) {
@@ -522,7 +644,6 @@
 
         function renderHeaderDate() {
             const headerDate = document.getElementById('header-date');
-            
             const baseMonday = getMonday(new Date());
             baseMonday.setDate(baseMonday.getDate() + (weekOffset * 7));
             
@@ -542,7 +663,6 @@
             } else {
                 monthString = `${monthsNamesOnly[monthsArr[0]]} — ${monthsNamesOnly[monthsArr[1]]} ${weekYear}`;
             }
-            
             headerDate.textContent = monthString;
 
             const badge = document.getElementById('schedule-date-badge');
@@ -571,15 +691,11 @@
                 const isToday = iterDate.toDateString() === today.toDateString();
 
                 let cardClass = "flex flex-col items-center justify-center py-3 rounded-2xl cursor-pointer transition-all relative ";
-                
                 if (isSelected) {
                     cardClass += "bg-blue-500 text-white shadow-md font-bold scale-[1.02]";
                 } else {
                     cardClass += "bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300";
                 }
-
-                const dayName = shortDaysRu[i];
-                const dayNum = iterDate.getDate();
 
                 let indicatorHtml = '';
                 if (isToday && !isSelected) {
@@ -591,8 +707,8 @@
                 const cardHtml = `
                     <div onclick="selectDate(${iterDate.getTime()})" class="${cardClass}">
                         ${indicatorHtml}
-                        <span class="text-xs uppercase font-medium opacity-80 mb-1">${dayName}</span>
-                        <span class="text-lg font-bold">${dayNum}</span>
+                        <span class="text-xs uppercase font-medium opacity-80 mb-1">${shortDaysRu[i]}</span>
+                        <span class="text-lg font-bold">${iterDate.getDate()}</span>
                     </div>
                 `;
                 panel.insertAdjacentHTML('beforeend', cardHtml);
@@ -614,6 +730,7 @@
             return weekSchedule[dayOfWeek] || [];
         }
 
+        // Переключение режима «День / Неделя»
         function setScheduleView(view) {
             currentScheduleView = view;
             const btnDay = document.getElementById('view-btn-day');
@@ -686,7 +803,7 @@
                     container.insertAdjacentHTML('beforeend', cardHtml);
                 });
             } else {
-                // Рендер Недельного Вида (сводка на 7 дней)
+                // Рендер недели
                 const monday = getMonday(selectedDate);
                 
                 for (let i = 0; i < 7; i++) {
@@ -701,7 +818,7 @@
                     if (classes.length === 0) {
                         classesHtml = `<p class="text-sm text-slate-400 italic py-2">Занятий нет</p>`;
                     } else {
-                        classes.forEach((cls, index) => {
+                        classes.forEach((cls) => {
                             const activeTasks = getActiveTasksCount(iterDateKey, cls.id);
                             const badgeHtml = activeTasks > 0 ? `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs px-2 py-0.5 rounded-full font-bold">ДЗ: ${activeTasks}</span>` : '';
                             
@@ -777,23 +894,17 @@
 
             if (currentClass) {
                 widget.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-teal-400');
-                widget.classList.remove('from-blue-500', 'to-sky-400', 'from-slate-700', 'to-slate-600');
                 statusEl.textContent = 'Идёт сейчас';
                 titleEl.textContent = currentClass.name;
                 detailsEl.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i> ${currentClass.room} (до ${currentClass.end})`;
             } else if (nextClass) {
                 widget.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-sky-400');
-                widget.classList.remove('from-emerald-500', 'to-teal-400', 'from-slate-700', 'to-slate-600');
-                let timeStr = nextClass.diff >= 60 ? 
-                    `${Math.floor(nextClass.diff/60)} ч ${nextClass.diff%60} мин` : 
-                    `${nextClass.diff} мин`;
-                
+                let timeStr = nextClass.diff >= 60 ? `${Math.floor(nextClass.diff/60)} ч ${nextClass.diff%60} мин` : `${nextClass.diff} мин`;
                 statusEl.textContent = `Через ${timeStr}`;
                 titleEl.textContent = nextClass.cls.name;
                 detailsEl.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i> ${nextClass.cls.room} • Начало в ${nextClass.cls.start}`;
             } else {
                 widget.classList.add('bg-gradient-to-r', 'from-slate-700', 'to-slate-600');
-                widget.classList.remove('from-blue-500', 'to-sky-400', 'from-emerald-500', 'to-teal-400');
                 statusEl.textContent = classes.length > 0 ? 'Пары закончились' : 'Выходной';
                 titleEl.textContent = 'Свободное время';
                 detailsEl.innerHTML = 'Отдыхайте и набирайтесь сил';
@@ -844,11 +955,10 @@
                 const isToday = iterDate.toDateString() === today.toDateString();
                 
                 let btnClass = "w-full aspect-square flex items-center justify-center rounded-xl text-sm transition ";
-                
                 if (isSelected) {
                     btnClass += "bg-blue-500 text-white shadow-md font-bold";
                 } else if (isToday) {
-                    btnClass += "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-bold hover:bg-blue-200 dark:hover:bg-blue-800/50";
+                    btnClass += "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-bold hover:bg-blue-200";
                 } else {
                     btnClass += "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300";
                 }
@@ -859,7 +969,6 @@
 
         function selectDate(timestamp) {
             selectedDate = new Date(timestamp);
-            
             const currentMonday = getMonday(new Date());
             const targetMonday = getMonday(selectedDate);
             weekOffset = Math.round((targetMonday - currentMonday) / (1000 * 60 * 60 * 24 * 7));
@@ -890,7 +999,6 @@
             const modal = document.getElementById('class-modal');
             const content = document.getElementById('modal-content');
             modal.classList.remove('hidden');
-            
             requestAnimationFrame(() => {
                 modal.classList.remove('opacity-0');
                 content.classList.remove('translate-y-full');
@@ -900,10 +1008,8 @@
         function closeModal() {
             const modal = document.getElementById('class-modal');
             const content = document.getElementById('modal-content');
-            
             modal.classList.add('opacity-0');
             content.classList.add('translate-y-full');
-            
             setTimeout(() => {
                 modal.classList.add('hidden');
                 currentModalClassId = null;
@@ -954,13 +1060,11 @@
                             else if (diffDays <= 2) dlColor = "text-amber-500 font-bold";
                             else dlColor = "text-blue-500";
                         }
-                        
                         let dlText = diffDays === 0 ? "Сегодня" : diffDays < 0 ? "Просрочено" : `${diffDays} дн.`;
                         deadlineHtml = `<div class="flex items-center gap-1 text-xs mt-2 ${dlColor}"><i data-lucide="clock" class="w-3 h-3"></i> ${dlText} (${dl.toLocaleDateString('ru-RU')})</div>`;
                     }
 
                     const isDone = status === 'done';
-                    
                     const cardHtml = `
                         <div class="bg-white dark:bg-cardDark p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col group relative">
                             <div class="flex items-start gap-2">
@@ -1045,8 +1149,10 @@
                         appData = imported;
                         if(!appData.daysData) appData.daysData = {};
                         if(!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
+                        if(!appData.themeMode) appData.themeMode = 'classic';
                         saveData();
                         applyTheme(appData.theme);
+                        applyThemeMode(appData.themeMode);
                         applySettingsToUI();
                         renderDaysPanel();
                         renderSchedule();
