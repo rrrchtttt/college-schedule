@@ -132,15 +132,9 @@
             animation: fall linear infinite;
         }
         @keyframes fall {
-            0% {
-                transform: translateY(-10vh) translateX(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(50vh) translateX(40px) rotate(180deg);
-            }
-            100% {
-                transform: translateY(110vh) translateX(-30px) rotate(360deg);
-            }
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); }
+            50% { transform: translateY(50vh) translateX(40px) rotate(180deg); }
+            100% { transform: translateY(110vh) translateX(-30px) rotate(360deg); }
         }
     </style>
 </head>
@@ -161,6 +155,12 @@
             </div>
             
             <div class="flex items-center gap-3">
+                <!-- Кнопка Индикатора Статуса (Админ / Гость) -->
+                <button onclick="handleAuthClick()" id="auth-status-btn" class="flex items-center gap-2 px-3.5 py-2.5 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition text-xs font-semibold">
+                    <i data-lucide="user" class="w-4 h-4 text-slate-500" id="auth-icon"></i>
+                    <span id="auth-label">Гость</span>
+                </button>
+
                 <button onclick="toggleCalendar()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Календарь">
                     <i data-lucide="calendar" class="w-5 h-5 text-blue-500"></i>
                 </button>
@@ -250,6 +250,39 @@
         </section>
     </div>
 
+    <!-- MODAL: АВТОРИЗАЦИЯ (АДМИН / ГОСТЬ) -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-cardDark w-full max-w-sm rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="auth-modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                    <i data-lucide="lock" class="w-5 h-5 text-blue-500"></i> Вход для Админа
+                </h2>
+                <button onclick="closeAuthModal()" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Для выполнения этого действия (редактирование, загрузка файлов, бэкап) необходимы права администратора.</p>
+
+            <form onsubmit="handleLogin(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Email (Логин)</label>
+                    <input type="email" id="auth-email" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Пароль</label>
+                    <input type="password" id="auth-password" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div id="auth-error" class="text-xs text-red-500 font-medium hidden">Неверный Email или пароль!</div>
+
+                <div class="pt-2 flex gap-2">
+                    <button type="submit" class="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium text-xs rounded-xl transition shadow-md">Войти</button>
+                    <button type="button" onclick="logoutAdmin()" id="logout-btn" class="hidden w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-medium text-xs rounded-xl transition">Выйти из прав</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL: НАСТРОЙКИ -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-cardDark w-full max-w-md rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="settings-modal-content">
@@ -263,7 +296,6 @@
             </div>
 
             <div class="space-y-4">
-                <!-- Выбор темы оформления -->
                 <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
                     <div>
                         <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Тема оформления</h4>
@@ -314,7 +346,6 @@
                     <div class="flex items-center gap-2 mb-1 flex-wrap">
                         <span id="modal-type" class="text-xs font-bold uppercase tracking-wider text-blue-500">Лекция</span>
                         <span class="text-slate-300 dark:text-slate-600">•</span>
-                        <!-- Индикатор дня недели для добавляемой заметки/дз -->
                         <span id="modal-day-badge" class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2.5 py-0.5 rounded-full">Понедельник (5 октября)</span>
                     </div>
                     <h2 id="modal-title" class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Название предмета</h2>
@@ -363,11 +394,11 @@
                             </div>
                         </div>
 
-                        <!-- Превью выбранных файлов перед добавлением задачи -->
+                        <!-- Превью файлов перед добавлением -->
                         <div id="pending-attachments-preview" class="flex flex-wrap gap-2 pt-1 hidden"></div>
                     </div>
 
-                    <!-- Канбан-колонки с обновленным информативным дизайном -->
+                    <!-- Канбан-колонки -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
                             <div class="flex justify-between items-center mb-3">
@@ -407,6 +438,11 @@
     </div>
 
     <script>
+        const ADMIN_CREDENTIALS = {
+            email: "andrvik113@gmail.com",
+            password: "My2YDVB7"
+        };
+
         const defaultData = {
             theme: 'light',
             themeMode: 'classic',
@@ -487,17 +523,19 @@
         if (!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
         if (!appData.themeMode) appData.themeMode = 'classic';
         
+        let isAdmin = localStorage.getItem('vityaPlannerIsAdmin') === 'true';
         let selectedDate = new Date();
         let weekOffset = 0;
         let currentScheduleView = 'day';
         let currentModalClassId = null;
         let notesTimeout = null;
-        let pendingAttachments = []; // Временные файлы перед добавлением задачи
+        let pendingAttachments = [];
 
         function init() {
             applyTheme(appData.theme);
             applyThemeMode(appData.themeMode);
             applySettingsToUI();
+            updateAuthUI();
             renderHeaderDate();
             renderDaysPanel();
             renderSchedule();
@@ -507,6 +545,10 @@
             lucide.createIcons();
 
             document.getElementById('modal-notes').addEventListener('input', function(e) {
+                if (!isAdmin) {
+                    openAuthModal();
+                    return;
+                }
                 const status = document.getElementById('notes-status');
                 status.textContent = 'Сохранение...';
                 clearTimeout(notesTimeout);
@@ -516,6 +558,119 @@
                     setTimeout(() => { status.textContent = ''; }, 2000);
                 }, 1000);
             });
+        }
+
+        // --- УПРАВЛЕНИЕ АВТОРИЗАЦИЕЙ ---
+        function updateAuthUI() {
+            const btn = document.getElementById('auth-status-btn');
+            const label = document.getElementById('auth-label');
+            const icon = document.getElementById('auth-icon');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            if (isAdmin) {
+                label.textContent = "Админ";
+                icon.setAttribute('data-lucide', 'shield-check');
+                icon.className = "w-4 h-4 text-emerald-500";
+                btn.className = "flex items-center gap-2 px-3.5 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-2xl shadow-soft transition text-xs font-semibold text-emerald-700 dark:text-emerald-300";
+                logoutBtn.classList.remove('hidden');
+            } else {
+                label.textContent = "Гость";
+                icon.setAttribute('data-lucide', 'user');
+                icon.className = "w-4 h-4 text-slate-500";
+                btn.className = "flex items-center gap-2 px-3.5 py-2.5 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition text-xs font-semibold text-slate-700 dark:text-slate-300";
+                logoutBtn.classList.add('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        function handleAuthClick() {
+            if (isAdmin) {
+                openAuthModal(); // Открыть меню с возможностью выйти
+            } else {
+                openAuthModal();
+            }
+        }
+
+        function openAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            const content = document.getElementById('auth-modal-content');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            });
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            const content = document.getElementById('auth-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            const errorEl = document.getElementById('auth-error');
+
+            if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+                isAdmin = true;
+                localStorage.setItem('vityaPlannerIsAdmin', 'true');
+                errorEl.classList.add('hidden');
+                closeAuthModal();
+                updateAuthUI();
+                renderSchedule();
+            } else {
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            localStorage.setItem('vityaPlannerIsAdmin', 'false');
+            closeAuthModal();
+            updateAuthUI();
+            renderSchedule();
+        }
+
+        // Переопределение метода экспорта (только для админа)
+        const originalExportData = window.exportData;
+        window.exportData = function() {
+            if (!isAdmin) {
+                openAuthModal();
+                return;
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "vitya_planner_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Переопределение импорта
+        window.importData = function(event) {
+            if (!isAdmin) {
+                openAuthModal();
+                event.target.value = '';
+                return;
+            }
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = function(e) {
+                    try {
+                        appData = JSON.parse(e.target.result);
+                        saveData();
+                        location.reload();
+                    } catch (error) {
+                        alert("Ошибка чтения файла бэкапа!");
+                    }
+                };
+            }
         }
 
         function saveData() {
@@ -532,11 +687,6 @@
         function ensureDayClassDataExists(dateKey, classId) {
             if (!appData.daysData[dateKey]) appData.daysData[dateKey] = {};
             if (!appData.daysData[dateKey][classId]) appData.daysData[dateKey][classId] = { notes: '', tasks: [] };
-        }
-
-        function getActiveTasksCount(dateKey, classId) {
-            if (!appData.daysData[dateKey] || !appData.daysData[dateKey][classId]) return 0;
-            return appData.daysData[dateKey][classId].tasks.filter(t => t.status !== 'done').length;
         }
 
         function toggleTheme() {
@@ -805,7 +955,6 @@
                     const dayData = appData.daysData[currentDateKey] && appData.daysData[currentDateKey][cls.id] ? appData.daysData[currentDateKey][cls.id] : { tasks: [] };
                     const activeTasks = dayData.tasks.filter(t => t.status !== 'done');
                     
-                    // Генерация блока ДЗ под предметом в другом цвете (как ты и просил)
                     let tasksListHtml = '';
                     if (dayData.tasks.length > 0) {
                         let taskItems = '';
@@ -922,7 +1071,7 @@
                         </div>
                     `;
                     container.insertAdjacentHTML('beforeend', dayCardHtml);
-                }
+                });
             }
             lucide.createIcons();
         }
@@ -1059,7 +1208,6 @@
             
             document.getElementById('modal-type').textContent = cls.type;
             
-            // Вывод дня недели в шапке модалки (например: Понедельник (5 октября))
             const dayNameStr = daysRu[selectedDate.getDay()];
             const dayNumStr = selectedDate.getDate();
             const monthNameStr = monthsRu[selectedDate.getMonth()];
@@ -1100,6 +1248,10 @@
         }
 
         function saveNotes(text) {
+            if (!isAdmin) {
+                openAuthModal();
+                return;
+            }
             if (currentModalClassId) {
                 const currentDateKey = getDateKey(selectedDate);
                 ensureDayClassDataExists(currentDateKey, currentModalClassId);
@@ -1108,8 +1260,12 @@
             }
         }
 
-        // --- ЛОГИКА СЖАТИЯ И ВЛОЖЕНИЙ ---
         function handleFileSelect(event) {
+            if (!isAdmin) {
+                openAuthModal();
+                event.target.value = '';
+                return;
+            }
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
@@ -1211,16 +1367,6 @@
             renderPendingAttachments();
         }
 
-        function removeTaskAttachment(taskId, attIndex) {
-            const currentDateKey = getDateKey(selectedDate);
-            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
-            if (task && task.attachments) {
-                task.attachments.splice(attIndex, 1);
-                saveData();
-                renderKanban();
-            }
-        }
-
         function openLightbox(imgSrc) {
             const lightbox = document.getElementById('image-lightbox');
             const img = document.getElementById('lightbox-img');
@@ -1238,7 +1384,67 @@
             'done': { next: null, prev: 'progress' }
         };
 
-        // --- РЕНДЕР КАНБАНА И ИНФОРМАТИВНЫХ КАРТОЧЕК ---
+        function addTask() {
+            if (!isAdmin) {
+                openAuthModal();
+                return;
+            }
+            const textInput = document.getElementById('new-task-text');
+            const dateInput = document.getElementById('new-task-date');
+            const text = textInput.value.trim();
+            if (!text) return;
+
+            const currentDateKey = getDateKey(selectedDate);
+            ensureDayClassDataExists(currentDateKey, currentModalClassId);
+
+            const newTask = {
+                id: Date.now(),
+                text: text,
+                deadline: dateInput.value || null,
+                status: 'todo',
+                attachments: [...pendingAttachments]
+            };
+
+            appData.daysData[currentDateKey][currentModalClassId].tasks.push(newTask);
+            saveData();
+
+            textInput.value = '';
+            dateInput.value = '';
+            pendingAttachments = [];
+            renderPendingAttachments();
+            renderKanban();
+        }
+
+        function setTaskStatus(taskId, newStatus) {
+            if (!isAdmin) {
+                openAuthModal();
+                return;
+            }
+            const currentDateKey = getDateKey(selectedDate);
+            const tasks = appData.daysData[currentDateKey][currentModalClassId].tasks;
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = newStatus;
+                saveData();
+                renderKanban();
+            }
+        }
+
+        function deleteTask(taskId) {
+            if (!isAdmin) {
+                openAuthModal();
+                return;
+            }
+            const currentDateKey = getDateKey(selectedDate);
+            const tasks = appData.daysData[currentDateKey][currentModalClassId].tasks;
+            const index = tasks.findIndex(t => t.id === taskId);
+            if (index !== -1) {
+                tasks.splice(index, 1);
+                saveData();
+                renderKanban();
+            }
+        }
+
         function renderKanban() {
             const currentDateKey = getDateKey(selectedDate);
             ensureDayClassDataExists(currentDateKey, currentModalClassId);
@@ -1279,7 +1485,7 @@
                         let imagesGrid = '';
                         let filesList = '';
 
-                        task.attachments.forEach((att, attIdx) => {
+                        task.attachments.forEach((att) => {
                             if (att.type === 'image') {
                                 imagesGrid += `
                                     <div class="relative group/img w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 cursor-pointer flex-shrink-0" onclick="openLightbox('${att.data}')">
@@ -1320,12 +1526,12 @@
 
                             ${attachmentsHtml}
                             
-                            <!-- Кнопки управления задачей (появляются при наведении) -->
+                            ${isAdmin ? `
                             <div class="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition bg-white/90 dark:bg-cardDark/90 backdrop-blur-sm p-1 rounded-xl shadow-sm">
                                 ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Назад"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i></button>` : ''}
                                 ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Вперед"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>` : ''}
                                 <button onclick="deleteTask(${task.id})" class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-red-500 transition" title="Удалить"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                            </div>
+                            </div>` : ''}
                         </div>
                     `;
                     col.insertAdjacentHTML('beforeend', cardHtml);
@@ -1334,96 +1540,7 @@
             lucide.createIcons();
         }
 
-        function addTask() {
-            const input = document.getElementById('new-task-text');
-            const dateInput = document.getElementById('new-task-date');
-            const text = input.value.trim();
-            
-            if ((text || pendingAttachments.length > 0) && currentModalClassId) {
-                const currentDateKey = getDateKey(selectedDate);
-                ensureDayClassDataExists(currentDateKey, currentModalClassId);
-                
-                appData.daysData[currentDateKey][currentModalClassId].tasks.push({
-                    id: Date.now(),
-                    text: text || 'Без описания',
-                    status: 'todo',
-                    deadline: dateInput.value || null,
-                    attachments: [...pendingAttachments]
-                });
-
-                saveData();
-                input.value = '';
-                dateInput.value = '';
-                pendingAttachments = [];
-                renderPendingAttachments();
-                renderKanban();
-            }
-        }
-
-        function setTaskStatus(taskId, newStatus) {
-            const currentDateKey = getDateKey(selectedDate);
-            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
-            if (task) {
-                task.status = newStatus;
-                saveData();
-                renderKanban();
-            }
-        }
-
-        function deleteTask(taskId) {
-            const currentDateKey = getDateKey(selectedDate);
-            appData.daysData[currentDateKey][currentModalClassId].tasks = appData.daysData[currentDateKey][currentModalClassId].tasks.filter(t => t.id !== taskId);
-            saveData();
-            renderKanban();
-        }
-
-        function exportData() {
-            const dataStr = JSON.stringify(appData, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Планнер_БГО101_Бэкап_${new Date().toLocaleDateString('ru-RU')}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (imported && (imported.daysData || imported.subjectsData)) {
-                        appData = imported;
-                        if(!appData.daysData) appData.daysData = {};
-                        if(!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
-                        if(!appData.themeMode) appData.themeMode = 'classic';
-                        saveData();
-                        applyTheme(appData.theme);
-                        applyThemeMode(appData.themeMode);
-                        applySettingsToUI();
-                        renderDaysPanel();
-                        renderSchedule();
-                        alert('Данные успешно загружены!');
-                    } else {
-                        alert('Неверный формат файла.');
-                    }
-                } catch (err) {
-                    alert('Ошибка чтения файла.');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        window.addEventListener('DOMContentLoaded', init);
-        
-        document.getElementById('class-modal').addEventListener('click', function(e) {
-            if(e.target === this) closeModal();
-        });
-        document.getElementById('settings-modal').addEventListener('click', function(e) {
-            if(e.target === this) closeSettingsModal();
-        });
+        window.onload = init;
     </script>
 </body>
+</html>
