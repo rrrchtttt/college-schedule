@@ -154,10 +154,7 @@
         <!-- HEADER -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Планнер Вити</h1>
-                    <span id="role-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Гость</span>
-                </div>
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Планнер Вити</h1>
                 <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
                     <i data-lucide="book-open" class="w-4 h-4"></i> Группа БГО-101 (МЭИ)
                 </p>
@@ -167,8 +164,7 @@
                 <button onclick="toggleCalendar()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Календарь">
                     <i data-lucide="calendar" class="w-5 h-5 text-blue-500"></i>
                 </button>
-                <!-- Кнопки экспорта/импорта видны только Админу -->
-                <div id="admin-tools" class="hidden flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1">
+                <div class="flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1">
                     <button onclick="exportData()" class="p-2 text-slate-500 hover:text-blue-500 transition" title="Экспорт бэкапа">
                         <i data-lucide="download" class="w-5 h-5"></i>
                     </button>
@@ -177,10 +173,9 @@
                         <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
                     </label>
                 </div>
-                <!-- Кнопка Настроек / Входа в шапке -->
-                <button onclick="openSettingsModal()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition relative" title="Настройки и Вход">
+                <!-- Кнопка Настроек в шапке -->
+                <button onclick="openSettingsModal()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Настройки">
                     <i data-lucide="settings" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
-                    <span id="admin-indicator" class="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 hidden" title="Админ активен"></span>
                 </button>
                 <button onclick="toggleTheme()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Тема">
                     <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-slate-700 dark:text-amber-400"></i>
@@ -255,12 +250,12 @@
         </section>
     </div>
 
-    <!-- MODAL: НАСТРОЙКИ И АВТОРИЗАЦИЯ -->
+    <!-- MODAL: НАСТРОЙКИ -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-cardDark w-full max-w-md rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="settings-modal-content">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                    <i data-lucide="settings" class="w-5 h-5 text-blue-500"></i> Настройки и Доступ
+                    <i data-lucide="settings" class="w-5 h-5 text-blue-500"></i> Настройки
                 </h2>
                 <button onclick="closeSettingsModal()" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -268,29 +263,6 @@
             </div>
 
             <div class="space-y-4">
-                <!-- Блок Авторизации / Статуса доступа -->
-                <div id="auth-container" class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700">
-                    <div id="auth-guest-view">
-                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200 mb-1">Режим Гостя</h4>
-                        <p class="text-xs text-slate-400 mb-3">Вам доступен просмотр расписания и задач. Для полного доступа войдите как администратор.</p>
-                        
-                        <div class="space-y-2">
-                            <input type="email" id="login-email" placeholder="Email (andrvik113@gmail.com)" class="w-full bg-white dark:bg-slate-700 text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 outline-none text-slate-700 dark:text-slate-200">
-                            <input type="password" id="login-password" placeholder="Пароль" class="w-full bg-white dark:bg-slate-700 text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 outline-none text-slate-700 dark:text-slate-200">
-                            <button onclick="handleLogin()" class="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium text-xs rounded-xl transition shadow-sm">Войти как Админ</button>
-                            <p id="login-error" class="text-xs text-red-500 text-center hidden mt-1">Неверный логин или пароль</p>
-                        </div>
-                    </div>
-
-                    <div id="auth-admin-view" class="hidden flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-500 block mb-0.5">Статус: Администратор</span>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">Вход выполнен под andrvik113@gmail.com</p>
-                        </div>
-                        <button onclick="handleLogout()" class="px-3 py-1.5 bg-red-50 dark:bg-red-900/30 text-red-600 hover:bg-red-100 rounded-xl text-xs font-semibold transition">Выйти</button>
-                    </div>
-                </div>
-
                 <!-- Выбор темы оформления -->
                 <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
                     <div>
@@ -370,8 +342,8 @@
                         <h3 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="kanban" class="w-5 h-5 text-emerald-500"></i> Задачи и ДЗ</h3>
                     </div>
 
-                    <!-- Форма добавления задачи с прикреплением файлов (Только для Админа) -->
-                    <div id="add-task-form-container" class="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl space-y-3 mb-6 border border-slate-100 dark:border-slate-700">
+                    <!-- Форма добавления задачи с прикреплением файлов -->
+                    <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl space-y-3 mb-6 border border-slate-100 dark:border-slate-700">
                         <input type="text" id="new-task-text" placeholder="Что нужно сделать или какое ДЗ задали?" class="w-full bg-transparent border-none outline-none text-sm text-slate-700 dark:text-slate-200 font-medium">
                         
                         <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200/60 dark:border-slate-700">
@@ -515,19 +487,17 @@
         if (!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
         if (!appData.themeMode) appData.themeMode = 'classic';
         
-        let currentUserRole = localStorage.getItem('vityaPlannerRole') || 'guest'; // 'guest' или 'admin'
         let selectedDate = new Date();
         let weekOffset = 0;
         let currentScheduleView = 'day';
         let currentModalClassId = null;
         let notesTimeout = null;
-        let pendingAttachments = [];
+        let pendingAttachments = []; // Временные файлы перед добавлением задачи
 
         function init() {
             applyTheme(appData.theme);
             applyThemeMode(appData.themeMode);
             applySettingsToUI();
-            updateRoleUI();
             renderHeaderDate();
             renderDaysPanel();
             renderSchedule();
@@ -537,7 +507,6 @@
             lucide.createIcons();
 
             document.getElementById('modal-notes').addEventListener('input', function(e) {
-                if (currentUserRole !== 'admin') return;
                 const status = document.getElementById('notes-status');
                 status.textContent = 'Сохранение...';
                 clearTimeout(notesTimeout);
@@ -550,64 +519,7 @@
         }
 
         function saveData() {
-            if (currentUserRole !== 'admin') return;
             localStorage.setItem('vityaPlannerData', JSON.stringify(appData));
-        }
-
-        // --- ЛОГИКА АВТОРИЗАЦИИ ---
-        function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-            const errEl = document.getElementById('login-error');
-
-            if (email === 'andrvik113@gmail.com' && password === 'My2YDVB7') {
-                currentUserRole = 'admin';
-                localStorage.setItem('vityaPlannerRole', 'admin');
-                errEl.classList.add('hidden');
-                document.getElementById('login-email').value = '';
-                document.getElementById('login-password').value = '';
-                updateRoleUI();
-                renderSchedule();
-            } else {
-                errEl.classList.remove('hidden');
-            }
-        }
-
-        function handleLogout() {
-            currentUserRole = 'guest';
-            localStorage.setItem('vityaPlannerRole', 'guest');
-            updateRoleUI();
-            renderSchedule();
-        }
-
-        function updateRoleUI() {
-            const roleBadge = document.getElementById('role-badge');
-            const adminTools = document.getElementById('admin-tools');
-            const adminIndicator = document.getElementById('admin-indicator');
-            const guestView = document.getElementById('auth-guest-view');
-            const adminView = document.getElementById('auth-admin-view');
-            const notesEl = document.getElementById('modal-notes');
-            const addTaskContainer = document.getElementById('add-task-form-container');
-
-            if (currentUserRole === 'admin') {
-                roleBadge.textContent = 'Админ';
-                roleBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500 text-white';
-                adminTools.classList.remove('hidden');
-                adminIndicator.classList.remove('hidden');
-                guestView.classList.add('hidden');
-                adminView.classList.remove('hidden');
-                notesEl.removeAttribute('disabled');
-                if (addTaskContainer) addTaskContainer.style.display = 'block';
-            } else {
-                roleBadge.textContent = 'Гость';
-                roleBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300';
-                adminTools.classList.add('hidden');
-                adminIndicator.classList.add('hidden');
-                guestView.classList.remove('hidden');
-                adminView.classList.add('hidden');
-                notesEl.setAttribute('disabled', 'true');
-                if (addTaskContainer) addTaskContainer.style.display = 'none';
-            }
         }
 
         function getDateKey(date) {
@@ -630,7 +542,7 @@
         function toggleTheme() {
             appData.theme = appData.theme === 'light' ? 'dark' : 'light';
             applyTheme(appData.theme);
-            if (currentUserRole === 'admin') saveData();
+            saveData();
         }
 
         function applyTheme(theme) {
@@ -657,7 +569,7 @@
         function changeThemeMode(mode) {
             appData.themeMode = mode;
             applyThemeMode(mode);
-            if (currentUserRole === 'admin') saveData();
+            saveData();
         }
 
         function applyThemeMode(mode) {
@@ -727,7 +639,7 @@
 
         function updateSetting(key, value) {
             appData.settings[key] = value;
-            if (currentUserRole === 'admin') saveData();
+            saveData();
             applySettingsToUI();
         }
 
@@ -893,6 +805,7 @@
                     const dayData = appData.daysData[currentDateKey] && appData.daysData[currentDateKey][cls.id] ? appData.daysData[currentDateKey][cls.id] : { tasks: [] };
                     const activeTasks = dayData.tasks.filter(t => t.status !== 'done');
                     
+                    // Генерация блока ДЗ под предметом в другом цвете (как ты и просил)
                     let tasksListHtml = '';
                     if (dayData.tasks.length > 0) {
                         let taskItems = '';
@@ -1009,7 +922,7 @@
                         </div>
                     `;
                     container.insertAdjacentHTML('beforeend', dayCardHtml);
-                });
+                }
             }
             lucide.createIcons();
         }
@@ -1146,6 +1059,7 @@
             
             document.getElementById('modal-type').textContent = cls.type;
             
+            // Вывод дня недели в шапке модалки (например: Понедельник (5 октября))
             const dayNameStr = daysRu[selectedDate.getDay()];
             const dayNumStr = selectedDate.getDate();
             const monthNameStr = monthsRu[selectedDate.getMonth()];
@@ -1186,7 +1100,6 @@
         }
 
         function saveNotes(text) {
-            if (currentUserRole !== 'admin') return;
             if (currentModalClassId) {
                 const currentDateKey = getDateKey(selectedDate);
                 ensureDayClassDataExists(currentDateKey, currentModalClassId);
@@ -1195,8 +1108,8 @@
             }
         }
 
+        // --- ЛОГИКА СЖАТИЯ И ВЛОЖЕНИЙ ---
         function handleFileSelect(event) {
-            if (currentUserRole !== 'admin') return;
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
@@ -1294,13 +1207,11 @@
         }
 
         function removePendingAttachment(index) {
-            if (currentUserRole !== 'admin') return;
             pendingAttachments.splice(index, 1);
             renderPendingAttachments();
         }
 
         function removeTaskAttachment(taskId, attIndex) {
-            if (currentUserRole !== 'admin') return;
             const currentDateKey = getDateKey(selectedDate);
             const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
             if (task && task.attachments) {
@@ -1327,59 +1238,7 @@
             'done': { next: null, prev: 'progress' }
         };
 
-        // --- УПРАВЛЕНИЕ ЗАДАЧАМИ С ПРОВЕРКОЙ РОЛИ ---
-        function addTask() {
-            if (currentUserRole !== 'admin') return;
-            const textInput = document.getElementById('new-task-text');
-            const dateInput = document.getElementById('new-task-date');
-            const text = textInput.value.trim();
-            if (!text) return;
-
-            const currentDateKey = getDateKey(selectedDate);
-            ensureDayClassDataExists(currentDateKey, currentModalClassId);
-
-            const newTask = {
-                id: Date.now(),
-                text: text,
-                deadline: dateInput.value || null,
-                status: 'todo',
-                attachments: [...pendingAttachments]
-            };
-
-            appData.daysData[currentDateKey][currentModalClassId].tasks.push(newTask);
-            saveData();
-
-            textInput.value = '';
-            dateInput.value = '';
-            pendingAttachments = [];
-            renderPendingAttachments();
-            renderKanban();
-        }
-
-        function setTaskStatus(taskId, newStatus) {
-            if (currentUserRole !== 'admin') return;
-            const currentDateKey = getDateKey(selectedDate);
-            const tasks = appData.daysData[currentDateKey][currentModalClassId].tasks;
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                task.status = newStatus;
-                saveData();
-                renderKanban();
-            }
-        }
-
-        function deleteTask(taskId) {
-            if (currentUserRole !== 'admin') return;
-            const currentDateKey = getDateKey(selectedDate);
-            const tasks = appData.daysData[currentDateKey][currentModalClassId].tasks;
-            const index = tasks.findIndex(t => t.id === taskId);
-            if (index !== -1) {
-                tasks.splice(index, 1);
-                saveData();
-                renderKanban();
-            }
-        }
-
+        // --- РЕНДЕР КАНБАНА И ИНФОРМАТИВНЫХ КАРТОЧЕК ---
         function renderKanban() {
             const currentDateKey = getDateKey(selectedDate);
             ensureDayClassDataExists(currentDateKey, currentModalClassId);
@@ -1420,7 +1279,7 @@
                         let imagesGrid = '';
                         let filesList = '';
 
-                        task.attachments.forEach((att) => {
+                        task.attachments.forEach((att, attIdx) => {
                             if (att.type === 'image') {
                                 imagesGrid += `
                                     <div class="relative group/img w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 cursor-pointer flex-shrink-0" onclick="openLightbox('${att.data}')">
@@ -1446,37 +1305,12 @@
                     }
 
                     const isDone = status === 'done';
-                    
-                    // Кнопки управления задачей доступны только админу
-                    let controlsHtml = '';
-                    if (currentUserRole === 'admin') {
-                        let statusButtons = '';
-                        if (status === 'todo' || status === 'progress') {
-                            statusButtons += `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition cursor-pointer" title="Отметить как выполненное"></button>`;
-                        } else {
-                            statusButtons += `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer shadow-sm" title="Вернуть в работу"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>`;
-                        }
-
-                        controlsHtml = `
-                            <div class="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition bg-white/90 dark:bg-cardDark/90 backdrop-blur-sm p-1 rounded-xl shadow-sm">
-                                ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Назад"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i></button>` : ''}
-                                ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Вперед"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>` : ''}
-                                <button onclick="deleteTask(${task.id})" class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-red-500 transition" title="Удалить"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                            </div>
-                        `;
-                    } else {
-                        // Для Гостя показываем просто галочку чтения
-                        let statusButtons = isDone ? 
-                            `<div class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>` :
-                            `<div class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full"></div>`;
-                    }
-
                     const cardHtml = `
                         <div class="bg-white dark:bg-cardDark p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col group relative">
                             <div class="flex items-start gap-3">
-                                ${currentUserRole === 'admin' ? 
-                                    (status === 'todo' || status === 'progress' ? `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition cursor-pointer" title="Отметить"></button>` : `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>`) :
-                                    (isDone ? `<div class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>` : `<div class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full opacity-50"></div>`)
+                                ${status === 'todo' || status === 'progress' ? 
+                                    `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition cursor-pointer" title="Отметить как выполненное"></button>` : 
+                                    `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer shadow-sm" title="Вернуть в работу"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>`
                                 }
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium leading-snug ${isDone ? 'task-done text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-white'}">${task.text}</p>
@@ -1485,7 +1319,13 @@
                             </div>
 
                             ${attachmentsHtml}
-                            ${controlsHtml}
+                            
+                            <!-- Кнопки управления задачей (появляются при наведении) -->
+                            <div class="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition bg-white/90 dark:bg-cardDark/90 backdrop-blur-sm p-1 rounded-xl shadow-sm">
+                                ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Назад"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i></button>` : ''}
+                                ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Вперед"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>` : ''}
+                                <button onclick="deleteTask(${task.id})" class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-red-500 transition" title="Удалить"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </div>
                         </div>
                     `;
                     col.insertAdjacentHTML('beforeend', cardHtml);
@@ -1494,36 +1334,96 @@
             lucide.createIcons();
         }
 
-        // Функции экспорта/импорта (доступны только администратору)
-        function exportData() {
-            if (currentUserRole !== 'admin') return;
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "vitya_planner_backup.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
+        function addTask() {
+            const input = document.getElementById('new-task-text');
+            const dateInput = document.getElementById('new-task-date');
+            const text = input.value.trim();
+            
+            if ((text || pendingAttachments.length > 0) && currentModalClassId) {
+                const currentDateKey = getDateKey(selectedDate);
+                ensureDayClassDataExists(currentDateKey, currentModalClassId);
+                
+                appData.daysData[currentDateKey][currentModalClassId].tasks.push({
+                    id: Date.now(),
+                    text: text || 'Без описания',
+                    status: 'todo',
+                    deadline: dateInput.value || null,
+                    attachments: [...pendingAttachments]
+                });
 
-        function importData(event) {
-            if (currentUserRole !== 'admin') return;
-            const fileReader = new FileReader();
-            if (event.target.files[0]) {
-                fileReader.readAsText(event.target.files[0], "UTF-8");
-                fileReader.onload = function (e) {
-                    try {
-                        appData = JSON.parse(e.target.result);
-                        saveData();
-                        location.reload();
-                    } catch (error) {
-                        alert("Ошибка чтения файла бэкапа!");
-                    }
-                }
+                saveData();
+                input.value = '';
+                dateInput.value = '';
+                pendingAttachments = [];
+                renderPendingAttachments();
+                renderKanban();
             }
         }
 
-        window.onload = init;
+        function setTaskStatus(taskId, newStatus) {
+            const currentDateKey = getDateKey(selectedDate);
+            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = newStatus;
+                saveData();
+                renderKanban();
+            }
+        }
+
+        function deleteTask(taskId) {
+            const currentDateKey = getDateKey(selectedDate);
+            appData.daysData[currentDateKey][currentModalClassId].tasks = appData.daysData[currentDateKey][currentModalClassId].tasks.filter(t => t.id !== taskId);
+            saveData();
+            renderKanban();
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Планнер_БГО101_Бэкап_${new Date().toLocaleDateString('ru-RU')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && (imported.daysData || imported.subjectsData)) {
+                        appData = imported;
+                        if(!appData.daysData) appData.daysData = {};
+                        if(!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
+                        if(!appData.themeMode) appData.themeMode = 'classic';
+                        saveData();
+                        applyTheme(appData.theme);
+                        applyThemeMode(appData.themeMode);
+                        applySettingsToUI();
+                        renderDaysPanel();
+                        renderSchedule();
+                        alert('Данные успешно загружены!');
+                    } else {
+                        alert('Неверный формат файла.');
+                    }
+                } catch (err) {
+                    alert('Ошибка чтения файла.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+        
+        document.getElementById('class-modal').addEventListener('click', function(e) {
+            if(e.target === this) closeModal();
+        });
+        document.getElementById('settings-modal').addEventListener('click', function(e) {
+            if(e.target === this) closeSettingsModal();
+        });
     </script>
 </body>
-</html>
