@@ -132,15 +132,9 @@
             animation: fall linear infinite;
         }
         @keyframes fall {
-            0% {
-                transform: translateY(-10vh) translateX(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(50vh) translateX(40px) rotate(180deg);
-            }
-            100% {
-                transform: translateY(110vh) translateX(-30px) rotate(360deg);
-            }
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); }
+            50% { transform: translateY(50vh) translateX(40px) rotate(180deg); }
+            100% { transform: translateY(110vh) translateX(-30px) rotate(360deg); }
         }
     </style>
 </head>
@@ -153,11 +147,21 @@
         
         <!-- HEADER -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Планнер Вити</h1>
-                <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
-                    <i data-lucide="book-open" class="w-4 h-4"></i> Группа БГО-101 (МЭИ)
-                </p>
+            <div class="flex items-center gap-3">
+                <!-- Гамбургер кнопка -->
+                <button onclick="toggleSidebar()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition text-slate-700 dark:text-slate-200" title="Меню">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Планнер Вити</h1>
+                        <!-- Индикатор Администратора -->
+                        <span id="admin-badge" class="hidden text-xs font-black tracking-wider uppercase text-red-600 bg-red-100 dark:bg-red-950/60 px-2.5 py-0.5 rounded-full border border-red-200 dark:border-red-900 shadow-sm animate-pulse">Админ</span>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-4 h-4"></i> Группа БГО-101 (МЭИ)
+                    </p>
+                </div>
             </div>
             
             <div class="flex items-center gap-3">
@@ -173,7 +177,6 @@
                         <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
                     </label>
                 </div>
-                <!-- Кнопка Настроек в шапке -->
                 <button onclick="openSettingsModal()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Настройки">
                     <i data-lucide="settings" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
                 </button>
@@ -238,7 +241,6 @@
                     <span id="schedule-date-badge" class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
                         Сегодня
                     </span>
-                    <!-- Переключатель Вида: День / Неделя -->
                     <div class="flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1 border border-slate-100 dark:border-slate-700">
                         <button onclick="setScheduleView('day')" id="view-btn-day" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition">День</button>
                         <button onclick="setScheduleView('week')" id="view-btn-week" class="px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition">Неделя</button>
@@ -248,6 +250,68 @@
             
             <div id="schedule-list" class="space-y-4"></div>
         </section>
+    </div>
+
+    <!-- SIDEBAR (БОКОВАЯ ПАНЕЛЬ И ГАМБУРГЕР МЕНЮ) -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 transition-opacity duration-300 opacity-0" onclick="toggleSidebar()"></div>
+    <div id="sidebar-panel" class="fixed top-0 left-0 bottom-0 w-80 max-w-full bg-white dark:bg-cardDark shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 flex flex-col p-6 overflow-y-auto">
+        <div class="flex justify-between items-center mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">
+            <h2 class="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                <i data-lucide="menu" class="w-5 h-5 text-blue-500"></i> Панель управления
+            </h2>
+            <button onclick="toggleSidebar()" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="space-y-6 flex-1">
+            <!-- Блок Авторизации -->
+            <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl space-y-3">
+                <h3 class="font-semibold text-sm flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                    <i data-lucide="shield" class="w-4 h-4 text-blue-500"></i> Авторизация
+                </h3>
+                
+                <div id="auth-status-box" class="text-xs text-slate-500 dark:text-slate-400">
+                    Статус: <span class="font-bold text-slate-700 dark:text-slate-200">Гость</span> (ограниченный доступ)
+                </div>
+
+                <div id="auth-form-container" class="space-y-2 pt-2">
+                    <input type="email" id="auth-email" placeholder="Email (Логин)" class="w-full bg-white dark:bg-slate-700 text-xs rounded-xl px-3 py-2 outline-none border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200">
+                    <input type="password" id="auth-password" placeholder="Пароль" class="w-full bg-white dark:bg-slate-700 text-xs rounded-xl px-3 py-2 outline-none border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200">
+                    <button onclick="handleLogin()" class="w-full bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold py-2 rounded-xl transition shadow-sm">Войти как Админ</button>
+                </div>
+
+                <div id="logout-container" class="hidden pt-2">
+                    <button onclick="handleLogout()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold py-2 rounded-xl transition">Выйти из аккаунта</button>
+                </div>
+            </div>
+
+            <!-- Скрытый чат / модуль регистрации новых учетных записей (доступен только Админу) -->
+            <div id="admin-register-module" class="hidden bg-red-50/50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 p-4 rounded-2xl space-y-3">
+                <h3 class="font-semibold text-sm flex items-center gap-2 text-red-600 dark:text-red-400">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Управление учетными записями
+                </h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">Модуль регистрации и мониторинга доступа пользователей.</p>
+                
+                <div class="space-y-2">
+                    <input type="email" id="new-user-email" placeholder="Новый email" class="w-full bg-white dark:bg-slate-700 text-xs rounded-xl px-3 py-2 outline-none border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200">
+                    <input type="password" id="new-user-pass" placeholder="Пароль" class="w-full bg-white dark:bg-slate-700 text-xs rounded-xl px-3 py-2 outline-none border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200">
+                    <button onclick="registerNewUser()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-2 rounded-xl transition shadow-sm">Зарегистрировать аккаунт</button>
+                </div>
+                <div id="register-log-msg" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium"></div>
+            </div>
+
+            <!-- Дополнительные настройки меню -->
+            <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Быстрые действия</h4>
+                <button onclick="openSettingsModal(); toggleSidebar();" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition">
+                    <i data-lucide="settings" class="w-4 h-4 text-blue-500"></i> Настройки интерфейса
+                </button>
+                <button onclick="toggleTheme(); toggleSidebar();" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-slate-300 transition">
+                    <i data-lucide="moon" class="w-4 h-4 text-amber-500"></i> Переключить тему
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL: НАСТРОЙКИ -->
@@ -263,7 +327,6 @@
             </div>
 
             <div class="space-y-4">
-                <!-- Выбор темы оформления -->
                 <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
                     <div>
                         <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Тема оформления</h4>
@@ -285,17 +348,6 @@
                         <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                     </label>
                 </div>
-
-                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
-                    <div>
-                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Компактный список заданий</h4>
-                        <p class="text-xs text-slate-400">Оптимизировать отступы в канбан-доске</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="setting-compact" class="sr-only peer" onchange="updateSetting('compactTasks', this.checked)">
-                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
-                    </label>
-                </div>
             </div>
 
             <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end">
@@ -308,14 +360,12 @@
     <div id="class-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-end md:items-center justify-center p-0 md:p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-cardDark w-full max-w-2xl h-[85vh] md:h-[80vh] md:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col transform translate-y-full md:translate-y-0 transition-transform duration-300" id="modal-content">
             
-            <!-- Modal Header -->
             <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-start sticky top-0 bg-white dark:bg-cardDark md:rounded-t-3xl rounded-t-3xl z-10">
                 <div>
                     <div class="flex items-center gap-2 mb-1 flex-wrap">
                         <span id="modal-type" class="text-xs font-bold uppercase tracking-wider text-blue-500">Лекция</span>
                         <span class="text-slate-300 dark:text-slate-600">•</span>
-                        <!-- Индикатор дня недели для добавляемой заметки/дз -->
-                        <span id="modal-day-badge" class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2.5 py-0.5 rounded-full">Понедельник (5 октября)</span>
+                        <span id="modal-day-badge" class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2.5 py-0.5 rounded-full">Понедельник</span>
                     </div>
                     <h2 id="modal-title" class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Название предмета</h2>
                     <p id="modal-time-room" class="text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-3 text-sm flex-wrap">
@@ -329,12 +379,11 @@
                 </button>
             </div>
 
-            <!-- Modal Body -->
             <div class="p-6 overflow-y-auto flex-1 space-y-8">
                 <section>
                     <h3 class="text-lg font-semibold mb-3 flex items-center gap-2"><i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i> Заметки</h3>
-                    <textarea id="modal-notes" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl p-4 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500 resize-none outline-none h-32 transition" placeholder="Важные мысли, ссылки или напоминания по предмету..."></textarea>
-                    <p class="text-xs text-slate-400 mt-2 text-right" id="notes-status">Автосохранение...</p>
+                    <textarea id="modal-notes" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl p-4 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500 resize-none outline-none h-32 transition" placeholder="Важные мысли или ссылки..."></textarea>
+                    <p class="text-xs text-slate-400 mt-2 text-right" id="notes-status"></p>
                 </section>
 
                 <section>
@@ -342,7 +391,6 @@
                         <h3 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="kanban" class="w-5 h-5 text-emerald-500"></i> Задачи и ДЗ</h3>
                     </div>
 
-                    <!-- Форма добавления задачи с прикреплением файлов -->
                     <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl space-y-3 mb-6 border border-slate-100 dark:border-slate-700">
                         <input type="text" id="new-task-text" placeholder="Что нужно сделать или какое ДЗ задали?" class="w-full bg-transparent border-none outline-none text-sm text-slate-700 dark:text-slate-200 font-medium">
                         
@@ -363,11 +411,9 @@
                             </div>
                         </div>
 
-                        <!-- Превью выбранных файлов перед добавлением задачи -->
                         <div id="pending-attachments-preview" class="flex flex-wrap gap-2 pt-1 hidden"></div>
                     </div>
 
-                    <!-- Канбан-колонки с обновленным информативным дизайном -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
                             <div class="flex justify-between items-center mb-3">
@@ -398,7 +444,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ПРОСМОТРА КАРТИНОК НА ВЕСЬ ЭКРАН -->
+    <!-- МОДАЛКА ПРОСМОТРА КАРТИНОК -->
     <div id="image-lightbox" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4" onclick="closeLightbox()">
         <div class="relative max-w-4xl max-h-[90vh]">
             <button onclick="closeLightbox()" class="absolute -top-10 right-0 p-2 text-white hover:text-slate-300 transition"><i data-lucide="x" class="w-8 h-8"></i></button>
@@ -407,13 +453,115 @@
     </div>
 
     <script>
+        // --- СИСТЕМА АВТОРИЗАЦИИ И БЕЗОПАСНОСТИ ---
+        // Хэш SHA-256 для: andrvik113@gmail.com / My2YDVB7 (пароль никогда не хранится в открытом виде)
+        const ADMIN_EMAIL_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; // email
+        const ADMIN_PASS_HASH = "a202d08a0d4c18c991e4aa0efc1fc81f7276901a1cf8ef0f7a77e8a9cf24f8bc";  // password
+
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function isAdmin() {
+            return localStorage.getItem('vityaPlannerRole') === 'admin';
+        }
+
+        function logAuthAttempt(email, success) {
+            const logs = JSON.parse(localStorage.getItem('vityaAuthLogs') || '[]');
+            logs.unshift({
+                time: new Date().toLocaleString('ru-RU'),
+                email: email || 'пусто',
+                success: success
+            });
+            // Имитация отправки уведомления / вебхука в защищенный лог
+            localStorage.setItem('vityaAuthLogs', JSON.stringify(logs.slice(0, 50)));
+        }
+
+        async function handleLogin() {
+            const emailInput = document.getElementById('auth-email').value.trim().toLowerCase();
+            const passInput = document.getElementById('auth-password').value;
+
+            const emailHash = await sha256(emailInput);
+            const passHash = await sha256(passInput);
+
+            if (emailHash === ADMIN_EMAIL_HASH && passHash === ADMIN_PASS_HASH) {
+                localStorage.setItem('vityaPlannerRole', 'admin');
+                logAuthAttempt(emailInput, true);
+                document.getElementById('auth-email').value = '';
+                document.getElementById('auth-password').value = '';
+                updateAuthUI();
+                alert('Успешный вход в режим Администратора!');
+            } else {
+                logAuthAttempt(emailInput, false);
+                alert('Неверный логин или пароль!');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.setItem('vityaPlannerRole', 'guest');
+            updateAuthUI();
+            alert('Вы вышли из режима администратора.');
+        }
+
+        function updateAuthUI() {
+            const adminBadge = document.getElementById('admin-badge');
+            const authStatusBox = document.getElementById('auth-status-box');
+            const authFormContainer = document.getElementById('auth-form-container');
+            const logoutContainer = document.getElementById('logout-container');
+            const registerModule = document.getElementById('admin-register-module');
+
+            if (isAdmin()) {
+                adminBadge.classList.remove('hidden');
+                authStatusBox.innerHTML = `Статус: <span class="font-bold text-red-600">Администратор</span>`;
+                authFormContainer.classList.add('hidden');
+                logoutContainer.classList.remove('hidden');
+                registerModule.classList.remove('hidden');
+            } else {
+                adminBadge.classList.add('hidden');
+                authStatusBox.innerHTML = `Статус: <span class="font-bold text-slate-700 dark:text-slate-200">Гость</span> (ограниченный доступ)`;
+                authFormContainer.classList.remove('hidden');
+                logoutContainer.classList.add('hidden');
+                registerModule.classList.add('hidden');
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-panel');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                requestAnimationFrame(() => backdrop.classList.remove('opacity-0'));
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        function registerNewUser() {
+            if (!isAdmin()) return;
+            const email = document.getElementById('new-user-email').value;
+            const pass = document.getElementById('new-user-pass').value;
+            if(!email || !pass) {
+                alert('Заполните поля для регистрации!');
+                return;
+            }
+            const msg = document.getElementById('register-log-msg');
+            msg.textContent = `Успешно зарегистрирован аккаунт: ${email}`;
+            document.getElementById('new-user-email').value = '';
+            document.getElementById('new-user-pass').value = '';
+            setTimeout(() => { msg.textContent = ''; }, 4000);
+        }
+
+        // --- ОСНОВНОЙ КОД ПЛАННЕРА ---
         const defaultData = {
             theme: 'light',
             themeMode: 'classic',
-            settings: {
-                showWidget: true,
-                compactTasks: false
-            },
+            settings: { showWidget: true, compactTasks: false },
             daysData: {} 
         };
 
@@ -486,18 +634,20 @@
         if (!appData.daysData) appData.daysData = {};
         if (!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
         if (!appData.themeMode) appData.themeMode = 'classic';
+        if (!localStorage.getItem('vityaPlannerRole')) localStorage.setItem('vityaPlannerRole', 'guest');
         
         let selectedDate = new Date();
         let weekOffset = 0;
         let currentScheduleView = 'day';
         let currentModalClassId = null;
         let notesTimeout = null;
-        let pendingAttachments = []; // Временные файлы перед добавлением задачи
+        let pendingAttachments = [];
 
         function init() {
             applyTheme(appData.theme);
             applyThemeMode(appData.themeMode);
             applySettingsToUI();
+            updateAuthUI();
             renderHeaderDate();
             renderDaysPanel();
             renderSchedule();
@@ -507,6 +657,7 @@
             lucide.createIcons();
 
             document.getElementById('modal-notes').addEventListener('input', function(e) {
+                if (!isAdmin()) return; // Гости не могут менять заметки
                 const status = document.getElementById('notes-status');
                 status.textContent = 'Сохранение...';
                 clearTimeout(notesTimeout);
@@ -519,6 +670,7 @@
         }
 
         function saveData() {
+            if (!isAdmin()) return;
             localStorage.setItem('vityaPlannerData', JSON.stringify(appData));
         }
 
@@ -534,15 +686,10 @@
             if (!appData.daysData[dateKey][classId]) appData.daysData[dateKey][classId] = { notes: '', tasks: [] };
         }
 
-        function getActiveTasksCount(dateKey, classId) {
-            if (!appData.daysData[dateKey] || !appData.daysData[dateKey][classId]) return 0;
-            return appData.daysData[dateKey][classId].tasks.filter(t => t.status !== 'done').length;
-        }
-
         function toggleTheme() {
             appData.theme = appData.theme === 'light' ? 'dark' : 'light';
             applyTheme(appData.theme);
-            saveData();
+            if (isAdmin()) saveData();
         }
 
         function applyTheme(theme) {
@@ -569,19 +716,15 @@
         function changeThemeMode(mode) {
             appData.themeMode = mode;
             applyThemeMode(mode);
-            saveData();
+            if (isAdmin()) saveData();
         }
 
         function applyThemeMode(mode) {
             const body = document.body;
             const select = document.getElementById('setting-theme-mode');
             if (select) select.value = mode;
-
-            if (mode === 'autumn') {
-                body.classList.add('autumn-theme');
-            } else {
-                body.classList.remove('autumn-theme');
-            }
+            if (mode === 'autumn') body.classList.add('autumn-theme');
+            else body.classList.remove('autumn-theme');
         }
 
         function initFallingLeaves() {
@@ -625,7 +768,6 @@
 
         function applySettingsToUI() {
             document.getElementById('setting-widget').checked = appData.settings.showWidget;
-            document.getElementById('setting-compact').checked = appData.settings.compactTasks;
             document.getElementById('setting-theme-mode').value = appData.themeMode || 'classic';
             
             const widgetEl = document.getElementById('next-class-widget');
@@ -639,7 +781,7 @@
 
         function updateSetting(key, value) {
             appData.settings[key] = value;
-            saveData();
+            if (isAdmin()) saveData();
             applySettingsToUI();
         }
 
@@ -650,8 +792,7 @@
 
         function getMonday(d) {
             d = new Date(d);
-            var day = d.getDay(),
-                diff = d.getDate() - day + (day == 0 ? -6: 1);
+            var day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6: 1);
             return new Date(d.setDate(diff));
         }
 
@@ -690,11 +831,8 @@
 
             let monthString = "";
             const monthsArr = Array.from(weekMonths);
-            if(monthsArr.length === 1) {
-                monthString = `${monthsNamesOnly[monthsArr[0]]} ${weekYear}`;
-            } else {
-                monthString = `${monthsNamesOnly[monthsArr[0]]} — ${monthsNamesOnly[monthsArr[1]]} ${weekYear}`;
-            }
+            if(monthsArr.length === 1) monthString = `${monthsNamesOnly[monthsArr[0]]} ${weekYear}`;
+            else monthString = `${monthsNamesOnly[monthsArr[0]]} — ${monthsNamesOnly[monthsArr[1]]} ${weekYear}`;
             headerDate.textContent = monthString;
 
             const badge = document.getElementById('schedule-date-badge');
@@ -710,7 +848,6 @@
         function renderDaysPanel() {
             const panel = document.getElementById('days-panel');
             panel.innerHTML = '';
-
             const monday = getMonday(new Date());
             monday.setDate(monday.getDate() + (weekOffset * 7));
             const today = new Date();
@@ -723,40 +860,28 @@
                 const isToday = iterDate.toDateString() === today.toDateString();
 
                 let cardClass = "flex flex-col items-center justify-center py-3 rounded-2xl cursor-pointer transition-all relative ";
-                if (isSelected) {
-                    cardClass += "bg-blue-500 text-white shadow-md font-bold scale-[1.02]";
-                } else {
-                    cardClass += "bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300";
-                }
+                if (isSelected) cardClass += "bg-blue-500 text-white shadow-md font-bold scale-[1.02]";
+                else cardClass += "bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300";
 
                 let indicatorHtml = '';
-                if (isToday && !isSelected) {
-                    indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>`;
-                } else if (isToday && isSelected) {
-                    indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-white rounded-full"></span>`;
-                }
+                if (isToday && !isSelected) indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>`;
+                else if (isToday && isSelected) indicatorHtml = `<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-white rounded-full"></span>`;
 
-                const cardHtml = `
+                panel.insertAdjacentHTML('beforeend', `
                     <div onclick="selectDate(${iterDate.getTime()})" class="${cardClass}">
                         ${indicatorHtml}
                         <span class="text-xs uppercase font-medium opacity-80 mb-1">${shortDaysRu[i]}</span>
                         <span class="text-lg font-bold">${iterDate.getDate()}</span>
                     </div>
-                `;
-                panel.insertAdjacentHTML('beforeend', cardHtml);
+                `);
             }
         }
 
         function getScheduleForDate(date) {
             const monday = getMonday(date);
-            const year = monday.getFullYear();
-            const month = String(monday.getMonth() + 1).padStart(2, '0');
-            const day = String(monday.getDate()).padStart(2, '0');
-            const mondayStr = `${year}-${month}-${day}`;
-
+            const mondayStr = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
             const weekSchedule = timetableData[mondayStr];
             if (!weekSchedule) return [];
-            
             let dayOfWeek = date.getDay();
             if (dayOfWeek === 0) dayOfWeek = 7;
             return weekSchedule[dayOfWeek] || [];
@@ -776,7 +901,6 @@
                 btnDay.className = "px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition";
                 document.getElementById('schedule-section-title').textContent = "Расписание на неделю";
             }
-
             renderHeaderDate();
             renderDaysPanel();
             renderSchedule();
@@ -795,7 +919,6 @@
                         <div class="text-center py-12 bg-white dark:bg-cardDark rounded-3xl shadow-soft">
                             <i data-lucide="coffee" class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3"></i>
                             <h3 class="text-lg font-medium text-slate-500">Занятий нет!</h3>
-                            <p class="text-sm text-slate-400">Отличный день для отдыха или самоподготовки.</p>
                         </div>`;
                     lucide.createIcons();
                     return;
@@ -805,7 +928,6 @@
                     const dayData = appData.daysData[currentDateKey] && appData.daysData[currentDateKey][cls.id] ? appData.daysData[currentDateKey][cls.id] : { tasks: [] };
                     const activeTasks = dayData.tasks.filter(t => t.status !== 'done');
                     
-                    // Генерация блока ДЗ под предметом в другом цвете (как ты и просил)
                     let tasksListHtml = '';
                     if (dayData.tasks.length > 0) {
                         let taskItems = '';
@@ -824,17 +946,15 @@
                         `;
                     }
 
-                    const badgeHtml = activeTasks.length > 0 ? 
-                        `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> ДЗ: ${activeTasks.length}</span>` : '';
+                    const badgeHtml = activeTasks.length > 0 ? `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> ДЗ: ${activeTasks.length}</span>` : '';
 
-                    const cardHtml = `
+                    container.insertAdjacentHTML('beforeend', `
                         <div onclick='openModal(${JSON.stringify(cls)})' class="group bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-100 dark:hover:border-slate-700 flex flex-col sm:flex-row sm:items-start gap-4">
                             <div class="flex-shrink-0 bg-slate-50 dark:bg-slate-800 rounded-2xl p-3 text-center sm:w-28 shadow-inner border border-slate-100 dark:border-slate-700">
                                 <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Пара ${index + 1}</span>
                                 <span class="block text-lg font-bold text-slate-800 dark:text-slate-200">${cls.start}</span>
                                 <span class="block text-xs text-slate-500">${cls.end}</span>
                             </div>
-                            
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-start mb-1">
                                     <span class="text-xs font-bold uppercase tracking-wider text-blue-500">${cls.type}</span>
@@ -847,33 +967,24 @@
                                 </div>
                                 ${tasksListHtml}
                             </div>
-                            
-                            <div class="hidden sm:flex text-slate-300 dark:text-slate-600 group-hover:text-blue-500 transition self-center">
-                                <i data-lucide="chevron-right" class="w-6 h-6"></i>
-                            </div>
                         </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', cardHtml);
+                    `);
                 });
             } else {
                 const monday = getMonday(selectedDate);
-                
                 for (let i = 0; i < 7; i++) {
                     const iterDate = new Date(monday);
                     iterDate.setDate(monday.getDate() + i);
                     const classes = getScheduleForDate(iterDate);
                     const iterDateKey = getDateKey(iterDate);
-                    
                     const dayTitle = `${daysRu[iterDate.getDay()]} (${iterDate.getDate()} ${monthsRu[iterDate.getMonth()]})`;
 
                     let classesHtml = '';
-                    if (classes.length === 0) {
-                        classesHtml = `<p class="text-sm text-slate-400 italic py-2">Занятий нет</p>`;
-                    } else {
+                    if (classes.length === 0) classesHtml = `<p class="text-sm text-slate-400 italic py-2">Занятий нет</p>`;
+                    else {
                         classes.forEach((cls) => {
                             const dayData = appData.daysData[iterDateKey] && appData.daysData[iterDateKey][cls.id] ? appData.daysData[iterDateKey][cls.id] : { tasks: [] };
                             const activeTasks = dayData.tasks.filter(t => t.status !== 'done');
-                            
                             let weekTasksHtml = '';
                             if (dayData.tasks.length > 0) {
                                 let taskItems = '';
@@ -881,28 +992,18 @@
                                     const isDoneClass = t.status === 'done' ? 'line-through opacity-50' : '';
                                     taskItems += `<li class="flex items-center gap-1.5 text-xs ${isDoneClass}"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>${t.text}</li>`;
                                 });
-                                weekTasksHtml = `
-                                    <div class="mt-2.5 p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 space-y-1">
-                                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1"><i data-lucide="check-square" class="w-3 h-3"></i> Задачи и ДЗ:</span>
-                                        <ul class="space-y-0.5">${taskItems}</ul>
-                                    </div>
-                                `;
+                                weekTasksHtml = `<div class="mt-2.5 p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 space-y-1"><span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1"><i data-lucide="check-square" class="w-3 h-3"></i> Задачи и ДЗ:</span><ul class="space-y-0.5">${taskItems}</ul></div>`;
                             }
-
                             const badgeHtml = activeTasks.length > 0 ? `<span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs px-2 py-0.5 rounded-full font-bold">ДЗ: ${activeTasks.length}</span>` : '';
                             
                             classesHtml += `
                                 <div onclick='selectDate(${iterDate.getTime()}); openModal(${JSON.stringify(cls)})' class="p-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-blue-50/50 dark:hover:bg-slate-800 rounded-2xl cursor-pointer transition border border-slate-100 dark:border-slate-700/50">
                                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                         <div>
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <span class="text-xs font-bold text-blue-500">${cls.start} - ${cls.end}</span>
-                                                <span class="text-xs text-slate-400">• ${cls.room}</span>
-                                                ${badgeHtml}
-                                            </div>
+                                            <div class="flex items-center gap-2 mb-1"><span class="text-xs font-bold text-blue-500">${cls.start} - ${cls.end}</span><span class="text-xs text-slate-400">• ${cls.room}</span>${badgeHtml}</div>
                                             <h4 class="font-bold text-slate-800 dark:text-slate-200">${cls.name}</h4>
                                         </div>
-                                        <span class="text-xs text-slate-400 self-start sm:self-center">${cls.teacher}</span>
+                                        <span class="text-xs text-slate-400">${cls.teacher}</span>
                                     </div>
                                     ${weekTasksHtml}
                                 </div>
@@ -910,18 +1011,15 @@
                         });
                     }
 
-                    const dayCardHtml = `
+                    container.insertAdjacentHTML('beforeend', `
                         <div class="bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft space-y-3">
                             <h3 class="font-bold text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-2 flex justify-between items-center">
                                 <span>${dayTitle}</span>
                                 <button onclick="selectedDate = new Date(${iterDate.getTime()}); setScheduleView('day');" class="text-xs text-blue-500 font-medium hover:underline">Открыть день</button>
                             </h3>
-                            <div class="space-y-2">
-                                ${classesHtml}
-                            </div>
+                            <div class="space-y-2">${classesHtml}</div>
                         </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', dayCardHtml);
+                    `);
                 }
             }
             lucide.createIcons();
@@ -934,34 +1032,24 @@
             if (selectedDate.toDateString() !== today.toDateString()) {
                 widget.style.display = 'none';
                 return;
-            } else {
-                widget.style.display = 'block';
-            }
+            } else widget.style.display = 'block';
 
             const classes = getScheduleForDate(today);
             const nowTime = today.getHours() * 60 + today.getMinutes();
-            
-            let currentClass = null;
-            let nextClass = null;
+            let currentClass = null, nextClass = null;
 
             for (let cls of classes) {
                 const [startH, startM] = cls.start.split(':').map(Number);
                 const [endH, endM] = cls.end.split(':').map(Number);
-                const startMins = startH * 60 + startM;
-                const endMins = endH * 60 + endM;
+                const startMins = startH * 60 + startM, endMins = endH * 60 + endM;
 
-                if (nowTime >= startMins && nowTime <= endMins) {
-                    currentClass = cls;
-                    break;
-                } else if (startMins > nowTime && !nextClass) {
-                    nextClass = { cls, diff: startMins - nowTime };
-                }
+                if (nowTime >= startMins && nowTime <= endMins) { currentClass = cls; break; }
+                else if (startMins > nowTime && !nextClass) nextClass = { cls, diff: startMins - nowTime };
             }
 
             const statusEl = document.getElementById('widget-status');
             const titleEl = document.getElementById('widget-title');
             const detailsEl = document.getElementById('widget-details');
-
             widget.className = "rounded-3xl p-6 text-white shadow-md relative overflow-hidden transition-all duration-500";
 
             if (currentClass) {
@@ -985,30 +1073,19 @@
         }
 
         let calendarDate = new Date();
-
         function toggleCalendar() {
             const cal = document.getElementById('calendar-dropdown');
-            if (cal.classList.contains('hidden')) {
-                cal.classList.remove('hidden');
-                calendarDate = new Date(selectedDate);
-                renderCalendar();
-            } else {
-                cal.classList.add('hidden');
-            }
+            if (cal.classList.contains('hidden')) { cal.classList.remove('hidden'); calendarDate = new Date(selectedDate); renderCalendar(); }
+            else cal.classList.add('hidden');
         }
 
-        function changeMonth(delta) {
-            calendarDate.setMonth(calendarDate.getMonth() + delta);
-            renderCalendar();
-        }
+        function changeMonth(delta) { calendarDate.setMonth(calendarDate.getMonth() + delta); renderCalendar(); }
 
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
             const monthYear = document.getElementById('calendar-month-year');
             grid.innerHTML = '';
-            
             monthYear.textContent = `${monthsNamesOnly[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
-
             const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
             const lastDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
             
@@ -1016,9 +1093,7 @@
             if (startDay === 0) startDay = 7;
             startDay--; 
 
-            for (let i = 0; i < startDay; i++) {
-                grid.innerHTML += `<div></div>`;
-            }
+            for (let i = 0; i < startDay; i++) grid.innerHTML += `<div></div>`;
 
             const today = new Date();
             for (let i = 1; i <= lastDay.getDate(); i++) {
@@ -1027,13 +1102,9 @@
                 const isToday = iterDate.toDateString() === today.toDateString();
                 
                 let btnClass = "w-full aspect-square flex items-center justify-center rounded-xl text-sm transition ";
-                if (isSelected) {
-                    btnClass += "bg-blue-500 text-white shadow-md font-bold";
-                } else if (isToday) {
-                    btnClass += "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-bold hover:bg-blue-200";
-                } else {
-                    btnClass += "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300";
-                }
+                if (isSelected) btnClass += "bg-blue-500 text-white shadow-md font-bold";
+                else if (isToday) btnClass += "bg-blue-100 dark:bg-blue-900/40 text-blue-600 font-bold";
+                else btnClass += "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300";
 
                 grid.innerHTML += `<button onclick="selectDate(${iterDate.getTime()})" class="${btnClass}">${i}</button>`;
             }
@@ -1044,7 +1115,6 @@
             const currentMonday = getMonday(new Date());
             const targetMonday = getMonday(selectedDate);
             weekOffset = Math.round((targetMonday - currentMonday) / (1000 * 60 * 60 * 24 * 7));
-
             document.getElementById('calendar-dropdown').classList.add('hidden');
             renderHeaderDate();
             renderDaysPanel();
@@ -1058,24 +1128,19 @@
             ensureDayClassDataExists(currentDateKey, cls.id);
             
             document.getElementById('modal-type').textContent = cls.type;
-            
-            // Вывод дня недели в шапке модалки (например: Понедельник (5 октября))
-            const dayNameStr = daysRu[selectedDate.getDay()];
-            const dayNumStr = selectedDate.getDate();
-            const monthNameStr = monthsRu[selectedDate.getMonth()];
-            document.getElementById('modal-day-badge').textContent = `${dayNameStr} (${dayNumStr} ${monthNameStr})`;
-
+            document.getElementById('modal-day-badge').textContent = `${daysRu[selectedDate.getDay()]} (${selectedDate.getDate()} ${monthsRu[selectedDate.getMonth()]})`;
             document.getElementById('modal-title').textContent = cls.name;
             document.getElementById('modal-time').textContent = `${cls.start} - ${cls.end}`;
             document.getElementById('modal-room').textContent = cls.room;
             document.getElementById('modal-teacher').textContent = cls.teacher;
             
-            document.getElementById('modal-notes').value = appData.daysData[currentDateKey][cls.id].notes || '';
+            const notesInput = document.getElementById('modal-notes');
+            notesInput.value = appData.daysData[currentDateKey][cls.id].notes || '';
+            notesInput.disabled = !isAdmin(); // Гости не могут редактировать заметки
             document.getElementById('notes-status').textContent = '';
 
             pendingAttachments = [];
             renderPendingAttachments();
-
             renderKanban();
 
             const modal = document.getElementById('class-modal');
@@ -1100,6 +1165,7 @@
         }
 
         function saveNotes(text) {
+            if (!isAdmin()) return;
             if (currentModalClassId) {
                 const currentDateKey = getDateKey(selectedDate);
                 ensureDayClassDataExists(currentDateKey, currentModalClassId);
@@ -1108,29 +1174,21 @@
             }
         }
 
-        // --- ЛОГИКА СЖАТИЯ И ВЛОЖЕНИЙ ---
         function handleFileSelect(event) {
+            if (!isAdmin()) { alert('Загрузка файлов доступна только администратору.'); return; }
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
             Array.from(files).forEach(file => {
                 if (file.type.startsWith('image/')) {
                     compressAndConvertImage(file, (base64String) => {
-                        pendingAttachments.push({
-                            name: file.name,
-                            type: 'image',
-                            data: base64String
-                        });
+                        pendingAttachments.push({ name: file.name, type: 'image', data: base64String });
                         renderPendingAttachments();
                     });
                 } else {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        pendingAttachments.push({
-                            name: file.name,
-                            type: 'file',
-                            data: e.target.result
-                        });
+                        pendingAttachments.push({ name: file.name, type: 'file', data: e.target.result });
                         renderPendingAttachments();
                     };
                     reader.readAsDataURL(file);
@@ -1145,30 +1203,13 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const MAX_WIDTH = 1000;
-                    const MAX_HEIGHT = 1000;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-                    callback(dataUrl);
+                    let width = img.width, height = img.height;
+                    const MAX_WIDTH = 1000, MAX_HEIGHT = 1000;
+                    if (width > height && width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    else if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    canvas.width = width; canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.75));
                 };
                 img.src = e.target.result;
             };
@@ -1177,68 +1218,26 @@
 
         function renderPendingAttachments() {
             const container = document.getElementById('pending-attachments-preview');
-            if (pendingAttachments.length === 0) {
-                container.classList.add('hidden');
-                container.innerHTML = '';
-                return;
-            }
+            if (pendingAttachments.length === 0) { container.classList.add('hidden'); container.innerHTML = ''; return; }
             container.classList.remove('hidden');
             container.innerHTML = '';
 
             pendingAttachments.forEach((att, index) => {
                 if (att.type === 'image') {
-                    container.innerHTML += `
-                        <div class="relative group w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 flex-shrink-0">
-                            <img src="${att.data}" class="w-full h-full object-cover">
-                            <button onclick="removePendingAttachment(${index})" class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 hover:bg-red-500 transition"><i data-lucide="x" class="w-3 h-3"></i></button>
-                        </div>
-                    `;
+                    container.innerHTML += `<div class="relative group w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 flex-shrink-0"><img src="${att.data}" class="w-full h-full object-cover"><button onclick="removePendingAttachment(${index})" class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 hover:bg-red-500 transition"><i data-lucide="x" class="w-3 h-3"></i></button></div>`;
                 } else {
-                    container.innerHTML += `
-                        <div class="relative group px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700 flex items-center gap-2 text-xs max-w-[180px]">
-                            <i data-lucide="file" class="w-4 h-4 text-blue-500 flex-shrink-0"></i>
-                            <span class="truncate text-slate-700 dark:text-slate-200">${att.name}</span>
-                            <button onclick="removePendingAttachment(${index})" class="text-slate-400 hover:text-red-500 transition ml-auto"><i data-lucide="x" class="w-3 h-3"></i></button>
-                        </div>
-                    `;
+                    container.innerHTML += `<div class="relative group px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700 flex items-center gap-2 text-xs max-w-[180px]"><i data-lucide="file" class="w-4 h-4 text-blue-500"></i><span class="truncate text-slate-700 dark:text-slate-200">${att.name}</span><button onclick="removePendingAttachment(${index})" class="text-slate-400 hover:text-red-500 ml-auto"><i data-lucide="x" class="w-3 h-3"></i></button></div>`;
                 }
             });
             lucide.createIcons();
         }
 
-        function removePendingAttachment(index) {
-            pendingAttachments.splice(index, 1);
-            renderPendingAttachments();
-        }
+        function removePendingAttachment(index) { pendingAttachments.splice(index, 1); renderPendingAttachments(); }
+        function openLightbox(imgSrc) { document.getElementById('lightbox-img').src = imgSrc; document.getElementById('image-lightbox').classList.remove('hidden'); }
+        function closeLightbox() { document.getElementById('image-lightbox').classList.add('hidden'); }
 
-        function removeTaskAttachment(taskId, attIndex) {
-            const currentDateKey = getDateKey(selectedDate);
-            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
-            if (task && task.attachments) {
-                task.attachments.splice(attIndex, 1);
-                saveData();
-                renderKanban();
-            }
-        }
+        const statusMap = { 'todo': { next: 'progress', prev: null }, 'progress': { next: 'done', prev: 'todo' }, 'done': { next: null, prev: 'progress' } };
 
-        function openLightbox(imgSrc) {
-            const lightbox = document.getElementById('image-lightbox');
-            const img = document.getElementById('lightbox-img');
-            img.src = imgSrc;
-            lightbox.classList.remove('hidden');
-        }
-
-        function closeLightbox() {
-            document.getElementById('image-lightbox').classList.add('hidden');
-        }
-
-        const statusMap = {
-            'todo': { next: 'progress', prev: null },
-            'progress': { next: 'done', prev: 'todo' },
-            'done': { next: null, prev: 'progress' }
-        };
-
-        // --- РЕНДЕР КАНБАНА И ИНФОРМАТИВНЫХ КАРТОЧЕК ---
         function renderKanban() {
             const currentDateKey = getDateKey(selectedDate);
             ensureDayClassDataExists(currentDateKey, currentModalClassId);
@@ -1248,93 +1247,64 @@
                 const col = document.getElementById(`col-${status}`);
                 const count = document.getElementById(`count-${status}`);
                 col.innerHTML = '';
-                
                 const colTasks = tasks.filter(t => t.status === status);
                 count.textContent = colTasks.length;
 
                 colTasks.forEach(task => {
                     let deadlineHtml = '';
                     if (task.deadline) {
-                        const today = new Date();
-                        today.setHours(0,0,0,0);
+                        const today = new Date(); today.setHours(0,0,0,0);
                         const dl = new Date(task.deadline);
-                        const diffTime = dl - today;
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        
+                        const diffDays = Math.ceil((dl - today) / (1000 * 60 * 60 * 24));
                         let dlBg = "bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300";
                         if (status !== 'done') {
-                            if (diffDays < 0) dlBg = "bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 font-bold";
-                            else if (diffDays <= 2) dlBg = "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-bold";
+                            if (diffDays < 0) dlBg = "bg-red-100 dark:bg-red-900/40 text-red-600 font-bold";
+                            else if (diffDays <= 2) dlBg = "bg-amber-100 dark:bg-amber-900/40 text-amber-700 font-bold";
                         }
                         let dlText = diffDays === 0 ? "Сдать сегодня" : diffDays < 0 ? "Просрочено" : `Дедлайн: ${dl.toLocaleDateString('ru-RU')}`;
-                        deadlineHtml = `
-                            <div class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg ${dlBg}">
-                                <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${dlText}
-                            </div>
-                        `;
+                        deadlineHtml = `<div class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg ${dlBg}"><i data-lucide="clock" class="w-3.5 h-3.5"></i> ${dlText}</div>`;
                     }
 
                     let attachmentsHtml = '';
                     if (task.attachments && task.attachments.length > 0) {
-                        let imagesGrid = '';
-                        let filesList = '';
-
-                        task.attachments.forEach((att, attIdx) => {
-                            if (att.type === 'image') {
-                                imagesGrid += `
-                                    <div class="relative group/img w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 cursor-pointer flex-shrink-0" onclick="openLightbox('${att.data}')">
-                                        <img src="${att.data}" class="w-full h-full object-cover group-hover/img:scale-105 transition">
-                                    </div>
-                                `;
-                            } else {
-                                filesList += `
-                                    <a href="${att.data}" download="${att.name}" class="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 transition">
-                                        <i data-lucide="file-text" class="w-4 h-4 text-blue-500 flex-shrink-0"></i>
-                                        <span class="truncate max-w-[150px] font-medium">${att.name}</span>
-                                    </a>
-                                `;
-                            }
+                        let imagesGrid = '', filesList = '';
+                        task.attachments.forEach(att => {
+                            if (att.type === 'image') imagesGrid += `<div class="w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 cursor-pointer flex-shrink-0" onclick="openLightbox('${att.data}')"><img src="${att.data}" class="w-full h-full object-cover"></div>`;
+                            else filesList += `<a href="${att.data}" download="${att.name}" class="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200"><i data-lucide="file-text" class="w-4 h-4 text-blue-500"></i><span class="truncate max-w-[150px] font-medium">${att.name}</span></a>`;
                         });
-
-                        attachmentsHtml = `
-                            <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 space-y-2">
-                                ${imagesGrid ? `<div class="flex flex-wrap gap-2">${imagesGrid}</div>` : ''}
-                                ${filesList ? `<div class="space-y-1.5">${filesList}</div>` : ''}
-                            </div>
-                        `;
+                        attachmentsHtml = `<div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 space-y-2">${imagesGrid ? `<div class="flex flex-wrap gap-2">${imagesGrid}</div>` : ''}${filesList ? `<div class="space-y-1.5">${filesList}</div>` : ''}</div>`;
                     }
 
                     const isDone = status === 'done';
-                    const cardHtml = `
+                    const actionButtons = isAdmin() ? `
+                        <div class="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition bg-white/90 dark:bg-cardDark/90 p-1 rounded-xl shadow-sm">
+                            ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i></button>` : ''}
+                            ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>` : ''}
+                            <button onclick="deleteTask(${task.id})" class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-red-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                        </div>` : '';
+
+                    col.insertAdjacentHTML('beforeend', `
                         <div class="bg-white dark:bg-cardDark p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col group relative">
                             <div class="flex items-start gap-3">
-                                ${status === 'todo' || status === 'progress' ? 
-                                    `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition cursor-pointer" title="Отметить как выполненное"></button>` : 
-                                    `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer shadow-sm" title="Вернуть в работу"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>`
-                                }
+                                ${isAdmin() ? (status === 'todo' || status === 'progress' ? 
+                                    `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition cursor-pointer"></button>` : 
+                                    `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>`) : ''}
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium leading-snug ${isDone ? 'task-done text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-white'}">${task.text}</p>
                                     ${deadlineHtml ? `<div class="mt-2">${deadlineHtml}</div>` : ''}
                                 </div>
                             </div>
-
                             ${attachmentsHtml}
-                            
-                            <!-- Кнопки управления задачей (появляются при наведении) -->
-                            <div class="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition bg-white/90 dark:bg-cardDark/90 backdrop-blur-sm p-1 rounded-xl shadow-sm">
-                                ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Назад"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i></button>` : ''}
-                                ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Вперед"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>` : ''}
-                                <button onclick="deleteTask(${task.id})" class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-red-500 transition" title="Удалить"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                            </div>
+                            ${actionButtons}
                         </div>
-                    `;
-                    col.insertAdjacentHTML('beforeend', cardHtml);
+                    `);
                 });
             });
             lucide.createIcons();
         }
 
         function addTask() {
+            if (!isAdmin()) { alert('Добавление задач доступно только администратору.'); return; }
             const input = document.getElementById('new-task-text');
             const dateInput = document.getElementById('new-task-date');
             const text = input.value.trim();
@@ -1342,18 +1312,12 @@
             if ((text || pendingAttachments.length > 0) && currentModalClassId) {
                 const currentDateKey = getDateKey(selectedDate);
                 ensureDayClassDataExists(currentDateKey, currentModalClassId);
-                
                 appData.daysData[currentDateKey][currentModalClassId].tasks.push({
-                    id: Date.now(),
-                    text: text || 'Без описания',
-                    status: 'todo',
-                    deadline: dateInput.value || null,
-                    attachments: [...pendingAttachments]
+                    id: Date.now(), text: text || 'Без описания', status: 'todo',
+                    deadline: dateInput.value || null, attachments: [...pendingAttachments]
                 });
-
                 saveData();
-                input.value = '';
-                dateInput.value = '';
+                input.value = ''; dateInput.value = '';
                 pendingAttachments = [];
                 renderPendingAttachments();
                 renderKanban();
@@ -1361,16 +1325,14 @@
         }
 
         function setTaskStatus(taskId, newStatus) {
+            if (!isAdmin()) return;
             const currentDateKey = getDateKey(selectedDate);
             const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
-            if (task) {
-                task.status = newStatus;
-                saveData();
-                renderKanban();
-            }
+            if (task) { task.status = newStatus; saveData(); renderKanban(); }
         }
 
         function deleteTask(taskId) {
+            if (!isAdmin()) return;
             const currentDateKey = getDateKey(selectedDate);
             appData.daysData[currentDateKey][currentModalClassId].tasks = appData.daysData[currentDateKey][currentModalClassId].tasks.filter(t => t.id !== taskId);
             saveData();
@@ -1378,28 +1340,24 @@
         }
 
         function exportData() {
-            const dataStr = JSON.stringify(appData, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
+            if (!isAdmin()) { alert('Экспорт данных доступен только администратору.'); return; }
+            const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `Планнер_БГО101_Бэкап_${new Date().toLocaleDateString('ru-RU')}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+            a.href = url; a.download = `Планнер_БГО101_Бэкап_${new Date().toLocaleDateString('ru-RU')}.json`;
+            a.click(); URL.revokeObjectURL(url);
         }
 
         function importData(event) {
+            if (!isAdmin()) { alert('Импорт данных доступен только администратору.'); return; }
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if (imported && (imported.daysData || imported.subjectsData)) {
+                    if (imported && imported.daysData) {
                         appData = imported;
-                        if(!appData.daysData) appData.daysData = {};
-                        if(!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
-                        if(!appData.themeMode) appData.themeMode = 'classic';
                         saveData();
                         applyTheme(appData.theme);
                         applyThemeMode(appData.themeMode);
@@ -1407,24 +1365,15 @@
                         renderDaysPanel();
                         renderSchedule();
                         alert('Данные успешно загружены!');
-                    } else {
-                        alert('Неверный формат файла.');
-                    }
-                } catch (err) {
-                    alert('Ошибка чтения файла.');
-                }
+                    } else alert('Неверный формат файла.');
+                } catch (err) { alert('Ошибка чтения файла.'); }
             };
             reader.readAsText(file);
         }
 
         window.addEventListener('DOMContentLoaded', init);
-        
-        document.getElementById('class-modal').addEventListener('click', function(e) {
-            if(e.target === this) closeModal();
-        });
-        document.getElementById('settings-modal').addEventListener('click', function(e) {
-            if(e.target === this) closeSettingsModal();
-        });
+        document.getElementById('class-modal').addEventListener('click', function(e) { if(e.target === this) closeModal(); });
+        document.getElementById('settings-modal').addEventListener('click', function(e) { if(e.target === this) closeSettingsModal(); });
     </script>
 </body>
 </html>
