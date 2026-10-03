@@ -132,9 +132,15 @@
             animation: fall linear infinite;
         }
         @keyframes fall {
-            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); }
-            50% { transform: translateY(50vh) translateX(40px) rotate(180deg); }
-            100% { transform: translateY(110vh) translateX(-30px) rotate(360deg); }
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(50vh) translateX(40px) rotate(180deg);
+            }
+            100% {
+                transform: translateY(110vh) translateX(-30px) rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -148,23 +154,21 @@
         <!-- HEADER -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Планнер Вити</h1>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Планнер Вити</h1>
+                    <span id="role-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Гость</span>
+                </div>
                 <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
                     <i data-lucide="book-open" class="w-4 h-4"></i> Группа БГО-101 (МЭИ)
                 </p>
             </div>
             
             <div class="flex items-center gap-3">
-                <!-- Кнопка Индикатора Статуса (Админ / Гость) -->
-                <button onclick="handleAuthClick()" id="auth-status-btn" class="flex items-center gap-2 px-3.5 py-2.5 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition text-xs font-semibold">
-                    <i data-lucide="user" class="w-4 h-4 text-slate-500" id="auth-icon"></i>
-                    <span id="auth-label">Гость</span>
-                </button>
-
                 <button onclick="toggleCalendar()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Календарь">
                     <i data-lucide="calendar" class="w-5 h-5 text-blue-500"></i>
                 </button>
-                <div class="flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1">
+                <!-- Кнопки экспорта/импорта видны только Админу -->
+                <div id="admin-tools" class="hidden flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1">
                     <button onclick="exportData()" class="p-2 text-slate-500 hover:text-blue-500 transition" title="Экспорт бэкапа">
                         <i data-lucide="download" class="w-5 h-5"></i>
                     </button>
@@ -173,9 +177,10 @@
                         <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
                     </label>
                 </div>
-                <!-- Кнопка Настроек в шапке -->
-                <button onclick="openSettingsModal()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Настройки">
+                <!-- Кнопка Настроек / Входа в шапке -->
+                <button onclick="openSettingsModal()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition relative" title="Настройки и Вход">
                     <i data-lucide="settings" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
+                    <span id="admin-indicator" class="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 hidden" title="Админ активен"></span>
                 </button>
                 <button onclick="toggleTheme()" class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition" title="Тема">
                     <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-slate-700 dark:text-amber-400"></i>
@@ -250,45 +255,12 @@
         </section>
     </div>
 
-    <!-- MODAL: АВТОРИЗАЦИЯ (АДМИН / ГОСТЬ) -->
-    <div id="auth-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white dark:bg-cardDark w-full max-w-sm rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="auth-modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                    <i data-lucide="lock" class="w-5 h-5 text-blue-500"></i> Вход для Админа
-                </h2>
-                <button onclick="closeAuthModal()" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Для выполнения этого действия (редактирование, загрузка файлов, бэкап) необходимы права администратора.</p>
-
-            <form onsubmit="handleLogin(event)" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Email (Логин)</label>
-                    <input type="email" id="auth-email" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Пароль</label>
-                    <input type="password" id="auth-password" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div id="auth-error" class="text-xs text-red-500 font-medium hidden">Неверный Email или пароль!</div>
-
-                <div class="pt-2 flex gap-2">
-                    <button type="submit" class="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium text-xs rounded-xl transition shadow-md">Войти</button>
-                    <button type="button" onclick="logoutAdmin()" id="logout-btn" class="hidden w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-medium text-xs rounded-xl transition">Выйти из прав</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: НАСТРОЙКИ -->
+    <!-- MODAL: НАСТРОЙКИ И АВТОРИЗАЦИЯ -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-cardDark w-full max-w-md rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300" id="settings-modal-content">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                    <i data-lucide="settings" class="w-5 h-5 text-blue-500"></i> Настройки
+                    <i data-lucide="settings" class="w-5 h-5 text-blue-500"></i> Настройки и Доступ
                 </h2>
                 <button onclick="closeSettingsModal()" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -296,6 +268,30 @@
             </div>
 
             <div class="space-y-4">
+                <!-- Блок Авторизации / Статуса доступа -->
+                <div id="auth-container" class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700">
+                    <div id="auth-guest-view">
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200 mb-1">Режим Гостя</h4>
+                        <p class="text-xs text-slate-400 mb-3">Вам доступен просмотр расписания и задач. Для полного доступа войдите как администратор.</p>
+                        
+                        <div class="space-y-2">
+                            <input type="email" id="login-email" placeholder="Email (andrvik113@gmail.com)" class="w-full bg-white dark:bg-slate-700 text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 outline-none text-slate-700 dark:text-slate-200">
+                            <input type="password" id="login-password" placeholder="Пароль" class="w-full bg-white dark:bg-slate-700 text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 outline-none text-slate-700 dark:text-slate-200">
+                            <button onclick="handleLogin()" class="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium text-xs rounded-xl transition shadow-sm">Войти как Админ</button>
+                            <p id="login-error" class="text-xs text-red-500 text-center hidden mt-1">Неверный логин или пароль</p>
+                        </div>
+                    </div>
+
+                    <div id="auth-admin-view" class="hidden flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-500 block mb-0.5">Статус: Администратор</span>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Вход выполнен под andrvik113@gmail.com</p>
+                        </div>
+                        <button onclick="handleLogout()" class="px-3 py-1.5 bg-red-50 dark:bg-red-900/30 text-red-600 hover:bg-red-100 rounded-xl text-xs font-semibold transition">Выйти</button>
+                    </div>
+                </div>
+
+                <!-- Выбор темы оформления -->
                 <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
                     <div>
                         <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">Тема оформления</h4>
@@ -346,6 +342,7 @@
                     <div class="flex items-center gap-2 mb-1 flex-wrap">
                         <span id="modal-type" class="text-xs font-bold uppercase tracking-wider text-blue-500">Лекция</span>
                         <span class="text-slate-300 dark:text-slate-600">•</span>
+                        <!-- Индикатор дня недели для добавляемой заметки/дз -->
                         <span id="modal-day-badge" class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2.5 py-0.5 rounded-full">Понедельник (5 октября)</span>
                     </div>
                     <h2 id="modal-title" class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">Название предмета</h2>
@@ -373,8 +370,8 @@
                         <h3 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="kanban" class="w-5 h-5 text-emerald-500"></i> Задачи и ДЗ</h3>
                     </div>
 
-                    <!-- Форма добавления задачи с прикреплением файлов -->
-                    <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl space-y-3 mb-6 border border-slate-100 dark:border-slate-700">
+                    <!-- Форма добавления задачи с прикреплением файлов (Только для Админа) -->
+                    <div id="add-task-form-container" class="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl space-y-3 mb-6 border border-slate-100 dark:border-slate-700">
                         <input type="text" id="new-task-text" placeholder="Что нужно сделать или какое ДЗ задали?" class="w-full bg-transparent border-none outline-none text-sm text-slate-700 dark:text-slate-200 font-medium">
                         
                         <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200/60 dark:border-slate-700">
@@ -394,11 +391,11 @@
                             </div>
                         </div>
 
-                        <!-- Превью файлов перед добавлением -->
+                        <!-- Превью выбранных файлов перед добавлением задачи -->
                         <div id="pending-attachments-preview" class="flex flex-wrap gap-2 pt-1 hidden"></div>
                     </div>
 
-                    <!-- Канбан-колонки -->
+                    <!-- Канбан-колонки с обновленным информативным дизайном -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
                             <div class="flex justify-between items-center mb-3">
@@ -438,11 +435,6 @@
     </div>
 
     <script>
-        const ADMIN_CREDENTIALS = {
-            email: "andrvik113@gmail.com",
-            password: "My2YDVB7"
-        };
-
         const defaultData = {
             theme: 'light',
             themeMode: 'classic',
@@ -523,7 +515,7 @@
         if (!appData.settings) appData.settings = { showWidget: true, compactTasks: false };
         if (!appData.themeMode) appData.themeMode = 'classic';
         
-        let isAdmin = localStorage.getItem('vityaPlannerIsAdmin') === 'true';
+        let currentUserRole = localStorage.getItem('vityaPlannerRole') || 'guest'; // 'guest' или 'admin'
         let selectedDate = new Date();
         let weekOffset = 0;
         let currentScheduleView = 'day';
@@ -535,7 +527,7 @@
             applyTheme(appData.theme);
             applyThemeMode(appData.themeMode);
             applySettingsToUI();
-            updateAuthUI();
+            updateRoleUI();
             renderHeaderDate();
             renderDaysPanel();
             renderSchedule();
@@ -545,10 +537,7 @@
             lucide.createIcons();
 
             document.getElementById('modal-notes').addEventListener('input', function(e) {
-                if (!isAdmin) {
-                    openAuthModal();
-                    return;
-                }
+                if (currentUserRole !== 'admin') return;
                 const status = document.getElementById('notes-status');
                 status.textContent = 'Сохранение...';
                 clearTimeout(notesTimeout);
@@ -560,121 +549,65 @@
             });
         }
 
-        // --- УПРАВЛЕНИЕ АВТОРИЗАЦИЕЙ ---
-        function updateAuthUI() {
-            const btn = document.getElementById('auth-status-btn');
-            const label = document.getElementById('auth-label');
-            const icon = document.getElementById('auth-icon');
-            const logoutBtn = document.getElementById('logout-btn');
-
-            if (isAdmin) {
-                label.textContent = "Админ";
-                icon.setAttribute('data-lucide', 'shield-check');
-                icon.className = "w-4 h-4 text-emerald-500";
-                btn.className = "flex items-center gap-2 px-3.5 py-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-2xl shadow-soft transition text-xs font-semibold text-emerald-700 dark:text-emerald-300";
-                logoutBtn.classList.remove('hidden');
-            } else {
-                label.textContent = "Гость";
-                icon.setAttribute('data-lucide', 'user');
-                icon.className = "w-4 h-4 text-slate-500";
-                btn.className = "flex items-center gap-2 px-3.5 py-2.5 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition text-xs font-semibold text-slate-700 dark:text-slate-300";
-                logoutBtn.classList.add('hidden');
-            }
-            lucide.createIcons();
+        function saveData() {
+            if (currentUserRole !== 'admin') return;
+            localStorage.setItem('vityaPlannerData', JSON.stringify(appData));
         }
 
-        function handleAuthClick() {
-            if (isAdmin) {
-                openAuthModal(); // Открыть меню с возможностью выйти
-            } else {
-                openAuthModal();
-            }
-        }
+        // --- ЛОГИКА АВТОРИЗАЦИИ ---
+        function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const errEl = document.getElementById('login-error');
 
-        function openAuthModal() {
-            const modal = document.getElementById('auth-modal');
-            const content = document.getElementById('auth-modal-content');
-            modal.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                modal.classList.remove('opacity-0');
-                content.classList.remove('scale-95');
-            });
-        }
-
-        function closeAuthModal() {
-            const modal = document.getElementById('auth-modal');
-            const content = document.getElementById('auth-modal-content');
-            modal.classList.add('opacity-0');
-            content.classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
-        }
-
-        function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value.trim();
-            const errorEl = document.getElementById('auth-error');
-
-            if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-                isAdmin = true;
-                localStorage.setItem('vityaPlannerIsAdmin', 'true');
-                errorEl.classList.add('hidden');
-                closeAuthModal();
-                updateAuthUI();
+            if (email === 'andrvik113@gmail.com' && password === 'My2YDVB7') {
+                currentUserRole = 'admin';
+                localStorage.setItem('vityaPlannerRole', 'admin');
+                errEl.classList.add('hidden');
+                document.getElementById('login-email').value = '';
+                document.getElementById('login-password').value = '';
+                updateRoleUI();
                 renderSchedule();
             } else {
-                errorEl.classList.remove('hidden');
+                errEl.classList.remove('hidden');
             }
         }
 
-        function logoutAdmin() {
-            isAdmin = false;
-            localStorage.setItem('vityaPlannerIsAdmin', 'false');
-            closeAuthModal();
-            updateAuthUI();
+        function handleLogout() {
+            currentUserRole = 'guest';
+            localStorage.setItem('vityaPlannerRole', 'guest');
+            updateRoleUI();
             renderSchedule();
         }
 
-        // Переопределение метода экспорта (только для админа)
-        const originalExportData = window.exportData;
-        window.exportData = function() {
-            if (!isAdmin) {
-                openAuthModal();
-                return;
-            }
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "vitya_planner_backup.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
+        function updateRoleUI() {
+            const roleBadge = document.getElementById('role-badge');
+            const adminTools = document.getElementById('admin-tools');
+            const adminIndicator = document.getElementById('admin-indicator');
+            const guestView = document.getElementById('auth-guest-view');
+            const adminView = document.getElementById('auth-admin-view');
+            const notesEl = document.getElementById('modal-notes');
+            const addTaskContainer = document.getElementById('add-task-form-container');
 
-        // Переопределение импорта
-        window.importData = function(event) {
-            if (!isAdmin) {
-                openAuthModal();
-                event.target.value = '';
-                return;
+            if (currentUserRole === 'admin') {
+                roleBadge.textContent = 'Админ';
+                roleBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500 text-white';
+                adminTools.classList.remove('hidden');
+                adminIndicator.classList.remove('hidden');
+                guestView.classList.add('hidden');
+                adminView.classList.remove('hidden');
+                notesEl.removeAttribute('disabled');
+                if (addTaskContainer) addTaskContainer.style.display = 'block';
+            } else {
+                roleBadge.textContent = 'Гость';
+                roleBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300';
+                adminTools.classList.add('hidden');
+                adminIndicator.classList.add('hidden');
+                guestView.classList.remove('hidden');
+                adminView.classList.add('hidden');
+                notesEl.setAttribute('disabled', 'true');
+                if (addTaskContainer) addTaskContainer.style.display = 'none';
             }
-            const fileReader = new FileReader();
-            if (event.target.files[0]) {
-                fileReader.readAsText(event.target.files[0], "UTF-8");
-                fileReader.onload = function(e) {
-                    try {
-                        appData = JSON.parse(e.target.result);
-                        saveData();
-                        location.reload();
-                    } catch (error) {
-                        alert("Ошибка чтения файла бэкапа!");
-                    }
-                };
-            }
-        }
-
-        function saveData() {
-            localStorage.setItem('vityaPlannerData', JSON.stringify(appData));
         }
 
         function getDateKey(date) {
@@ -689,10 +622,15 @@
             if (!appData.daysData[dateKey][classId]) appData.daysData[dateKey][classId] = { notes: '', tasks: [] };
         }
 
+        function getActiveTasksCount(dateKey, classId) {
+            if (!appData.daysData[dateKey] || !appData.daysData[dateKey][classId]) return 0;
+            return appData.daysData[dateKey][classId].tasks.filter(t => t.status !== 'done').length;
+        }
+
         function toggleTheme() {
             appData.theme = appData.theme === 'light' ? 'dark' : 'light';
             applyTheme(appData.theme);
-            saveData();
+            if (currentUserRole === 'admin') saveData();
         }
 
         function applyTheme(theme) {
@@ -719,7 +657,7 @@
         function changeThemeMode(mode) {
             appData.themeMode = mode;
             applyThemeMode(mode);
-            saveData();
+            if (currentUserRole === 'admin') saveData();
         }
 
         function applyThemeMode(mode) {
@@ -789,7 +727,7 @@
 
         function updateSetting(key, value) {
             appData.settings[key] = value;
-            saveData();
+            if (currentUserRole === 'admin') saveData();
             applySettingsToUI();
         }
 
@@ -1248,10 +1186,7 @@
         }
 
         function saveNotes(text) {
-            if (!isAdmin) {
-                openAuthModal();
-                return;
-            }
+            if (currentUserRole !== 'admin') return;
             if (currentModalClassId) {
                 const currentDateKey = getDateKey(selectedDate);
                 ensureDayClassDataExists(currentDateKey, currentModalClassId);
@@ -1261,11 +1196,7 @@
         }
 
         function handleFileSelect(event) {
-            if (!isAdmin) {
-                openAuthModal();
-                event.target.value = '';
-                return;
-            }
+            if (currentUserRole !== 'admin') return;
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
@@ -1363,8 +1294,20 @@
         }
 
         function removePendingAttachment(index) {
+            if (currentUserRole !== 'admin') return;
             pendingAttachments.splice(index, 1);
             renderPendingAttachments();
+        }
+
+        function removeTaskAttachment(taskId, attIndex) {
+            if (currentUserRole !== 'admin') return;
+            const currentDateKey = getDateKey(selectedDate);
+            const task = appData.daysData[currentDateKey][currentModalClassId].tasks.find(t => t.id === taskId);
+            if (task && task.attachments) {
+                task.attachments.splice(attIndex, 1);
+                saveData();
+                renderKanban();
+            }
         }
 
         function openLightbox(imgSrc) {
@@ -1384,11 +1327,9 @@
             'done': { next: null, prev: 'progress' }
         };
 
+        // --- УПРАВЛЕНИЕ ЗАДАЧАМИ С ПРОВЕРКОЙ РОЛИ ---
         function addTask() {
-            if (!isAdmin) {
-                openAuthModal();
-                return;
-            }
+            if (currentUserRole !== 'admin') return;
             const textInput = document.getElementById('new-task-text');
             const dateInput = document.getElementById('new-task-date');
             const text = textInput.value.trim();
@@ -1416,10 +1357,7 @@
         }
 
         function setTaskStatus(taskId, newStatus) {
-            if (!isAdmin) {
-                openAuthModal();
-                return;
-            }
+            if (currentUserRole !== 'admin') return;
             const currentDateKey = getDateKey(selectedDate);
             const tasks = appData.daysData[currentDateKey][currentModalClassId].tasks;
             const task = tasks.find(t => t.id === taskId);
@@ -1431,10 +1369,7 @@
         }
 
         function deleteTask(taskId) {
-            if (!isAdmin) {
-                openAuthModal();
-                return;
-            }
+            if (currentUserRole !== 'admin') return;
             const currentDateKey = getDateKey(selectedDate);
             const tasks = appData.daysData[currentDateKey][currentModalClassId].tasks;
             const index = tasks.findIndex(t => t.id === taskId);
@@ -1511,12 +1446,37 @@
                     }
 
                     const isDone = status === 'done';
+                    
+                    // Кнопки управления задачей доступны только админу
+                    let controlsHtml = '';
+                    if (currentUserRole === 'admin') {
+                        let statusButtons = '';
+                        if (status === 'todo' || status === 'progress') {
+                            statusButtons += `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition cursor-pointer" title="Отметить как выполненное"></button>`;
+                        } else {
+                            statusButtons += `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer shadow-sm" title="Вернуть в работу"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>`;
+                        }
+
+                        controlsHtml = `
+                            <div class="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition bg-white/90 dark:bg-cardDark/90 backdrop-blur-sm p-1 rounded-xl shadow-sm">
+                                ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Назад"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i></button>` : ''}
+                                ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Вперед"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>` : ''}
+                                <button onclick="deleteTask(${task.id})" class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-red-500 transition" title="Удалить"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        `;
+                    } else {
+                        // Для Гостя показываем просто галочку чтения
+                        let statusButtons = isDone ? 
+                            `<div class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>` :
+                            `<div class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full"></div>`;
+                    }
+
                     const cardHtml = `
                         <div class="bg-white dark:bg-cardDark p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col group relative">
                             <div class="flex items-start gap-3">
-                                ${status === 'todo' || status === 'progress' ? 
-                                    `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition cursor-pointer" title="Отметить как выполненное"></button>` : 
-                                    `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer shadow-sm" title="Вернуть в работу"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>`
+                                ${currentUserRole === 'admin' ? 
+                                    (status === 'todo' || status === 'progress' ? `<button onclick="setTaskStatus(${task.id}, 'done')" class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition cursor-pointer" title="Отметить"></button>` : `<button onclick="setTaskStatus(${task.id}, 'todo')" class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>`) :
+                                    (isDone ? `<div class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>` : `<div class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full opacity-50"></div>`)
                                 }
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium leading-snug ${isDone ? 'task-done text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-white'}">${task.text}</p>
@@ -1525,19 +1485,42 @@
                             </div>
 
                             ${attachmentsHtml}
-                            
-                            ${isAdmin ? `
-                            <div class="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition bg-white/90 dark:bg-cardDark/90 backdrop-blur-sm p-1 rounded-xl shadow-sm">
-                                ${statusMap[status].prev ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Назад"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i></button>` : ''}
-                                ${statusMap[status].next ? `<button onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition" title="Вперед"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>` : ''}
-                                <button onclick="deleteTask(${task.id})" class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-red-500 transition" title="Удалить"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                            </div>` : ''}
+                            ${controlsHtml}
                         </div>
                     `;
                     col.insertAdjacentHTML('beforeend', cardHtml);
                 });
             });
             lucide.createIcons();
+        }
+
+        // Функции экспорта/импорта (доступны только администратору)
+        function exportData() {
+            if (currentUserRole !== 'admin') return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "vitya_planner_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            if (currentUserRole !== 'admin') return;
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = function (e) {
+                    try {
+                        appData = JSON.parse(e.target.result);
+                        saveData();
+                        location.reload();
+                    } catch (error) {
+                        alert("Ошибка чтения файла бэкапа!");
+                    }
+                }
+            }
         }
 
         window.onload = init;
