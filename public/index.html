@@ -1,1 +1,3727 @@
+<!DOCTYPE html>
+<html lang="ru" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Планнер Вити</title>
 
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#F0F4F8" id="meta-theme-color">
+
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%233B82F6%22 width=%22100%22 height=%22100%22 rx=%2220%22/><text y=%2250%22 x=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>В</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%233B82F6%22 width=%22100%22 height=%22100%22 rx=%2220%22/><text y=%2250%22 x=%2250%22 fill=%22white%22 font-family=%22sans-serif%22 font-size=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22>В</text></svg>">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        lightBg: 'var(--bg-light)',
+                        darkBg: 'var(--bg-dark)',
+                        cardLight: 'var(--card-light)',
+                        cardDark: 'var(--card-dark)',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-light: #F0F4F8;
+            --bg-dark: #0F172A;
+            --card-light: #FFFFFF;
+            --card-dark: #1E293B;
+            --accent-main: #3B82F6;
+        }
+
+        body.autumn-theme {
+            --bg-light: #FDF8F2;
+            --bg-dark: #1C1512;
+            --card-light: #FFFDF9;
+            --card-dark: #2A211D;
+            --accent-main: #D97706;
+        }
+
+        body.autumn-theme .bg-blue-500,
+        body.autumn-theme .peer-checked\:bg-blue-500:checked ~ div,
+        body.autumn-theme .peer-checked\:bg-blue-500 {
+            background-color: #D97706 !important;
+        }
+
+        body.autumn-theme .text-blue-500,
+        body.autumn-theme .group-hover\:text-blue-500:hover {
+            color: #D97706 !important;
+        }
+
+        body.autumn-theme .border-blue-100,
+        body.autumn-theme .hover\:border-blue-100:hover {
+            border-color: #FDE68A !important;
+        }
+
+        body.autumn-theme .bg-blue-50 {
+            background-color: #FEF3C7 !important;
+        }
+
+        body.autumn-theme .bg-blue-100 {
+            background-color: #FDE68A !important;
+            color: #92400E !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        * {
+            scrollbar-width: none;
+        }
+
+        body,
+        .card-transition {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .task-done {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #CBD5E1;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .dark .custom-checkbox {
+            border-color: #475569;
+        }
+
+        .custom-checkbox:checked {
+            background-color: var(--accent-main);
+            border-color: var(--accent-main);
+        }
+
+        .custom-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.75rem;
+        }
+
+        #leaves-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 99;
+            display: none;
+        }
+
+        body.autumn-theme #leaves-container {
+            display: block;
+        }
+
+        .leaf {
+            position: absolute;
+            top: -10%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.4;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(50vh) translateX(40px) rotate(180deg);
+            }
+
+            100% {
+                transform: translateY(110vh) translateX(-30px) rotate(360deg);
+            }
+        }
+
+        .guest-readonly textarea,
+        .guest-readonly input {
+            cursor: not-allowed !important;
+        }
+    </style>
+</head>
+
+<body class="bg-lightBg dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen p-4 md:p-8 selection:bg-blue-200 dark:selection:bg-blue-900 pb-24">
+
+    <!-- Падающие листья -->
+    <div id="leaves-container"></div>
+
+    <div class="max-w-3xl mx-auto space-y-8">
+
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    Планнер Вити
+                </h1>
+
+                <p class="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    Группа БГО-101 (МЭИ)
+                </p>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+
+                <!-- Статус доступа -->
+                <div id="access-status"
+                     class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-cardDark rounded-2xl shadow-soft">
+                    <span id="access-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                    <span id="access-status-text" class="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        Гость
+                    </span>
+                </div>
+
+                <!-- Вход / выход -->
+                <button
+                    id="auth-button"
+                    onclick="openLoginModal()"
+                    class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition"
+                    title="Войти как администратор">
+                    <i data-lucide="log-in" class="w-5 h-5 text-blue-500"></i>
+                </button>
+
+                <!-- Календарь -->
+                <button
+                    onclick="toggleCalendar()"
+                    class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition"
+                    title="Календарь">
+                    <i data-lucide="calendar" class="w-5 h-5 text-blue-500"></i>
+                </button>
+
+                <!-- Импорт / экспорт -->
+                <div
+                    id="admin-data-controls"
+                    class="hidden flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1">
+
+                    <button
+                        onclick="exportData()"
+                        class="p-2 text-slate-500 hover:text-blue-500 transition"
+                        title="Экспорт бэкапа">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                    </button>
+
+                    <label
+                        class="p-2 text-slate-500 hover:text-blue-500 transition cursor-pointer"
+                        title="Импорт бэкапа">
+                        <i data-lucide="upload" class="w-5 h-5"></i>
+                        <input
+                            type="file"
+                            id="import-file"
+                            class="hidden"
+                            accept=".json"
+                            onchange="importData(event)">
+                    </label>
+                </div>
+
+                <!-- Настройки -->
+                <button
+                    onclick="openSettingsModal()"
+                    class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition"
+                    title="Настройки">
+                    <i data-lucide="settings" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
+                </button>
+
+                <!-- Тема -->
+                <button
+                    onclick="toggleTheme()"
+                    class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition"
+                    title="Тема">
+                    <i id="theme-icon" data-lucide="moon" class="w-5 h-5 text-slate-700 dark:text-amber-400"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- WIDGET -->
+        <section
+            id="next-class-widget"
+            class="bg-gradient-to-r from-blue-500 to-sky-400 rounded-3xl p-6 text-white shadow-md relative overflow-hidden">
+
+            <div class="absolute top-0 right-0 opacity-10 translate-x-1/4 -translate-y-1/4">
+                <i data-lucide="clock" class="w-48 h-48"></i>
+            </div>
+
+            <div class="relative z-10">
+                <p
+                    id="widget-status"
+                    class="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2">
+                    Анализ расписания...
+                </p>
+
+                <h2 id="widget-title" class="text-2xl font-bold mb-1">
+                    Свободное время
+                </h2>
+
+                <p
+                    id="widget-details"
+                    class="text-blue-50 flex items-center gap-2 opacity-90">
+                    Отдыхайте или занимайтесь своими делами
+                </p>
+            </div>
+        </section>
+
+        <!-- ПАНЕЛЬ ДНЕЙ -->
+        <section class="bg-white dark:bg-cardDark rounded-3xl shadow-soft p-4 card-transition space-y-4">
+
+            <div class="flex items-center justify-between px-2">
+                <h2
+                    id="header-date"
+                    class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                    Загрузка...
+                </h2>
+
+                <div class="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl shadow-inner p-1 gap-1">
+
+                    <button
+                        onclick="changeWeek(-1)"
+                        class="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition"
+                        title="Прошлая неделя">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+
+                    <button
+                        onclick="resetToCurrentWeek()"
+                        class="px-2 text-xs font-medium text-blue-500 hover:underline">
+                        Сегодня
+                    </button>
+
+                    <button
+                        onclick="changeWeek(1)"
+                        class="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition"
+                        title="Следующая неделя">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="days-panel" class="grid grid-cols-7 gap-2"></div>
+        </section>
+
+        <!-- CALENDAR -->
+        <section
+            id="calendar-dropdown"
+            class="hidden bg-white dark:bg-cardDark rounded-3xl shadow-soft p-6 card-transition transition-all duration-300">
+
+            <div class="flex justify-between items-center mb-4">
+
+                <button
+                    onclick="changeMonth(-1)"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition">
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                </button>
+
+                <h3 id="calendar-month-year" class="font-semibold text-lg"></h3>
+
+                <button
+                    onclick="changeMonth(1)"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition">
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+
+            </div>
+
+            <div class="grid grid-cols-7 gap-2 text-center text-sm mb-2 text-slate-400 font-medium">
+                <div>Пн</div>
+                <div>Вт</div>
+                <div>Ср</div>
+                <div>Чт</div>
+                <div>Пт</div>
+                <div>Сб</div>
+                <div>Вс</div>
+            </div>
+
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
+        </section>
+
+        <!-- SCHEDULE -->
+        <section>
+
+            <div class="flex items-center justify-between mb-6">
+
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <i data-lucide="list" class="w-5 h-5 text-blue-500"></i>
+                    <span id="schedule-section-title">Расписание на день</span>
+                </h2>
+
+                <div class="flex items-center gap-3">
+
+                    <span
+                        id="schedule-date-badge"
+                        class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
+                        Сегодня
+                    </span>
+
+                    <div class="flex bg-white dark:bg-cardDark rounded-2xl shadow-soft p-1 border border-slate-100 dark:border-slate-700">
+
+                        <button
+                            onclick="setScheduleView('day')"
+                            id="view-btn-day"
+                            class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition">
+                            День
+                        </button>
+
+                        <button
+                            onclick="setScheduleView('week')"
+                            id="view-btn-week"
+                            class="px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition">
+                            Неделя
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="schedule-list" class="space-y-4"></div>
+        </section>
+    </div>
+
+    <!-- MODAL: LOGIN -->
+    <div
+        id="login-modal"
+        class="fixed inset-0 bg-slate-900/50 dark:bg-black/70 backdrop-blur-sm hidden z-[70] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+
+        <div
+            id="login-modal-content"
+            class="bg-white dark:bg-cardDark w-full max-w-md rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300">
+
+            <div class="flex justify-between items-center mb-6">
+
+                <h2 class="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-blue-500"></i>
+                    Вход администратора
+                </h2>
+
+                <button
+                    onclick="closeLoginModal()"
+                    class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form onsubmit="loginAdmin(event)" class="space-y-4">
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        Email
+                    </label>
+
+                    <input
+                        id="login-email"
+                        type="email"
+                        autocomplete="username"
+                        placeholder="Введите email"
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        Пароль
+                    </label>
+
+                    <input
+                        id="login-password"
+                        type="password"
+                        autocomplete="current-password"
+                        placeholder="Введите пароль"
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white">
+                </div>
+
+                <p
+                    id="login-error"
+                    class="hidden text-sm text-red-500 bg-red-50 dark:bg-red-900/20 rounded-xl p-3">
+                    Неверный email или пароль.
+                </p>
+
+                <button
+                    type="submit"
+                    class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-2xl transition shadow-md">
+                    Войти как администратор
+                </button>
+
+                <p class="text-xs text-center text-slate-400">
+                    Без входа сайт работает в режиме просмотра.
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: SETTINGS -->
+    <div
+        id="settings-modal"
+        class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+
+        <div
+            class="bg-white dark:bg-cardDark w-full max-w-md rounded-3xl shadow-2xl p-6 transform scale-95 transition-transform duration-300"
+            id="settings-modal-content">
+
+            <div class="flex justify-between items-center mb-6">
+
+                <h2 class="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                    <i data-lucide="settings" class="w-5 h-5 text-blue-500"></i>
+                    Настройки
+                </h2>
+
+                <button
+                    onclick="closeSettingsModal()"
+                    class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
+
+                    <div>
+                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">
+                            Тема оформления
+                        </h4>
+
+                        <p class="text-xs text-slate-400">
+                            Классическая или Осенний вайб
+                        </p>
+                    </div>
+
+                    <select
+                        id="setting-theme-mode"
+                        onchange="changeThemeMode(this.value)"
+                        class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-xl px-3 py-1.5 outline-none border border-slate-200 dark:border-slate-600 cursor-pointer">
+
+                        <option value="classic">Классическая</option>
+                        <option value="autumn">Осенний режим</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
+
+                    <div>
+                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">
+                            Виджет «Ближайшее занятие»
+                        </h4>
+
+                        <p class="text-xs text-slate-400">
+                            Показывать блок статуса пары вверху
+                        </p>
+                    </div>
+
+                    <label class="relative inline-flex items-center cursor-pointer">
+
+                        <input
+                            type="checkbox"
+                            id="setting-widget"
+                            class="sr-only peer"
+                            onchange="updateSetting('showWidget', this.checked)">
+
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl">
+
+                    <div>
+                        <h4 class="font-medium text-sm text-slate-800 dark:text-slate-200">
+                            Компактный список заданий
+                        </h4>
+
+                        <p class="text-xs text-slate-400">
+                            Оптимизировать отступы в канбан-доске
+                        </p>
+                    </div>
+
+                    <label class="relative inline-flex items-center cursor-pointer">
+
+                        <input
+                            type="checkbox"
+                            id="setting-compact"
+                            class="sr-only peer"
+                            onchange="updateSetting('compactTasks', this.checked)">
+
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end">
+                <button
+                    onclick="closeSettingsModal()"
+                    class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm rounded-xl transition shadow-md">
+                    Готово
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CLASS -->
+    <div
+        id="class-modal"
+        class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm hidden z-50 flex items-end md:items-center justify-center p-0 md:p-4 opacity-0 transition-opacity duration-300">
+
+        <div
+            class="bg-white dark:bg-cardDark w-full max-w-2xl h-[85vh] md:h-[80vh] md:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col transform translate-y-full md:translate-y-0 transition-transform duration-300"
+            id="modal-content">
+
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-start sticky top-0 bg-white dark:bg-cardDark md:rounded-t-3xl rounded-t-3xl z-10">
+
+                <div>
+
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+
+                        <span
+                            id="modal-type"
+                            class="text-xs font-bold uppercase tracking-wider text-blue-500">
+                            Лекция
+                        </span>
+
+                        <span class="text-slate-300 dark:text-slate-600">•</span>
+
+                        <span
+                            id="modal-day-badge"
+                            class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2.5 py-0.5 rounded-full">
+                            Понедельник
+                        </span>
+
+                        <span
+                            id="modal-access-badge"
+                            class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                            Просмотр
+                        </span>
+                    </div>
+
+                    <h2
+                        id="modal-title"
+                        class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                        Название предмета
+                    </h2>
+
+                    <p
+                        id="modal-time-room"
+                        class="text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-3 text-sm flex-wrap">
+
+                        <span class="flex items-center gap-1">
+                            <i data-lucide="clock" class="w-4 h-4"></i>
+                            <span id="modal-time">10:00 - 11:30</span>
+                        </span>
+
+                        <span class="flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span id="modal-room">Ауд. 101</span>
+                        </span>
+
+                        <span class="flex items-center gap-1">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                            <span id="modal-teacher">Преподаватель</span>
+                        </span>
+                    </p>
+                </div>
+
+                <button
+                    onclick="closeModal()"
+                    class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition text-slate-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-8">
+
+                <!-- NOTES -->
+                <section>
+
+                    <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-5 h-5 text-amber-500"></i>
+                        Заметки
+                    </h3>
+
+                    <textarea
+                        id="modal-notes"
+                        class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl p-4 text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500 resize-none outline-none h-32 transition"
+                        placeholder="Важные мысли, ссылки или напоминания по предмету..."></textarea>
+
+                    <p
+                        class="text-xs text-slate-400 mt-2 text-right"
+                        id="notes-status">
+                        Только просмотр для гостей
+                    </p>
+                </section>
+
+                <!-- TASKS -->
+                <section>
+
+                    <div class="flex justify-between items-center mb-4">
+
+                        <h3 class="text-lg font-semibold flex items-center gap-2">
+                            <i data-lucide="kanban" class="w-5 h-5 text-emerald-500"></i>
+                            Задачи и ДЗ
+                        </h3>
+
+                        <span
+                            id="guest-task-notice"
+                            class="hidden text-xs text-slate-400">
+                            Только просмотр
+                        </span>
+                    </div>
+
+                    <!-- Форма добавления -->
+                    <div
+                        id="task-create-panel"
+                        class="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl space-y-3 mb-6 border border-slate-100 dark:border-slate-700">
+
+                        <input
+                            type="text"
+                            id="new-task-text"
+                            placeholder="Что нужно сделать или какое ДЗ задали?"
+                            class="w-full bg-transparent border-none outline-none text-sm text-slate-700 dark:text-slate-200 font-medium">
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200/60 dark:border-slate-700">
+
+                            <div class="flex items-center gap-2">
+
+                                <span class="text-xs text-slate-400">
+                                    Дедлайн:
+                                </span>
+
+                                <input
+                                    type="date"
+                                    id="new-task-date"
+                                    class="bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-xl px-2 py-1.5 outline-none border border-slate-200 dark:border-slate-600 cursor-pointer">
+                            </div>
+
+                            <div class="flex items-center gap-2">
+
+                                <label
+                                    class="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 px-3 py-1.5 rounded-xl cursor-pointer transition font-medium">
+
+                                    <i data-lucide="paperclip" class="w-3.5 h-3.5"></i>
+                                    Прикрепить файл
+
+                                    <input
+                                        type="file"
+                                        id="new-task-file-input"
+                                        class="hidden"
+                                        multiple
+                                        accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                                        onchange="handleFileSelect(event)">
+                                </label>
+
+                                <button
+                                    onclick="addTask()"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-xl transition shadow-md text-xs font-semibold flex items-center gap-1">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    Добавить задачу
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            id="pending-attachments-preview"
+                            class="flex flex-wrap gap-2 pt-1 hidden">
+                        </div>
+                    </div>
+
+                    <!-- KANBAN -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4">
+
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-medium text-sm text-slate-500 dark:text-slate-400">
+                                    Надо сделать
+                                </h4>
+
+                                <span
+                                    class="bg-slate-200 dark:bg-slate-700 text-xs px-2 py-1 rounded-full font-semibold"
+                                    id="count-todo">
+                                    0
+                                </span>
+                            </div>
+
+                            <div
+                                id="col-todo"
+                                class="space-y-3 min-h-[5rem]">
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50/60 dark:bg-blue-900/10 rounded-2xl p-4 border border-blue-100 dark:border-blue-900/30">
+
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-medium text-sm text-blue-500">
+                                    В процессе
+                                </h4>
+
+                                <span
+                                    class="bg-blue-100 dark:bg-blue-900/40 text-blue-600 text-xs px-2 py-1 rounded-full font-semibold"
+                                    id="count-progress">
+                                    0
+                                </span>
+                            </div>
+
+                            <div
+                                id="col-progress"
+                                class="space-y-3 min-h-[5rem]">
+                            </div>
+                        </div>
+
+                        <div class="bg-emerald-50/60 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/30">
+
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-medium text-sm text-emerald-600 dark:text-emerald-500">
+                                    Сдано
+                                </h4>
+
+                                <span
+                                    class="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 text-xs px-2 py-1 rounded-full font-semibold"
+                                    id="count-done">
+                                    0
+                                </span>
+                            </div>
+
+                            <div
+                                id="col-done"
+                                class="space-y-3 min-h-[5rem]">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE LIGHTBOX -->
+    <div
+        id="image-lightbox"
+        class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4"
+        onclick="closeLightbox()">
+
+        <div class="relative max-w-4xl max-h-[90vh]">
+
+            <button
+                onclick="closeLightbox()"
+                class="absolute -top-10 right-0 p-2 text-white hover:text-slate-300 transition">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+
+            <img
+                id="lightbox-img"
+                src=""
+                class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain">
+        </div>
+    </div>
+
+    <script>
+
+        /* ============================================================
+           АВТОРИЗАЦИЯ
+           ============================================================ */
+
+        // Авторизация выполняется на сервере Render.
+        // Логин/пароль никогда не хранятся в HTML и не проверяются в браузере.
+        let isAdmin = false;
+
+        async function refreshAuthState() {
+            try {
+                const response = await fetch('/api/auth/me', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                isAdmin = response.ok;
+            } catch {
+                isAdmin = false;
+            }
+
+            updateAccessUI();
+            applyPermissions();
+        }
+
+        function isGuest() {
+            return !isAdmin;
+        }
+
+        function openLoginModal() {
+            if (isAdmin) {
+                logoutAdmin();
+                return;
+            }
+
+            const modal = document.getElementById('login-modal');
+            const content = document.getElementById('login-modal-content');
+
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('login-password').value = '';
+
+            modal.classList.remove('hidden');
+
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            });
+
+            setTimeout(() => {
+                document.getElementById('login-email').focus();
+            }, 100);
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('login-modal');
+            const content = document.getElementById('login-modal-content');
+
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        async function loginAdmin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorElement = document.getElementById('login-error');
+
+            errorElement.classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!response.ok) {
+                    isAdmin = false;
+                    errorElement.classList.remove('hidden');
+                    return;
+                }
+
+                isAdmin = true;
+                document.getElementById('login-password').value = '';
+
+                closeLoginModal();
+                updateAccessUI();
+                applyPermissions();
+
+                alert('Вы вошли как администратор.');
+            } catch {
+                isAdmin = false;
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        async function logoutAdmin() {
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
+            } catch {
+                // Ничего не выводим в консоль.
+            }
+
+            isAdmin = false;
+            updateAccessUI();
+            applyPermissions();
+
+            alert('Вы вышли из режима администратора.');
+        }
+
+        function updateAccessUI() {
+            const statusText = document.getElementById('access-status-text');
+            const statusDot = document.getElementById('access-status-dot');
+            const authButton = document.getElementById('auth-button');
+            const dataControls = document.getElementById('admin-data-controls');
+
+            if (isAdmin) {
+                statusText.textContent = 'Администратор';
+                statusText.className = 'text-xs font-semibold text-emerald-600 dark:text-emerald-400';
+
+                statusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+
+                authButton.title = 'Выйти из режима администратора';
+                authButton.innerHTML = '<i data-lucide="log-out" class="w-5 h-5 text-red-500"></i>';
+
+                dataControls.classList.remove('hidden');
+            } else {
+                statusText.textContent = 'Гость';
+                statusText.className = 'text-xs font-semibold text-slate-600 dark:text-slate-300';
+
+                statusDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-400';
+
+                authButton.title = 'Войти как администратор';
+                authButton.innerHTML = '<i data-lucide="log-in" class="w-5 h-5 text-blue-500"></i>';
+
+                dataControls.classList.add('hidden');
+            }
+
+            lucide.createIcons();
+        }
+
+        function applyPermissions() {
+            const taskPanel = document.getElementById('task-create-panel');
+            const guestNotice = document.getElementById('guest-task-notice');
+            const notes = document.getElementById('modal-notes');
+
+            if (isAdmin) {
+                taskPanel.classList.remove('hidden');
+                guestNotice.classList.add('hidden');
+
+                notes.readOnly = false;
+                notes.classList.remove('opacity-70', 'cursor-not-allowed');
+                notes.placeholder = 'Важные мысли, ссылки или напоминания по предмету...';
+
+                document.getElementById('notes-status').textContent = '';
+
+            } else {
+                taskPanel.classList.add('hidden');
+                guestNotice.classList.remove('hidden');
+
+                notes.readOnly = true;
+                notes.classList.add('opacity-70', 'cursor-not-allowed');
+                notes.placeholder = 'Гости могут только просматривать заметки.';
+
+                document.getElementById('notes-status').textContent = 'Только просмотр для гостей';
+            }
+
+            if (currentModalClassId) {
+                renderKanban();
+            }
+        }
+
+        /* ============================================================
+           ДАННЫЕ
+           ============================================================ */
+
+        const defaultData = {
+            theme: 'light',
+            themeMode: 'classic',
+            settings: {
+                showWidget: true,
+                compactTasks: false
+            },
+            daysData: {}
+        };
+
+        const timetableData = {
+            "2026-09-21": {
+                5: [
+                    {
+                        id: 'bgo_25_1',
+                        subjectId: 'bgd',
+                        name: 'Безопасность жизнедеятельности',
+                        type: 'Лекция',
+                        room: 'Ауд. 205',
+                        teacher: 'Макаршин И.В.',
+                        start: '09:00',
+                        end: '10:30'
+                    },
+                    {
+                        id: 'bgo_25_2',
+                        subjectId: 'bgd',
+                        name: 'Безопасность жизнедеятельности',
+                        type: 'Лекция',
+                        room: 'Ауд. 205',
+                        teacher: 'Макаршин И.В.',
+                        start: '10:40',
+                        end: '12:10'
+                    }
+                ]
+            },
+
+            "2026-09-28": {
+                1: [
+                    {
+                        id: 'bgo_28_1',
+                        subjectId: 'sport',
+                        name: 'Физическая культура и спорт',
+                        type: 'Лекция',
+                        room: 'Ауд. 409',
+                        teacher: 'Фирсин С.А.',
+                        start: '10:40',
+                        end: '12:10'
+                    },
+                    {
+                        id: 'bgo_28_2',
+                        subjectId: 'sport',
+                        name: 'Физическая культура и спорт',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 409',
+                        teacher: 'Фирсин С.А.',
+                        start: '12:40',
+                        end: '14:10'
+                    }
+                ],
+
+                2: [
+                    {
+                        id: 'bgo_29_1',
+                        subjectId: 'phil',
+                        name: 'Философия',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Заклинский П.А.',
+                        start: '09:00',
+                        end: '10:30'
+                    },
+                    {
+                        id: 'bgo_29_2',
+                        subjectId: 'phil',
+                        name: 'Философия',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Заклинский П.А.',
+                        start: '10:40',
+                        end: '12:10'
+                    }
+                ],
+
+                3: [
+                    {
+                        id: 'bgo_30_1',
+                        subjectId: 'org',
+                        name: 'Основы российской государственности',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Кузьмичева Н.В.',
+                        start: '09:00',
+                        end: '10:30'
+                    },
+                    {
+                        id: 'bgo_30_2',
+                        subjectId: 'org',
+                        name: 'Основы российской государственности',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Кузьмичева Н.В.',
+                        start: '10:40',
+                        end: '12:10'
+                    },
+                    {
+                        id: 'bgo_30_3',
+                        subjectId: 'hist',
+                        name: 'История России',
+                        type: 'Лекция',
+                        room: 'Ауд. 205',
+                        teacher: 'Королева-Конопляная Г.И.',
+                        start: '12:40',
+                        end: '14:10'
+                    },
+                    {
+                        id: 'bgo_30_4',
+                        subjectId: 'hist',
+                        name: 'История России',
+                        type: 'Лекция',
+                        room: 'Ауд. 205',
+                        teacher: 'Королева-Конопляная Г.И.',
+                        start: '14:20',
+                        end: '15:50'
+                    }
+                ],
+
+                4: [
+                    {
+                        id: 'bgo_01_1',
+                        subjectId: 'moral',
+                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Волович И.Г.',
+                        start: '12:40',
+                        end: '14:10'
+                    },
+                    {
+                        id: 'bgo_01_2',
+                        subjectId: 'moral',
+                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Волович И.Г.',
+                        start: '14:30',
+                        end: '15:50'
+                    },
+                    {
+                        id: 'bgo_01_3',
+                        subjectId: 'phil',
+                        name: 'Философия',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 206',
+                        teacher: 'Заклинский П.А.',
+                        start: '16:00',
+                        end: '17:30'
+                    }
+                ],
+
+                5: [
+                    {
+                        id: 'bgo_02_1',
+                        subjectId: 'econ',
+                        name: 'Экономическая теория',
+                        type: 'Лекция',
+                        room: 'Ауд. 409',
+                        teacher: 'Башашкина Г.Ю.',
+                        start: '12:40',
+                        end: '14:10'
+                    },
+                    {
+                        id: 'bgo_02_2',
+                        subjectId: 'econ',
+                        name: 'Экономическая теория',
+                        type: 'Лекция',
+                        room: 'Ауд. 409',
+                        teacher: 'Башашкина Г.Ю.',
+                        start: '14:20',
+                        end: '15:50'
+                    },
+                    {
+                        id: 'bgo_02_3',
+                        subjectId: 'lang',
+                        name: 'Иностранный язык',
+                        type: 'Лекция',
+                        room: 'Ауд. 401',
+                        teacher: 'Пенькова Е.А.',
+                        start: '16:00',
+                        end: '17:30'
+                    }
+                ]
+            },
+
+            "2026-10-05": {
+                1: [
+                    {
+                        id: 'bgo_05_1',
+                        subjectId: 'bgd',
+                        name: 'Безопасность жизнедеятельности',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 205',
+                        teacher: 'Макаршин И.В.',
+                        start: '14:20',
+                        end: '15:50'
+                    },
+                    {
+                        id: 'bgo_05_2',
+                        subjectId: 'bgd',
+                        name: 'Безопасность жизнедеятельности',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 205',
+                        teacher: 'Макаршин И.В.',
+                        start: '16:00',
+                        end: '17:30'
+                    }
+                ],
+
+                2: [
+                    {
+                        id: 'bgo_06_1',
+                        subjectId: 'phil',
+                        name: 'Философия',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 206',
+                        teacher: 'Заклинский П.А.',
+                        start: '09:00',
+                        end: '10:30'
+                    },
+                    {
+                        id: 'bgo_06_2',
+                        subjectId: 'phil',
+                        name: 'Философия',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 206',
+                        teacher: 'Заклинский П.А.',
+                        start: '10:40',
+                        end: '12:10'
+                    }
+                ],
+
+                3: [
+                    {
+                        id: 'bgo_07_1',
+                        subjectId: 'rus',
+                        name: 'Русский язык и культура речи',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Кузьмичева Н.В.',
+                        start: '09:00',
+                        end: '10:30'
+                    },
+                    {
+                        id: 'bgo_07_2',
+                        subjectId: 'rus',
+                        name: 'Русский язык и культура речи',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Кузьмичева Н.В.',
+                        start: '10:40',
+                        end: '12:10'
+                    },
+                    {
+                        id: 'bgo_07_3',
+                        subjectId: 'hist',
+                        name: 'История России',
+                        type: 'Лекция',
+                        room: 'Ауд. 205',
+                        teacher: 'Королева-Конопляная Г.И.',
+                        start: '12:40',
+                        end: '14:10'
+                    },
+                    {
+                        id: 'bgo_07_4',
+                        subjectId: 'hist',
+                        name: 'История России',
+                        type: 'Лекция',
+                        room: 'Ауд. 205',
+                        teacher: 'Королева-Конопляная Г.И.',
+                        start: '14:20',
+                        end: '15:50'
+                    }
+                ],
+
+                4: [
+                    {
+                        id: 'bgo_08_1',
+                        subjectId: 'econ',
+                        name: 'Экономическая теория',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 401',
+                        teacher: 'Баклашкина Г.Ю.',
+                        start: '09:00',
+                        end: '10:30'
+                    },
+                    {
+                        id: 'bgo_08_2',
+                        subjectId: 'econ',
+                        name: 'Экономическая теория',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 401',
+                        teacher: 'Баклашкина Г.Ю.',
+                        start: '10:40',
+                        end: '12:10'
+                    },
+                    {
+                        id: 'bgo_08_3',
+                        subjectId: 'moral',
+                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Волович И.Г.',
+                        start: '12:40',
+                        end: '14:10'
+                    },
+                    {
+                        id: 'bgo_08_4',
+                        subjectId: 'hist',
+                        name: 'История России',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 205',
+                        teacher: 'Королева-Конопляная Г.И.',
+                        start: '16:00',
+                        end: '17:30'
+                    }
+                ],
+
+                5: [
+                    {
+                        id: 'bgo_09_1',
+                        subjectId: 'lang',
+                        name: 'Иностранный язык',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 401',
+                        teacher: 'Пенькова Е.А.',
+                        start: '09:00',
+                        end: '10:30'
+                    },
+                    {
+                        id: 'bgo_09_2',
+                        subjectId: 'bgd',
+                        name: 'Безопасность жизнедеятельности',
+                        type: 'Лекция',
+                        room: 'Ауд. 210',
+                        teacher: 'Макаршин И.В.',
+                        start: '10:40',
+                        end: '12:10'
+                    }
+                ],
+
+                6: [
+                    {
+                        id: 'bgo_10_1',
+                        subjectId: 'moral',
+                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 210',
+                        teacher: 'Волович И.Г.',
+                        start: '09:00',
+                        end: '10:30'
+                    },
+                    {
+                        id: 'bgo_10_2',
+                        subjectId: 'moral',
+                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
+                        type: 'Практическое занятие',
+                        room: 'Ауд. 210',
+                        teacher: 'Волович И.Г.',
+                        start: '10:40',
+                        end: '12:10'
+                    }
+                ]
+            }
+        };
+
+        let appData = JSON.parse(localStorage.getItem('vityaPlannerData')) || defaultData;
+
+        if (!appData.daysData) {
+            appData.daysData = {};
+        }
+
+        if (!appData.settings) {
+            appData.settings = {
+                showWidget: true,
+                compactTasks: false
+            };
+        }
+
+        if (!appData.themeMode) {
+            appData.themeMode = 'classic';
+        }
+
+        let selectedDate = new Date();
+        let weekOffset = 0;
+        let currentScheduleView = 'day';
+        let currentModalClassId = null;
+        let notesTimeout = null;
+        let pendingAttachments = [];
+
+        /* ============================================================
+           INIT
+           ============================================================ */
+
+        async function init() {
+            applyTheme(appData.theme);
+            applyThemeMode(appData.themeMode);
+            applySettingsToUI();
+
+            // Состояние администратора определяет только сервер.
+            await refreshAuthState();
+
+            renderHeaderDate();
+            renderDaysPanel();
+            renderSchedule();
+            updateNextClassWidget();
+            initFallingLeaves();
+
+            setInterval(updateNextClassWidget, 60000);
+
+            lucide.createIcons();
+
+            document.getElementById('modal-notes').addEventListener('input', function(e) {
+
+                if (!isAdmin) {
+                    e.target.value = appData.daysData[
+                        getDateKey(selectedDate)
+                    ]?.[currentModalClassId]?.notes || '';
+
+                    return;
+                }
+
+                const status = document.getElementById('notes-status');
+
+                status.textContent = 'Сохранение...';
+
+                clearTimeout(notesTimeout);
+
+                notesTimeout = setTimeout(() => {
+                    saveNotes(e.target.value);
+
+                    status.textContent = 'Сохранено';
+
+                    setTimeout(() => {
+                        if (isAdmin) {
+                            status.textContent = '';
+                        }
+                    }, 2000);
+
+                }, 1000);
+            });
+
+            applyPermissions();
+        }
+
+        function saveData() {
+            localStorage.setItem('vityaPlannerData', JSON.stringify(appData));
+        }
+
+        function getDateKey(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            return `${year}-${month}-${day}`;
+        }
+
+        function ensureDayClassDataExists(dateKey, classId) {
+            if (!appData.daysData[dateKey]) {
+                appData.daysData[dateKey] = {};
+            }
+
+            if (!appData.daysData[dateKey][classId]) {
+                appData.daysData[dateKey][classId] = {
+                    notes: '',
+                    tasks: []
+                };
+            }
+        }
+
+        function getActiveTasksCount(dateKey, classId) {
+            if (
+                !appData.daysData[dateKey] ||
+                !appData.daysData[dateKey][classId]
+            ) {
+                return 0;
+            }
+
+            return appData.daysData[dateKey][classId].tasks
+                .filter(t => t.status !== 'done')
+                .length;
+        }
+
+        /* ============================================================
+           THEME
+           ============================================================ */
+
+        function toggleTheme() {
+            appData.theme = appData.theme === 'light' ? 'dark' : 'light';
+
+            applyTheme(appData.theme);
+            saveData();
+        }
+
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            const metaColor = document.getElementById('meta-theme-color');
+            const themeIcon = document.getElementById('theme-icon');
+
+            if (theme === 'dark') {
+                html.classList.add('dark');
+
+                if (appData.themeMode !== 'autumn') {
+                    metaColor.setAttribute('content', '#0F172A');
+                }
+
+                themeIcon.setAttribute('data-lucide', 'sun');
+                themeIcon.classList.remove('text-slate-700');
+                themeIcon.classList.add('text-amber-400');
+
+            } else {
+
+                html.classList.remove('dark');
+
+                if (appData.themeMode !== 'autumn') {
+                    metaColor.setAttribute('content', '#F0F4F8');
+                }
+
+                themeIcon.setAttribute('data-lucide', 'moon');
+                themeIcon.classList.add('text-slate-700');
+                themeIcon.classList.remove('text-amber-400');
+            }
+
+            lucide.createIcons();
+        }
+
+        function changeThemeMode(mode) {
+            appData.themeMode = mode;
+
+            applyThemeMode(mode);
+            saveData();
+        }
+
+        function applyThemeMode(mode) {
+            const body = document.body;
+            const select = document.getElementById('setting-theme-mode');
+
+            if (select) {
+                select.value = mode;
+            }
+
+            if (mode === 'autumn') {
+                body.classList.add('autumn-theme');
+            } else {
+                body.classList.remove('autumn-theme');
+            }
+        }
+
+        /* ============================================================
+           LEAVES
+           ============================================================ */
+
+        function initFallingLeaves() {
+            const container = document.getElementById('leaves-container');
+
+            container.innerHTML = '';
+
+            const leafColors = [
+                '#D97706',
+                '#B45309',
+                '#92400E',
+                '#EA580C',
+                '#C2410C'
+            ];
+
+            for (let i = 0; i < 15; i++) {
+
+                const leaf = document.createElement('div');
+
+                leaf.className = 'leaf';
+
+                const color = leafColors[
+                    Math.floor(Math.random() * leafColors.length)
+                ];
+
+                const leafSvg =
+                    `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${encodeURIComponent(color)}"><path d="M17.8 2.8c-2.5-.5-5.5.6-7.8 2.5-3.5 3-5.2 7.2-4.5 10.5l-3 3 1.4 1.4 3-3c3.3.7 7.5-1 10.5-4.5 1.9-2.3 3-5.3 2.5-7.8-.3-1.6-1.5-2.8-3.1-3.1z"/></svg>`;
+
+                leaf.style.backgroundImage = `url("${leafSvg}")`;
+
+                const size = Math.floor(Math.random() * 18) + 16;
+
+                leaf.style.width = `${size}px`;
+                leaf.style.height = `${size}px`;
+                leaf.style.left = `${Math.random() * 100}vw`;
+                leaf.style.animationDuration = `${Math.random() * 7 + 5}s`;
+                leaf.style.animationDelay = `${Math.random() * 6}s`;
+
+                container.appendChild(leaf);
+            }
+        }
+
+        /* ============================================================
+           SETTINGS
+           ============================================================ */
+
+        function openSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            const content = document.getElementById('settings-modal-content');
+
+            modal.classList.remove('hidden');
+
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            });
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            const content = document.getElementById('settings-modal-content');
+
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function applySettingsToUI() {
+
+            document.getElementById('setting-widget').checked =
+                appData.settings.showWidget;
+
+            document.getElementById('setting-compact').checked =
+                appData.settings.compactTasks;
+
+            document.getElementById('setting-theme-mode').value =
+                appData.themeMode || 'classic';
+
+            const widgetEl =
+                document.getElementById('next-class-widget');
+
+            if (appData.settings.showWidget) {
+                widgetEl.style.display = 'block';
+                updateNextClassWidget();
+            } else {
+                widgetEl.style.display = 'none';
+            }
+        }
+
+        function updateSetting(key, value) {
+            appData.settings[key] = value;
+
+            saveData();
+            applySettingsToUI();
+        }
+
+        /* ============================================================
+           DATE / WEEK
+           ============================================================ */
+
+        const monthsRu = [
+            'Января',
+            'Февраля',
+            'Марта',
+            'Апреля',
+            'Мая',
+            'Июня',
+            'Июля',
+            'Августа',
+            'Сентября',
+            'Октября',
+            'Ноября',
+            'Декабря'
+        ];
+
+        const monthsNamesOnly = [
+            'Январь',
+            'Февраль',
+            'Март',
+            'Апрель',
+            'Май',
+            'Июнь',
+            'Июль',
+            'Август',
+            'Сентябрь',
+            'Октябрь',
+            'Ноябрь',
+            'Декабрь'
+        ];
+
+        const daysRu = [
+            'Воскресенье',
+            'Понедельник',
+            'Вторник',
+            'Среда',
+            'Четверг',
+            'Пятница',
+            'Суббота'
+        ];
+
+        const shortDaysRu = [
+            'Пн',
+            'Вт',
+            'Ср',
+            'Чт',
+            'Пт',
+            'Сб',
+            'Вс'
+        ];
+
+        function getMonday(d) {
+            d = new Date(d);
+
+            const day = d.getDay();
+
+            const diff =
+                d.getDate() -
+                day +
+                (day == 0 ? -6 : 1);
+
+            return new Date(d.setDate(diff));
+        }
+
+        function changeWeek(direction) {
+            weekOffset += direction;
+
+            const monday = getMonday(new Date());
+
+            monday.setDate(
+                monday.getDate() + (weekOffset * 7)
+            );
+
+            selectedDate = new Date(monday);
+
+            renderHeaderDate();
+            renderDaysPanel();
+            renderSchedule();
+        }
+
+        function resetToCurrentWeek() {
+            weekOffset = 0;
+            selectedDate = new Date();
+
+            renderHeaderDate();
+            renderDaysPanel();
+            renderSchedule();
+            updateNextClassWidget();
+        }
+
+        function renderHeaderDate() {
+            const headerDate =
+                document.getElementById('header-date');
+
+            const baseMonday =
+                getMonday(new Date());
+
+            baseMonday.setDate(
+                baseMonday.getDate() + (weekOffset * 7)
+            );
+
+            const weekMonths = new Set();
+
+            const weekYear =
+                baseMonday.getFullYear();
+
+            for (let i = 0; i < 7; i++) {
+
+                const tempDate =
+                    new Date(baseMonday);
+
+                tempDate.setDate(
+                    baseMonday.getDate() + i
+                );
+
+                weekMonths.add(
+                    tempDate.getMonth()
+                );
+            }
+
+            let monthString = '';
+
+            const monthsArr =
+                Array.from(weekMonths);
+
+            if (monthsArr.length === 1) {
+
+                monthString =
+                    `${monthsNamesOnly[monthsArr[0]]} ${weekYear}`;
+
+            } else {
+
+                monthString =
+                    `${monthsNamesOnly[monthsArr[0]]} — ${monthsNamesOnly[monthsArr[1]]} ${weekYear}`;
+            }
+
+            headerDate.textContent = monthString;
+
+            const badge =
+                document.getElementById('schedule-date-badge');
+
+            const today = new Date();
+
+            if (
+                currentScheduleView === 'day' &&
+                selectedDate.toDateString() === today.toDateString()
+            ) {
+                badge.textContent = 'Сегодня';
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderDaysPanel() {
+            const panel =
+                document.getElementById('days-panel');
+
+            panel.innerHTML = '';
+
+            const monday =
+                getMonday(new Date());
+
+            monday.setDate(
+                monday.getDate() + (weekOffset * 7)
+            );
+
+            const today = new Date();
+
+            for (let i = 0; i < 7; i++) {
+
+                const iterDate =
+                    new Date(monday);
+
+                iterDate.setDate(
+                    monday.getDate() + i
+                );
+
+                const isSelected =
+                    currentScheduleView === 'day' &&
+                    iterDate.toDateString() ===
+                    selectedDate.toDateString();
+
+                const isToday =
+                    iterDate.toDateString() ===
+                    today.toDateString();
+
+                let cardClass =
+                    'flex flex-col items-center justify-center py-3 rounded-2xl cursor-pointer transition-all relative ';
+
+                if (isSelected) {
+
+                    cardClass +=
+                        'bg-blue-500 text-white shadow-md font-bold scale-[1.02]';
+
+                } else {
+
+                    cardClass +=
+                        'bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300';
+                }
+
+                let indicatorHtml = '';
+
+                if (isToday && !isSelected) {
+
+                    indicatorHtml =
+                        '<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>';
+
+                } else if (isToday && isSelected) {
+
+                    indicatorHtml =
+                        '<span class="absolute top-2 right-2 w-1.5 h-1.5 bg-white rounded-full"></span>';
+                }
+
+                const cardHtml = `
+                    <div
+                        onclick="selectDate(${iterDate.getTime()})"
+                        class="${cardClass}">
+
+                        ${indicatorHtml}
+
+                        <span class="text-xs uppercase font-medium opacity-80 mb-1">
+                            ${shortDaysRu[i]}
+                        </span>
+
+                        <span class="text-lg font-bold">
+                            ${iterDate.getDate()}
+                        </span>
+                    </div>
+                `;
+
+                panel.insertAdjacentHTML(
+                    'beforeend',
+                    cardHtml
+                );
+            }
+        }
+
+        function getScheduleForDate(date) {
+            const monday = getMonday(date);
+
+            const year =
+                monday.getFullYear();
+
+            const month =
+                String(monday.getMonth() + 1).padStart(2, '0');
+
+            const day =
+                String(monday.getDate()).padStart(2, '0');
+
+            const mondayStr =
+                `${year}-${month}-${day}`;
+
+            const weekSchedule =
+                timetableData[mondayStr];
+
+            if (!weekSchedule) {
+                return [];
+            }
+
+            let dayOfWeek =
+                date.getDay();
+
+            if (dayOfWeek === 0) {
+                dayOfWeek = 7;
+            }
+
+            return weekSchedule[dayOfWeek] || [];
+        }
+
+        function setScheduleView(view) {
+            currentScheduleView = view;
+
+            const btnDay =
+                document.getElementById('view-btn-day');
+
+            const btnWeek =
+                document.getElementById('view-btn-week');
+
+            if (view === 'day') {
+
+                btnDay.className =
+                    'px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition';
+
+                btnWeek.className =
+                    'px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition';
+
+                document.getElementById(
+                    'schedule-section-title'
+                ).textContent = 'Расписание на день';
+
+            } else {
+
+                btnWeek.className =
+                    'px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-500 text-white transition';
+
+                btnDay.className =
+                    'px-3 py-1.5 text-xs font-semibold rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition';
+
+                document.getElementById(
+                    'schedule-section-title'
+                ).textContent = 'Расписание на неделю';
+            }
+
+            renderHeaderDate();
+            renderDaysPanel();
+            renderSchedule();
+        }
+
+        /* ============================================================
+           SCHEDULE RENDER
+           ============================================================ */
+
+        function renderSchedule() {
+            const container =
+                document.getElementById('schedule-list');
+
+            container.innerHTML = '';
+
+            if (currentScheduleView === 'day') {
+
+                const classes =
+                    getScheduleForDate(selectedDate);
+
+                const currentDateKey =
+                    getDateKey(selectedDate);
+
+                if (classes.length === 0) {
+
+                    container.innerHTML = `
+                        <div class="text-center py-12 bg-white dark:bg-cardDark rounded-3xl shadow-soft">
+
+                            <i
+                                data-lucide="coffee"
+                                class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3">
+                            </i>
+
+                            <h3 class="text-lg font-medium text-slate-500">
+                                Занятий нет!
+                            </h3>
+
+                            <p class="text-sm text-slate-400">
+                                Отличный день для отдыха или самоподготовки.
+                            </p>
+                        </div>
+                    `;
+
+                    lucide.createIcons();
+                    return;
+                }
+
+                classes.forEach((cls, index) => {
+
+                    const dayData =
+                        appData.daysData[currentDateKey] &&
+                        appData.daysData[currentDateKey][cls.id]
+                            ? appData.daysData[currentDateKey][cls.id]
+                            : { tasks: [] };
+
+                    const activeTasks =
+                        (dayData.tasks || [])
+                            .filter(t => t.status !== 'done');
+
+                    let tasksListHtml = '';
+
+                    if (dayData.tasks && dayData.tasks.length > 0) {
+
+                        let taskItems = '';
+
+                        dayData.tasks.forEach(t => {
+
+                            const isDoneClass =
+                                t.status === 'done'
+                                    ? 'line-through opacity-50'
+                                    : '';
+
+                            taskItems += `
+                                <li class="flex items-center gap-2 text-xs font-medium ${isDoneClass}">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    ${escapeHtml(t.text)}
+                                </li>
+                            `;
+                        });
+
+                        tasksListHtml = `
+                            <div class="mt-3 p-3 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 space-y-1.5">
+
+                                <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+
+                                    <span class="flex items-center gap-1">
+                                        <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
+                                        Задачи и ДЗ:
+                                    </span>
+
+                                    <span>
+                                        ${activeTasks.length} активных
+                                    </span>
+                                </div>
+
+                                <ul class="space-y-1">
+                                    ${taskItems}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    const badgeHtml =
+                        activeTasks.length > 0
+                            ? `
+                                <span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                    <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                                    ДЗ: ${activeTasks.length}
+                                </span>
+                              `
+                            : '';
+
+                    const cardHtml = `
+                        <div
+                            onclick='openModal(${JSON.stringify(cls)})'
+                            class="group bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft hover:shadow-md transition cursor-pointer border border-transparent hover:border-blue-100 dark:hover:border-slate-700 flex flex-col sm:flex-row sm:items-start gap-4">
+
+                            <div class="flex-shrink-0 bg-slate-50 dark:bg-slate-800 rounded-2xl p-3 text-center sm:w-28 shadow-inner border border-slate-100 dark:border-slate-700">
+
+                                <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                                    Пара ${index + 1}
+                                </span>
+
+                                <span class="block text-lg font-bold text-slate-800 dark:text-slate-200">
+                                    ${cls.start}
+                                </span>
+
+                                <span class="block text-xs text-slate-500">
+                                    ${cls.end}
+                                </span>
+                            </div>
+
+                            <div class="flex-1 min-w-0">
+
+                                <div class="flex justify-between items-start mb-1">
+
+                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-500">
+                                        ${escapeHtml(cls.type)}
+                                    </span>
+
+                                    ${badgeHtml}
+                                </div>
+
+                                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-500 transition">
+                                    ${escapeHtml(cls.name)}
+                                </h3>
+
+                                <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+
+                                    <span class="flex items-center gap-1">
+                                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                        ${escapeHtml(cls.room)}
+                                    </span>
+
+                                    <span class="flex items-center gap-1">
+                                        <i data-lucide="user" class="w-4 h-4"></i>
+                                        ${escapeHtml(cls.teacher)}
+                                    </span>
+                                </div>
+
+                                ${tasksListHtml}
+                            </div>
+
+                            <div class="hidden sm:flex text-slate-300 dark:text-slate-600 group-hover:text-blue-500 transition self-center">
+                                <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    `;
+
+                    container.insertAdjacentHTML(
+                        'beforeend',
+                        cardHtml
+                    );
+                });
+
+            } else {
+
+                const monday =
+                    getMonday(selectedDate);
+
+                for (let i = 0; i < 7; i++) {
+
+                    const iterDate =
+                        new Date(monday);
+
+                    iterDate.setDate(
+                        monday.getDate() + i
+                    );
+
+                    const classes =
+                        getScheduleForDate(iterDate);
+
+                    const iterDateKey =
+                        getDateKey(iterDate);
+
+                    const dayTitle =
+                        `${daysRu[iterDate.getDay()]} (${iterDate.getDate()} ${monthsRu[iterDate.getMonth()]})`;
+
+                    let classesHtml = '';
+
+                    if (classes.length === 0) {
+
+                        classesHtml =
+                            `<p class="text-sm text-slate-400 italic py-2">Занятий нет</p>`;
+
+                    } else {
+
+                        classes.forEach((cls) => {
+
+                            const dayData =
+                                appData.daysData[iterDateKey] &&
+                                appData.daysData[iterDateKey][cls.id]
+                                    ? appData.daysData[iterDateKey][cls.id]
+                                    : { tasks: [] };
+
+                            const activeTasks =
+                                (dayData.tasks || [])
+                                    .filter(t => t.status !== 'done');
+
+                            let weekTasksHtml = '';
+
+                            if (dayData.tasks && dayData.tasks.length > 0) {
+
+                                let taskItems = '';
+
+                                dayData.tasks.forEach(t => {
+
+                                    const isDoneClass =
+                                        t.status === 'done'
+                                            ? 'line-through opacity-50'
+                                            : '';
+
+                                    taskItems += `
+                                        <li class="flex items-center gap-1.5 text-xs ${isDoneClass}">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                            ${escapeHtml(t.text)}
+                                        </li>
+                                    `;
+                                });
+
+                                weekTasksHtml = `
+                                    <div class="mt-2.5 p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 space-y-1">
+
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                                            <i data-lucide="check-square" class="w-3 h-3"></i>
+                                            Задачи и ДЗ:
+                                        </span>
+
+                                        <ul class="space-y-0.5">
+                                            ${taskItems}
+                                        </ul>
+                                    </div>
+                                `;
+                            }
+
+                            const badgeHtml =
+                                activeTasks.length > 0
+                                    ? `
+                                        <span class="bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs px-2 py-0.5 rounded-full font-bold">
+                                            ДЗ: ${activeTasks.length}
+                                        </span>
+                                      `
+                                    : '';
+
+                            classesHtml += `
+                                <div
+                                    onclick='selectDate(${iterDate.getTime()}); openModal(${JSON.stringify(cls)})'
+                                    class="p-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-blue-50/50 dark:hover:bg-slate-800 rounded-2xl cursor-pointer transition border border-slate-100 dark:border-slate-700/50">
+
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+
+                                        <div>
+
+                                            <div class="flex items-center gap-2 mb-1">
+
+                                                <span class="text-xs font-bold text-blue-500">
+                                                    ${cls.start} - ${cls.end}
+                                                </span>
+
+                                                <span class="text-xs text-slate-400">
+                                                    • ${escapeHtml(cls.room)}
+                                                </span>
+
+                                                ${badgeHtml}
+                                            </div>
+
+                                            <h4 class="font-bold text-slate-800 dark:text-slate-200">
+                                                ${escapeHtml(cls.name)}
+                                            </h4>
+                                        </div>
+
+                                        <span class="text-xs text-slate-400 self-start sm:self-center">
+                                            ${escapeHtml(cls.teacher)}
+                                        </span>
+                                    </div>
+
+                                    ${weekTasksHtml}
+                                </div>
+                            `;
+                        });
+                    }
+
+                    const dayCardHtml = `
+                        <div class="bg-white dark:bg-cardDark rounded-3xl p-5 shadow-soft space-y-3">
+
+                            <h3 class="font-bold text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-2 flex justify-between items-center">
+
+                                <span>
+                                    ${dayTitle}
+                                </span>
+
+                                <button
+                                    onclick="selectedDate = new Date(${iterDate.getTime()}); setScheduleView('day');"
+                                    class="text-xs text-blue-500 font-medium hover:underline">
+                                    Открыть день
+                                </button>
+                            </h3>
+
+                            <div class="space-y-2">
+                                ${classesHtml}
+                            </div>
+                        </div>
+                    `;
+
+                    container.insertAdjacentHTML(
+                        'beforeend',
+                        dayCardHtml
+                    );
+                }
+            }
+
+            lucide.createIcons();
+        }
+
+        /* ============================================================
+           NEXT CLASS WIDGET
+           ============================================================ */
+
+        function updateNextClassWidget() {
+
+            if (!appData.settings.showWidget) {
+                return;
+            }
+
+            const today = new Date();
+
+            const widget =
+                document.getElementById('next-class-widget');
+
+            if (
+                selectedDate.toDateString() !==
+                today.toDateString()
+            ) {
+                widget.style.display = 'none';
+                return;
+            }
+
+            widget.style.display = 'block';
+
+            const classes =
+                getScheduleForDate(today);
+
+            const nowTime =
+                today.getHours() * 60 +
+                today.getMinutes();
+
+            let currentClass = null;
+            let nextClass = null;
+
+            for (let cls of classes) {
+
+                const [startH, startM] =
+                    cls.start.split(':').map(Number);
+
+                const [endH, endM] =
+                    cls.end.split(':').map(Number);
+
+                const startMins =
+                    startH * 60 + startM;
+
+                const endMins =
+                    endH * 60 + endM;
+
+                if (
+                    nowTime >= startMins &&
+                    nowTime <= endMins
+                ) {
+                    currentClass = cls;
+                    break;
+
+                } else if (
+                    startMins > nowTime &&
+                    !nextClass
+                ) {
+                    nextClass = {
+                        cls,
+                        diff: startMins - nowTime
+                    };
+                }
+            }
+
+            const statusEl =
+                document.getElementById('widget-status');
+
+            const titleEl =
+                document.getElementById('widget-title');
+
+            const detailsEl =
+                document.getElementById('widget-details');
+
+            widget.className =
+                'rounded-3xl p-6 text-white shadow-md relative overflow-hidden transition-all duration-500';
+
+            if (currentClass) {
+
+                widget.classList.add(
+                    'bg-gradient-to-r',
+                    'from-emerald-500',
+                    'to-teal-400'
+                );
+
+                statusEl.textContent =
+                    'Идёт сейчас';
+
+                titleEl.textContent =
+                    currentClass.name;
+
+                detailsEl.innerHTML = `
+                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    ${currentClass.room}
+                    (до ${currentClass.end})
+                `;
+
+            } else if (nextClass) {
+
+                widget.classList.add(
+                    'bg-gradient-to-r',
+                    'from-blue-500',
+                    'to-sky-400'
+                );
+
+                const timeStr =
+                    nextClass.diff >= 60
+                        ? `${Math.floor(nextClass.diff / 60)} ч ${nextClass.diff % 60} мин`
+                        : `${nextClass.diff} мин`;
+
+                statusEl.textContent =
+                    `Через ${timeStr}`;
+
+                titleEl.textContent =
+                    nextClass.cls.name;
+
+                detailsEl.innerHTML = `
+                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    ${nextClass.cls.room}
+                    • Начало в ${nextClass.cls.start}
+                `;
+
+            } else {
+
+                widget.classList.add(
+                    'bg-gradient-to-r',
+                    'from-slate-700',
+                    'to-slate-600'
+                );
+
+                statusEl.textContent =
+                    classes.length > 0
+                        ? 'Пары закончились'
+                        : 'Выходной';
+
+                titleEl.textContent =
+                    'Свободное время';
+
+                detailsEl.innerHTML =
+                    'Отдыхайте и набирайтесь сил';
+            }
+
+            lucide.createIcons();
+        }
+
+        /* ============================================================
+           CALENDAR
+           ============================================================ */
+
+        let calendarDate = new Date();
+
+        function toggleCalendar() {
+            const cal =
+                document.getElementById('calendar-dropdown');
+
+            if (cal.classList.contains('hidden')) {
+
+                cal.classList.remove('hidden');
+
+                calendarDate =
+                    new Date(selectedDate);
+
+                renderCalendar();
+
+            } else {
+
+                cal.classList.add('hidden');
+            }
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(
+                calendarDate.getMonth() + delta
+            );
+
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid =
+                document.getElementById('calendar-grid');
+
+            const monthYear =
+                document.getElementById('calendar-month-year');
+
+            grid.innerHTML = '';
+
+            monthYear.textContent =
+                `${monthsNamesOnly[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
+
+            const firstDay =
+                new Date(
+                    calendarDate.getFullYear(),
+                    calendarDate.getMonth(),
+                    1
+                );
+
+            const lastDay =
+                new Date(
+                    calendarDate.getFullYear(),
+                    calendarDate.getMonth() + 1,
+                    0
+                );
+
+            let startDay =
+                firstDay.getDay();
+
+            if (startDay === 0) {
+                startDay = 7;
+            }
+
+            startDay--;
+
+            for (let i = 0; i < startDay; i++) {
+                grid.innerHTML += '<div></div>';
+            }
+
+            const today = new Date();
+
+            for (
+                let i = 1;
+                i <= lastDay.getDate();
+                i++
+            ) {
+
+                const iterDate =
+                    new Date(
+                        calendarDate.getFullYear(),
+                        calendarDate.getMonth(),
+                        i
+                    );
+
+                const isSelected =
+                    iterDate.toDateString() ===
+                    selectedDate.toDateString();
+
+                const isToday =
+                    iterDate.toDateString() ===
+                    today.toDateString();
+
+                let btnClass =
+                    'w-full aspect-square flex items-center justify-center rounded-xl text-sm transition ';
+
+                if (isSelected) {
+
+                    btnClass +=
+                        'bg-blue-500 text-white shadow-md font-bold';
+
+                } else if (isToday) {
+
+                    btnClass +=
+                        'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-bold hover:bg-blue-200';
+
+                } else {
+
+                    btnClass +=
+                        'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300';
+                }
+
+                grid.innerHTML += `
+                    <button
+                        onclick="selectDate(${iterDate.getTime()})"
+                        class="${btnClass}">
+                        ${i}
+                    </button>
+                `;
+            }
+        }
+
+        function selectDate(timestamp) {
+            selectedDate =
+                new Date(timestamp);
+
+            const currentMonday =
+                getMonday(new Date());
+
+            const targetMonday =
+                getMonday(selectedDate);
+
+            weekOffset =
+                Math.round(
+                    (targetMonday - currentMonday) /
+                    (1000 * 60 * 60 * 24 * 7)
+                );
+
+            document
+                .getElementById('calendar-dropdown')
+                .classList.add('hidden');
+
+            renderHeaderDate();
+            renderDaysPanel();
+            renderSchedule();
+            updateNextClassWidget();
+        }
+
+        /* ============================================================
+           CLASS MODAL
+           ============================================================ */
+
+        function openModal(cls) {
+            currentModalClassId = cls.id;
+
+            const currentDateKey =
+                getDateKey(selectedDate);
+
+            /*
+             * ВАЖНО:
+             * Гость не должен создавать структуру данных
+             * просто открывая занятие.
+             */
+            if (isAdmin) {
+                ensureDayClassDataExists(
+                    currentDateKey,
+                    cls.id
+                );
+            }
+
+            const dayData =
+                appData.daysData[currentDateKey] &&
+                appData.daysData[currentDateKey][cls.id]
+                    ? appData.daysData[currentDateKey][cls.id]
+                    : {
+                        notes: '',
+                        tasks: []
+                    };
+
+            document.getElementById(
+                'modal-type'
+            ).textContent = cls.type;
+
+            const dayNameStr =
+                daysRu[selectedDate.getDay()];
+
+            const dayNumStr =
+                selectedDate.getDate();
+
+            const monthNameStr =
+                monthsRu[selectedDate.getMonth()];
+
+            document.getElementById(
+                'modal-day-badge'
+            ).textContent =
+                `${dayNameStr} (${dayNumStr} ${monthNameStr})`;
+
+            document.getElementById(
+                'modal-title'
+            ).textContent = cls.name;
+
+            document.getElementById(
+                'modal-time'
+            ).textContent =
+                `${cls.start} - ${cls.end}`;
+
+            document.getElementById(
+                'modal-room'
+            ).textContent = cls.room;
+
+            document.getElementById(
+                'modal-teacher'
+            ).textContent = cls.teacher;
+
+            document.getElementById(
+                'modal-notes'
+            ).value =
+                dayData.notes || '';
+
+            if (isAdmin) {
+
+                document.getElementById(
+                    'modal-access-badge'
+                ).textContent =
+                    'Администратор';
+
+                document.getElementById(
+                    'modal-access-badge'
+                ).className =
+                    'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400';
+
+            } else {
+
+                document.getElementById(
+                    'modal-access-badge'
+                ).textContent =
+                    'Только просмотр';
+
+                document.getElementById(
+                    'modal-access-badge'
+                ).className =
+                    'text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500';
+            }
+
+            if (isAdmin) {
+                document.getElementById(
+                    'notes-status'
+                ).textContent = '';
+            } else {
+                document.getElementById(
+                    'notes-status'
+                ).textContent =
+                    'Только просмотр для гостей';
+            }
+
+            pendingAttachments = [];
+
+            renderPendingAttachments();
+            renderKanban();
+            applyPermissions();
+
+            const modal =
+                document.getElementById('class-modal');
+
+            const content =
+                document.getElementById('modal-content');
+
+            modal.classList.remove('hidden');
+
+            requestAnimationFrame(() => {
+
+                modal.classList.remove('opacity-0');
+
+                content.classList.remove(
+                    'translate-y-full'
+                );
+            });
+
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            const modal =
+                document.getElementById('class-modal');
+
+            const content =
+                document.getElementById('modal-content');
+
+            modal.classList.add('opacity-0');
+            content.classList.add('translate-y-full');
+
+            setTimeout(() => {
+
+                modal.classList.add('hidden');
+
+                currentModalClassId = null;
+
+                renderSchedule();
+
+            }, 300);
+        }
+
+        function saveNotes(text) {
+
+            if (!isAdmin) {
+                return;
+            }
+
+            if (currentModalClassId) {
+
+                const currentDateKey =
+                    getDateKey(selectedDate);
+
+                ensureDayClassDataExists(
+                    currentDateKey,
+                    currentModalClassId
+                );
+
+                appData
+                    .daysData[currentDateKey][currentModalClassId]
+                    .notes = text;
+
+                saveData();
+            }
+        }
+
+        /* ============================================================
+           FILES
+           ============================================================ */
+
+        function handleFileSelect(event) {
+
+            if (!isAdmin) {
+                event.target.value = '';
+                return;
+            }
+
+            const files =
+                event.target.files;
+
+            if (!files || files.length === 0) {
+                return;
+            }
+
+            Array.from(files).forEach(file => {
+
+                if (file.type.startsWith('image/')) {
+
+                    compressAndConvertImage(
+                        file,
+                        (base64String) => {
+
+                            pendingAttachments.push({
+                                name: file.name,
+                                type: 'image',
+                                data: base64String
+                            });
+
+                            renderPendingAttachments();
+                        }
+                    );
+
+                } else {
+
+                    const reader =
+                        new FileReader();
+
+                    reader.onload = function(e) {
+
+                        pendingAttachments.push({
+                            name: file.name,
+                            type: 'file',
+                            data: e.target.result
+                        });
+
+                        renderPendingAttachments();
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            event.target.value = '';
+        }
+
+        function compressAndConvertImage(file, callback) {
+
+            const reader =
+                new FileReader();
+
+            reader.onload = function(e) {
+
+                const img =
+                    new Image();
+
+                img.onload = function() {
+
+                    const canvas =
+                        document.createElement('canvas');
+
+                    let width =
+                        img.width;
+
+                    let height =
+                        img.height;
+
+                    const MAX_WIDTH = 1000;
+                    const MAX_HEIGHT = 1000;
+
+                    if (width > height) {
+
+                        if (width > MAX_WIDTH) {
+
+                            height *=
+                                MAX_WIDTH / width;
+
+                            width =
+                                MAX_WIDTH;
+                        }
+
+                    } else {
+
+                        if (height > MAX_HEIGHT) {
+
+                            width *=
+                                MAX_HEIGHT / height;
+
+                            height =
+                                MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx =
+                        canvas.getContext('2d');
+
+                    ctx.drawImage(
+                        img,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+
+                    const dataUrl =
+                        canvas.toDataURL(
+                            'image/jpeg',
+                            0.75
+                        );
+
+                    callback(dataUrl);
+                };
+
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        function renderPendingAttachments() {
+
+            const container =
+                document.getElementById(
+                    'pending-attachments-preview'
+                );
+
+            if (!isAdmin || pendingAttachments.length === 0) {
+
+                container.classList.add('hidden');
+                container.innerHTML = '';
+
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+
+            pendingAttachments.forEach(
+                (att, index) => {
+
+                    if (att.type === 'image') {
+
+                        container.innerHTML += `
+                            <div class="relative group w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 flex-shrink-0">
+
+                                <img
+                                    src="${att.data}"
+                                    class="w-full h-full object-cover">
+
+                                <button
+                                    onclick="removePendingAttachment(${index})"
+                                    class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 hover:bg-red-500 transition">
+
+                                    <i data-lucide="x" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        `;
+
+                    } else {
+
+                        container.innerHTML += `
+                            <div class="relative group px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-700 flex items-center gap-2 text-xs max-w-[180px]">
+
+                                <i data-lucide="file" class="w-4 h-4 text-blue-500 flex-shrink-0"></i>
+
+                                <span class="truncate text-slate-700 dark:text-slate-200">
+                                    ${escapeHtml(att.name)}
+                                </span>
+
+                                <button
+                                    onclick="removePendingAttachment(${index})"
+                                    class="text-slate-400 hover:text-red-500 transition ml-auto">
+
+                                    <i data-lucide="x" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+            );
+
+            lucide.createIcons();
+        }
+
+        function removePendingAttachment(index) {
+
+            if (!isAdmin) {
+                return;
+            }
+
+            pendingAttachments.splice(
+                index,
+                1
+            );
+
+            renderPendingAttachments();
+        }
+
+        function removeTaskAttachment(
+            taskId,
+            attIndex
+        ) {
+
+            if (!isAdmin) {
+                return;
+            }
+
+            const currentDateKey =
+                getDateKey(selectedDate);
+
+            const task =
+                appData
+                    .daysData[currentDateKey]
+                    [currentModalClassId]
+                    .tasks
+                    .find(t => t.id === taskId);
+
+            if (
+                task &&
+                task.attachments
+            ) {
+
+                task.attachments.splice(
+                    attIndex,
+                    1
+                );
+
+                saveData();
+                renderKanban();
+            }
+        }
+
+        function openLightbox(imgSrc) {
+
+            const lightbox =
+                document.getElementById(
+                    'image-lightbox'
+                );
+
+            const img =
+                document.getElementById(
+                    'lightbox-img'
+                );
+
+            img.src = imgSrc;
+
+            lightbox.classList.remove(
+                'hidden'
+            );
+        }
+
+        function closeLightbox() {
+            document
+                .getElementById('image-lightbox')
+                .classList.add('hidden');
+        }
+
+        /* ============================================================
+           TASKS / KANBAN
+           ============================================================ */
+
+        const statusMap = {
+            todo: {
+                next: 'progress',
+                prev: null
+            },
+
+            progress: {
+                next: 'done',
+                prev: 'todo'
+            },
+
+            done: {
+                next: null,
+                prev: 'progress'
+            }
+        };
+
+        function renderKanban() {
+
+            const currentDateKey =
+                getDateKey(selectedDate);
+
+            const dayData =
+                appData.daysData[currentDateKey] &&
+                appData.daysData[currentDateKey][currentModalClassId]
+                    ? appData.daysData[currentDateKey][currentModalClassId]
+                    : {
+                        notes: '',
+                        tasks: []
+                    };
+
+            const tasks =
+                dayData.tasks || [];
+
+            ['todo', 'progress', 'done']
+                .forEach(status => {
+
+                    const col =
+                        document.getElementById(
+                            `col-${status}`
+                        );
+
+                    const count =
+                        document.getElementById(
+                            `count-${status}`
+                        );
+
+                    col.innerHTML = '';
+
+                    const colTasks =
+                        tasks.filter(
+                            t => t.status === status
+                        );
+
+                    count.textContent =
+                        colTasks.length;
+
+                    colTasks.forEach(task => {
+
+                        let deadlineHtml = '';
+
+                        if (task.deadline) {
+
+                            const today =
+                                new Date();
+
+                            today.setHours(
+                                0,
+                                0,
+                                0,
+                                0
+                            );
+
+                            const dl =
+                                new Date(task.deadline);
+
+                            const diffTime =
+                                dl - today;
+
+                            const diffDays =
+                                Math.ceil(
+                                    diffTime /
+                                    (1000 * 60 * 60 * 24)
+                                );
+
+                            let dlBg =
+                                'bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300';
+
+                            if (
+                                status !== 'done'
+                            ) {
+
+                                if (
+                                    diffDays < 0
+                                ) {
+
+                                    dlBg =
+                                        'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 font-bold';
+
+                                } else if (
+                                    diffDays <= 2
+                                ) {
+
+                                    dlBg =
+                                        'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-bold';
+                                }
+                            }
+
+                            const dlText =
+                                diffDays === 0
+                                    ? 'Сдать сегодня'
+                                    : diffDays < 0
+                                        ? 'Просрочено'
+                                        : `Дедлайн: ${dl.toLocaleDateString('ru-RU')}`;
+
+                            deadlineHtml = `
+                                <div class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg ${dlBg}">
+
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+
+                                    ${dlText}
+                                </div>
+                            `;
+                        }
+
+                        let attachmentsHtml = '';
+
+                        if (
+                            task.attachments &&
+                            task.attachments.length > 0
+                        ) {
+
+                            let imagesGrid = '';
+                            let filesList = '';
+
+                            task.attachments.forEach(
+                                (att, attIdx) => {
+
+                                    if (
+                                        att.type === 'image'
+                                    ) {
+
+                                        imagesGrid += `
+                                            <div
+                                                class="relative group/img w-16 h-16 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 cursor-pointer flex-shrink-0"
+                                                onclick="openLightbox('${att.data}')">
+
+                                                <img
+                                                    src="${att.data}"
+                                                    class="w-full h-full object-cover group-hover/img:scale-105 transition">
+                                            </div>
+                                        `;
+
+                                    } else {
+
+                                        filesList += `
+                                            <a
+                                                href="${att.data}"
+                                                download="${escapeHtml(att.name)}"
+                                                class="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 transition">
+
+                                                <i data-lucide="file-text" class="w-4 h-4 text-blue-500 flex-shrink-0"></i>
+
+                                                <span class="truncate max-w-[150px] font-medium">
+                                                    ${escapeHtml(att.name)}
+                                                </span>
+                                            </a>
+                                        `;
+                                    }
+                                }
+                            );
+
+                            attachmentsHtml = `
+                                <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 space-y-2">
+
+                                    ${
+                                        imagesGrid
+                                            ? `<div class="flex flex-wrap gap-2">${imagesGrid}</div>`
+                                            : ''
+                                    }
+
+                                    ${
+                                        filesList
+                                            ? `<div class="space-y-1.5">${filesList}</div>`
+                                            : ''
+                                    }
+
+                                </div>
+                            `;
+                        }
+
+                        const isDone =
+                            status === 'done';
+
+                        let taskControlHtml = '';
+
+                        if (isAdmin) {
+
+                            taskControlHtml = `
+                                <div class="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition bg-white/90 dark:bg-cardDark/90 backdrop-blur-sm p-1 rounded-xl shadow-sm">
+
+                                    ${
+                                        statusMap[status].prev
+                                            ? `
+                                                <button
+                                                    onclick="setTaskStatus(${task.id}, '${statusMap[status].prev}')"
+                                                    class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition"
+                                                    title="Назад">
+
+                                                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                                                </button>
+                                              `
+                                            : ''
+                                    }
+
+                                    ${
+                                        statusMap[status].next
+                                            ? `
+                                                <button
+                                                    onclick="setTaskStatus(${task.id}, '${statusMap[status].next}')"
+                                                    class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 hover:text-blue-500 transition"
+                                                    title="Вперед">
+
+                                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                                </button>
+                                              `
+                                            : ''
+                                    }
+
+                                    <button
+                                        onclick="deleteTask(${task.id})"
+                                        class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg text-red-500 transition"
+                                        title="Удалить">
+
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+
+                        let checkboxHtml = '';
+
+                        if (isAdmin) {
+
+                            checkboxHtml =
+                                status === 'todo' ||
+                                status === 'progress'
+                                    ? `
+                                        <button
+                                            onclick="setTaskStatus(${task.id}, 'done')"
+                                            class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-300 dark:border-slate-600 rounded-full hover:border-blue-500 transition cursor-pointer"
+                                            title="Отметить как выполненное">
+                                        </button>
+                                      `
+                                    : `
+                                        <button
+                                            onclick="setTaskStatus(${task.id}, 'todo')"
+                                            class="mt-1 w-5 h-5 flex-shrink-0 bg-blue-500 rounded-full flex items-center justify-center text-white cursor-pointer shadow-sm"
+                                            title="Вернуть в работу">
+
+                                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                      `;
+
+                        } else {
+
+                            checkboxHtml = `
+                                <div
+                                    class="mt-1 w-5 h-5 flex-shrink-0 border-2 border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center"
+                                    title="Только просмотр">
+                                </div>
+                            `;
+                        }
+
+                        const cardHtml = `
+                            <div class="bg-white dark:bg-cardDark p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col group relative">
+
+                                <div class="flex items-start gap-3">
+
+                                    ${checkboxHtml}
+
+                                    <div class="flex-1 min-w-0">
+
+                                        <p class="text-sm font-medium leading-snug ${isDone ? 'task-done text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-white'}">
+                                            ${escapeHtml(task.text)}
+                                        </p>
+
+                                        ${
+                                            deadlineHtml
+                                                ? `<div class="mt-2">${deadlineHtml}</div>`
+                                                : ''
+                                        }
+
+                                    </div>
+                                </div>
+
+                                ${attachmentsHtml}
+
+                                ${taskControlHtml}
+                            </div>
+                        `;
+
+                        col.insertAdjacentHTML(
+                            'beforeend',
+                            cardHtml
+                        );
+                    });
+                });
+
+            lucide.createIcons();
+        }
+
+        function addTask() {
+
+            if (!isAdmin) {
+                return;
+            }
+
+            const input =
+                document.getElementById(
+                    'new-task-text'
+                );
+
+            const dateInput =
+                document.getElementById(
+                    'new-task-date'
+                );
+
+            const text =
+                input.value.trim();
+
+            if (
+                (text || pendingAttachments.length > 0) &&
+                currentModalClassId
+            ) {
+
+                const currentDateKey =
+                    getDateKey(selectedDate);
+
+                ensureDayClassDataExists(
+                    currentDateKey,
+                    currentModalClassId
+                );
+
+                appData
+                    .daysData[currentDateKey]
+                    [currentModalClassId]
+                    .tasks
+                    .push({
+                        id: Date.now(),
+                        text: text || 'Без описания',
+                        status: 'todo',
+                        deadline:
+                            dateInput.value || null,
+                        attachments:
+                            [...pendingAttachments]
+                    });
+
+                saveData();
+
+                input.value = '';
+                dateInput.value = '';
+
+                pendingAttachments = [];
+
+                renderPendingAttachments();
+                renderKanban();
+            }
+        }
+
+        function setTaskStatus(
+            taskId,
+            newStatus
+        ) {
+
+            if (!isAdmin) {
+                return;
+            }
+
+            const currentDateKey =
+                getDateKey(selectedDate);
+
+            const dayData =
+                appData
+                    .daysData[currentDateKey];
+
+            if (
+                !dayData ||
+                !dayData[currentModalClassId]
+            ) {
+                return;
+            }
+
+            const task =
+                dayData[currentModalClassId]
+                    .tasks
+                    .find(
+                        t => t.id === taskId
+                    );
+
+            if (task) {
+
+                task.status =
+                    newStatus;
+
+                saveData();
+                renderKanban();
+            }
+        }
+
+        function deleteTask(taskId) {
+
+            if (!isAdmin) {
+                return;
+            }
+
+            const currentDateKey =
+                getDateKey(selectedDate);
+
+            if (
+                !appData.daysData[currentDateKey] ||
+                !appData.daysData[currentDateKey][currentModalClassId]
+            ) {
+                return;
+            }
+
+            appData
+                .daysData[currentDateKey]
+                [currentModalClassId]
+                .tasks =
+                appData
+                    .daysData[currentDateKey]
+                    [currentModalClassId]
+                    .tasks
+                    .filter(
+                        t => t.id !== taskId
+                    );
+
+            saveData();
+            renderKanban();
+        }
+
+        /* ============================================================
+           IMPORT / EXPORT
+           ============================================================ */
+
+        function exportData() {
+
+            if (!isAdmin) {
+                alert('Экспорт доступен только администратору.');
+                return;
+            }
+
+            const dataStr =
+                JSON.stringify(
+                    appData,
+                    null,
+                    2
+                );
+
+            const blob =
+                new Blob(
+                    [dataStr],
+                    {
+                        type: 'application/json'
+                    }
+                );
+
+            const url =
+                URL.createObjectURL(blob);
+
+            const a =
+                document.createElement('a');
+
+            a.href = url;
+
+            a.download =
+                `Планнер_БГО101_Бэкап_${new Date().toLocaleDateString('ru-RU')}.json`;
+
+            a.click();
+
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+
+            if (!isAdmin) {
+                event.target.value = '';
+                alert('Импорт доступен только администратору.');
+                return;
+            }
+
+            const file =
+                event.target.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
+                function(e) {
+
+                    try {
+
+                        const imported =
+                            JSON.parse(
+                                e.target.result
+                            );
+
+                        if (
+                            imported &&
+                            (
+                                imported.daysData ||
+                                imported.subjectsData
+                            )
+                        ) {
+
+                            appData =
+                                imported;
+
+                            if (!appData.daysData) {
+                                appData.daysData = {};
+                            }
+
+                            if (!appData.settings) {
+                                appData.settings = {
+                                    showWidget: true,
+                                    compactTasks: false
+                                };
+                            }
+
+                            if (!appData.themeMode) {
+                                appData.themeMode =
+                                    'classic';
+                            }
+
+                            saveData();
+
+                            applyTheme(
+                                appData.theme
+                            );
+
+                            applyThemeMode(
+                                appData.themeMode
+                            );
+
+                            applySettingsToUI();
+
+                            renderDaysPanel();
+                            renderSchedule();
+
+                            alert(
+                                'Данные успешно загружены!'
+                            );
+
+                        } else {
+
+                            alert(
+                                'Неверный формат файла.'
+                            );
+                        }
+
+                    } catch (err) {
+
+                        alert(
+                            'Ошибка чтения файла.'
+                        );
+                    }
+                };
+
+            reader.readAsText(file);
+
+            event.target.value = '';
+        }
+
+        /* ============================================================
+           SECURITY / HTML ESCAPE
+           ============================================================ */
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        /* ============================================================
+           EVENTS
+           ============================================================ */
+
+        window.addEventListener(
+            'DOMContentLoaded',
+            init
+        );
+
+        document
+            .getElementById('class-modal')
+            .addEventListener(
+                'click',
+                function(e) {
+
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                }
+            );
+
+        document
+            .getElementById('settings-modal')
+            .addEventListener(
+                'click',
+                function(e) {
+
+                    if (e.target === this) {
+                        closeSettingsModal();
+                    }
+                }
+            );
+
+        document
+            .getElementById('login-modal')
+            .addEventListener(
+                'click',
+                function(e) {
+
+                    if (e.target === this) {
+                        closeLoginModal();
+                    }
+                }
+            );
+
+    </script>
+</body>
+</html>
