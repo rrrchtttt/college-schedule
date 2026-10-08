@@ -218,6 +218,30 @@
                     <i data-lucide="log-in" class="w-5 h-5 text-blue-500"></i>
                 </button>
 
+                <!-- Гамбургер-меню -->
+                <div class="relative">
+                    <button
+                        onclick="toggleMainMenu()"
+                        class="p-3 bg-white dark:bg-cardDark rounded-2xl shadow-soft hover:shadow-md transition"
+                        title="Меню">
+                        <i data-lucide="menu" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
+                    </button>
+                    <div id="main-menu" class="hidden absolute right-0 top-14 z-40 w-64 bg-white dark:bg-cardDark rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 p-2 space-y-1">
+                        <button onclick="toggleMainMenu(); toggleCalendar()" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-left">
+                            <i data-lucide="calendar" class="w-5 h-5 text-blue-500"></i><span>Календарь</span>
+                        </button>
+                        <button onclick="toggleMainMenu(); openSettingsModal()" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-left">
+                            <i data-lucide="settings" class="w-5 h-5 text-slate-500"></i><span>Настройки</span>
+                        </button>
+                        <button id="menu-admin-button" onclick="toggleMainMenu(); openAdminPanel()" class="hidden w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-left">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i><span>Панель администратора</span>
+                        </button>
+                        <button id="menu-backup-button" onclick="toggleMainMenu(); exportData()" class="hidden w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-left">
+                            <i data-lucide="download" class="w-5 h-5 text-blue-500"></i><span>Скачать резервную копию</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Календарь -->
                 <button
                     onclick="toggleCalendar()"
@@ -824,6 +848,62 @@
         </div>
     </div>
 
+    <!-- ADMIN PANEL -->
+    <div id="admin-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-cardDark rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-5 md:p-7">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Панель администратора</h2>
+                    <p class="text-sm text-slate-500 mt-1">Изменение расписания, пользователи и посещаемость</p>
+                </div>
+                <button onclick="closeAdminPanel()" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-6">
+                <section class="rounded-2xl border border-slate-200 dark:border-slate-700 p-4">
+                    <h3 class="font-bold mb-3">Редактор расписания</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label class="text-sm">Дата<input id="admin-date" type="date" class="mt-1 w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></label>
+                        <label class="text-sm">Пара<select id="admin-pair" class="mt-1 w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"><option value="1">1 — 09:00–10:30</option><option value="2">2 — 10:40–12:10</option><option value="3">3 — 12:40–14:10</option><option value="4">4 — 14:20–15:50</option><option value="5">5 — 16:00–17:30</option><option value="6">6 — 17:40–19:10</option></select></label>
+                        <label class="text-sm md:col-span-2">Предмет<input id="admin-subject" class="mt-1 w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></label>
+                        <label class="text-sm">Тип<input id="admin-type" placeholder="Лекция / Практическое занятие / Зачет" class="mt-1 w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></label>
+                        <label class="text-sm">Аудитория<input id="admin-room" placeholder="210" class="mt-1 w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></label>
+                        <label class="text-sm md:col-span-2">Преподаватель<input id="admin-teacher" class="mt-1 w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></label>
+                        <label class="text-sm md:col-span-2">Заметка дня (например «ДЕНЬ САМОПОДГОТОВКИ»)<input id="admin-day-note" class="mt-1 w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></label>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <button onclick="adminLoadSelectedClass()" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 font-semibold">Загрузить</button>
+                        <button onclick="adminSaveClass()" class="px-4 py-2 rounded-xl bg-blue-500 text-white font-semibold">Сохранить занятие</button>
+                        <button onclick="adminDeleteClass()" class="px-4 py-2 rounded-xl bg-red-50 text-red-600 dark:bg-red-950/30 font-semibold">Удалить занятие</button>
+                        <button onclick="adminSaveDayNote()" class="px-4 py-2 rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-950/30 font-semibold">Сохранить заметку дня</button>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">Изменения сохраняются на сервере только после проверки прав администратора.</p>
+                </section>
+
+                <section class="rounded-2xl border border-slate-200 dark:border-slate-700 p-4">
+                    <h3 class="font-bold mb-3">Создать пользователя</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <input id="admin-user-name" placeholder="Имя (необязательно)" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <input id="admin-user-email" type="email" placeholder="Email" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <input id="admin-user-password" type="password" placeholder="Пароль (8+ символов)" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                    </div>
+                    <button onclick="adminCreateUser()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-500 text-white font-semibold">Создать пользователя</button>
+                    <div id="admin-users-list" class="mt-4 space-y-2"></div>
+                </section>
+
+                <section class="rounded-2xl border border-slate-200 dark:border-slate-700 p-4">
+                    <h3 class="font-bold mb-3">Посещаемость</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <input id="attendance-date" type="date" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <select id="attendance-class" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></select>
+                        <select id="attendance-status" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"><option value="present">Присутствовал</option><option value="absent">Отсутствовал</option><option value="late">Опоздал</option><option value="">Сбросить</option></select>
+                    </div>
+                    <button onclick="adminSaveAttendance()" class="mt-3 px-4 py-2 rounded-xl bg-violet-500 text-white font-semibold">Сохранить посещаемость</button>
+                </section>
+            </div>
+        </div>
+    </div>
+
     <!-- IMAGE LIGHTBOX -->
     <div
         id="image-lightbox"
@@ -851,33 +931,39 @@
            АВТОРИЗАЦИЯ
            ============================================================ */
 
+        // ВАЖНО: браузер не является источником истины для прав доступа.
+        // Все изменяемые общие данные сохраняются только через защищённые API.
+        // Даже если гость изменит JavaScript/DevTools, сервер не примет запись.
+
         // Авторизация выполняется на сервере Render.
         // Логин/пароль никогда не хранятся в HTML и не проверяются в браузере.
         let isAdmin = false;
+        let currentRole = 'guest';
+        let currentEmail = '';
 
         async function refreshAuthState() {
             try {
-                const response = await fetch('/api/auth/me', {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Accept': 'application/json' }
-                });
-
-                isAdmin = response.ok;
+                const response = await fetch('/api/auth/me', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+                if (!response.ok) throw new Error('guest');
+                const data = await response.json();
+                currentRole = data.role || 'guest';
+                currentEmail = data.email || '';
+                isAdmin = currentRole === 'admin';
             } catch {
+                currentRole = 'guest';
+                currentEmail = '';
                 isAdmin = false;
             }
-
             updateAccessUI();
             applyPermissions();
         }
 
         function isGuest() {
-            return !isAdmin;
+            return currentRole === 'guest';
         }
 
         function openLoginModal() {
-            if (isAdmin) {
+            if (currentRole !== 'guest') {
                 logoutAdmin();
                 return;
             }
@@ -933,19 +1019,16 @@
                 });
 
                 if (!response.ok) {
+                    currentRole = 'guest';
                     isAdmin = false;
                     errorElement.classList.remove('hidden');
                     return;
                 }
 
-                isAdmin = true;
+                await refreshAuthState();
                 document.getElementById('login-password').value = '';
-
                 closeLoginModal();
-                updateAccessUI();
-                applyPermissions();
-
-                alert('Вы вошли как администратор.');
+                alert(isAdmin ? 'Вы вошли как администратор.' : 'Вы вошли как пользователь.');
             } catch {
                 isAdmin = false;
                 errorElement.classList.remove('hidden');
@@ -963,11 +1046,13 @@
                 // Ничего не выводим в консоль.
             }
 
+            currentRole = 'guest';
+            currentEmail = '';
             isAdmin = false;
             updateAccessUI();
             applyPermissions();
 
-            alert('Вы вышли из режима администратора.');
+            alert('Вы вышли из аккаунта.');
         }
 
         function updateAccessUI() {
@@ -979,25 +1064,31 @@
             if (isAdmin) {
                 statusText.textContent = 'Администратор';
                 statusText.className = 'text-xs font-semibold text-emerald-600 dark:text-emerald-400';
-
                 statusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
-
-                authButton.title = 'Выйти из режима администратора';
+                authButton.title = 'Выйти из аккаунта';
                 authButton.innerHTML = '<i data-lucide="log-out" class="w-5 h-5 text-red-500"></i>';
-
                 dataControls.classList.remove('hidden');
+                document.getElementById('menu-admin-button').classList.remove('hidden');
+                document.getElementById('menu-backup-button').classList.remove('hidden');
+            } else if (currentRole === 'user') {
+                statusText.textContent = 'Пользователь';
+                statusText.className = 'text-xs font-semibold text-blue-600 dark:text-blue-400';
+                statusDot.className = 'w-2.5 h-2.5 rounded-full bg-blue-500';
+                authButton.title = 'Выйти из аккаунта';
+                authButton.innerHTML = '<i data-lucide="log-out" class="w-5 h-5 text-blue-500"></i>';
+                dataControls.classList.add('hidden');
+                document.getElementById('menu-admin-button').classList.add('hidden');
+                document.getElementById('menu-backup-button').classList.add('hidden');
             } else {
                 statusText.textContent = 'Гость';
                 statusText.className = 'text-xs font-semibold text-slate-600 dark:text-slate-300';
-
                 statusDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-400';
-
-                authButton.title = 'Войти как администратор';
+                authButton.title = 'Войти';
                 authButton.innerHTML = '<i data-lucide="log-in" class="w-5 h-5 text-blue-500"></i>';
-
                 dataControls.classList.add('hidden');
+                document.getElementById('menu-admin-button').classList.add('hidden');
+                document.getElementById('menu-backup-button').classList.add('hidden');
             }
-
             lucide.createIcons();
         }
 
@@ -1046,371 +1137,35 @@
             daysData: {}
         };
 
-        const timetableData = {
-            "2026-09-21": {
-                5: [
-                    {
-                        id: 'bgo_25_1',
-                        subjectId: 'bgd',
-                        name: 'Безопасность жизнедеятельности',
-                        type: 'Лекция',
-                        room: 'Ауд. 205',
-                        teacher: 'Макаршин И.В.',
-                        start: '09:00',
-                        end: '10:30'
-                    },
-                    {
-                        id: 'bgo_25_2',
-                        subjectId: 'bgd',
-                        name: 'Безопасность жизнедеятельности',
-                        type: 'Лекция',
-                        room: 'Ауд. 205',
-                        teacher: 'Макаршин И.В.',
-                        start: '10:40',
-                        end: '12:10'
-                    }
-                ]
+        let timetableData = {};
+
+        let appData = {
+            ...defaultData,
+            theme: 'light',
+            themeMode: 'classic',
+            settings: {
+                showWidget: true,
+                compactTasks: false
             },
-
-            "2026-09-28": {
-                1: [
-                    {
-                        id: 'bgo_28_1',
-                        subjectId: 'sport',
-                        name: 'Физическая культура и спорт',
-                        type: 'Лекция',
-                        room: 'Ауд. 409',
-                        teacher: 'Фирсин С.А.',
-                        start: '10:40',
-                        end: '12:10'
-                    },
-                    {
-                        id: 'bgo_28_2',
-                        subjectId: 'sport',
-                        name: 'Физическая культура и спорт',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 409',
-                        teacher: 'Фирсин С.А.',
-                        start: '12:40',
-                        end: '14:10'
-                    }
-                ],
-
-                2: [
-                    {
-                        id: 'bgo_29_1',
-                        subjectId: 'phil',
-                        name: 'Философия',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Заклинский П.А.',
-                        start: '09:00',
-                        end: '10:30'
-                    },
-                    {
-                        id: 'bgo_29_2',
-                        subjectId: 'phil',
-                        name: 'Философия',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Заклинский П.А.',
-                        start: '10:40',
-                        end: '12:10'
-                    }
-                ],
-
-                3: [
-                    {
-                        id: 'bgo_30_1',
-                        subjectId: 'org',
-                        name: 'Основы российской государственности',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Кузьмичева Н.В.',
-                        start: '09:00',
-                        end: '10:30'
-                    },
-                    {
-                        id: 'bgo_30_2',
-                        subjectId: 'org',
-                        name: 'Основы российской государственности',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Кузьмичева Н.В.',
-                        start: '10:40',
-                        end: '12:10'
-                    },
-                    {
-                        id: 'bgo_30_3',
-                        subjectId: 'hist',
-                        name: 'История России',
-                        type: 'Лекция',
-                        room: 'Ауд. 205',
-                        teacher: 'Королева-Конопляная Г.И.',
-                        start: '12:40',
-                        end: '14:10'
-                    },
-                    {
-                        id: 'bgo_30_4',
-                        subjectId: 'hist',
-                        name: 'История России',
-                        type: 'Лекция',
-                        room: 'Ауд. 205',
-                        teacher: 'Королева-Конопляная Г.И.',
-                        start: '14:20',
-                        end: '15:50'
-                    }
-                ],
-
-                4: [
-                    {
-                        id: 'bgo_01_1',
-                        subjectId: 'moral',
-                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Волович И.Г.',
-                        start: '12:40',
-                        end: '14:10'
-                    },
-                    {
-                        id: 'bgo_01_2',
-                        subjectId: 'moral',
-                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Волович И.Г.',
-                        start: '14:30',
-                        end: '15:50'
-                    },
-                    {
-                        id: 'bgo_01_3',
-                        subjectId: 'phil',
-                        name: 'Философия',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 206',
-                        teacher: 'Заклинский П.А.',
-                        start: '16:00',
-                        end: '17:30'
-                    }
-                ],
-
-                5: [
-                    {
-                        id: 'bgo_02_1',
-                        subjectId: 'econ',
-                        name: 'Экономическая теория',
-                        type: 'Лекция',
-                        room: 'Ауд. 409',
-                        teacher: 'Башашкина Г.Ю.',
-                        start: '12:40',
-                        end: '14:10'
-                    },
-                    {
-                        id: 'bgo_02_2',
-                        subjectId: 'econ',
-                        name: 'Экономическая теория',
-                        type: 'Лекция',
-                        room: 'Ауд. 409',
-                        teacher: 'Башашкина Г.Ю.',
-                        start: '14:20',
-                        end: '15:50'
-                    },
-                    {
-                        id: 'bgo_02_3',
-                        subjectId: 'lang',
-                        name: 'Иностранный язык',
-                        type: 'Лекция',
-                        room: 'Ауд. 401',
-                        teacher: 'Пенькова Е.А.',
-                        start: '16:00',
-                        end: '17:30'
-                    }
-                ]
-            },
-
-            "2026-10-05": {
-                1: [
-                    {
-                        id: 'bgo_05_1',
-                        subjectId: 'bgd',
-                        name: 'Безопасность жизнедеятельности',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 205',
-                        teacher: 'Макаршин И.В.',
-                        start: '14:20',
-                        end: '15:50'
-                    },
-                    {
-                        id: 'bgo_05_2',
-                        subjectId: 'bgd',
-                        name: 'Безопасность жизнедеятельности',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 205',
-                        teacher: 'Макаршин И.В.',
-                        start: '16:00',
-                        end: '17:30'
-                    }
-                ],
-
-                2: [
-                    {
-                        id: 'bgo_06_1',
-                        subjectId: 'phil',
-                        name: 'Философия',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 206',
-                        teacher: 'Заклинский П.А.',
-                        start: '09:00',
-                        end: '10:30'
-                    },
-                    {
-                        id: 'bgo_06_2',
-                        subjectId: 'phil',
-                        name: 'Философия',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 206',
-                        teacher: 'Заклинский П.А.',
-                        start: '10:40',
-                        end: '12:10'
-                    }
-                ],
-
-                3: [
-                    {
-                        id: 'bgo_07_1',
-                        subjectId: 'rus',
-                        name: 'Русский язык и культура речи',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Кузьмичева Н.В.',
-                        start: '09:00',
-                        end: '10:30'
-                    },
-                    {
-                        id: 'bgo_07_2',
-                        subjectId: 'rus',
-                        name: 'Русский язык и культура речи',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Кузьмичева Н.В.',
-                        start: '10:40',
-                        end: '12:10'
-                    },
-                    {
-                        id: 'bgo_07_3',
-                        subjectId: 'hist',
-                        name: 'История России',
-                        type: 'Лекция',
-                        room: 'Ауд. 205',
-                        teacher: 'Королева-Конопляная Г.И.',
-                        start: '12:40',
-                        end: '14:10'
-                    },
-                    {
-                        id: 'bgo_07_4',
-                        subjectId: 'hist',
-                        name: 'История России',
-                        type: 'Лекция',
-                        room: 'Ауд. 205',
-                        teacher: 'Королева-Конопляная Г.И.',
-                        start: '14:20',
-                        end: '15:50'
-                    }
-                ],
-
-                4: [
-                    {
-                        id: 'bgo_08_1',
-                        subjectId: 'econ',
-                        name: 'Экономическая теория',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 401',
-                        teacher: 'Баклашкина Г.Ю.',
-                        start: '09:00',
-                        end: '10:30'
-                    },
-                    {
-                        id: 'bgo_08_2',
-                        subjectId: 'econ',
-                        name: 'Экономическая теория',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 401',
-                        teacher: 'Баклашкина Г.Ю.',
-                        start: '10:40',
-                        end: '12:10'
-                    },
-                    {
-                        id: 'bgo_08_3',
-                        subjectId: 'moral',
-                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Волович И.Г.',
-                        start: '12:40',
-                        end: '14:10'
-                    },
-                    {
-                        id: 'bgo_08_4',
-                        subjectId: 'hist',
-                        name: 'История России',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 205',
-                        teacher: 'Королева-Конопляная Г.И.',
-                        start: '16:00',
-                        end: '17:30'
-                    }
-                ],
-
-                5: [
-                    {
-                        id: 'bgo_09_1',
-                        subjectId: 'lang',
-                        name: 'Иностранный язык',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 401',
-                        teacher: 'Пенькова Е.А.',
-                        start: '09:00',
-                        end: '10:30'
-                    },
-                    {
-                        id: 'bgo_09_2',
-                        subjectId: 'bgd',
-                        name: 'Безопасность жизнедеятельности',
-                        type: 'Лекция',
-                        room: 'Ауд. 210',
-                        teacher: 'Макаршин И.В.',
-                        start: '10:40',
-                        end: '12:10'
-                    }
-                ],
-
-                6: [
-                    {
-                        id: 'bgo_10_1',
-                        subjectId: 'moral',
-                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 210',
-                        teacher: 'Волович И.Г.',
-                        start: '09:00',
-                        end: '10:30'
-                    },
-                    {
-                        id: 'bgo_10_2',
-                        subjectId: 'moral',
-                        name: 'Основы нравственности и воспитания (волонтерство и НКО)',
-                        type: 'Практическое занятие',
-                        room: 'Ауд. 210',
-                        teacher: 'Волович И.Г.',
-                        start: '10:40',
-                        end: '12:10'
-                    }
-                ]
-            }
+            daysData: {}
         };
 
-        let appData = JSON.parse(localStorage.getItem('vityaPlannerData')) || defaultData;
+        try {
+            const savedPrefs = JSON.parse(
+                localStorage.getItem('vityaPlannerPreferences') || 'null'
+            );
+
+            if (savedPrefs && typeof savedPrefs === 'object') {
+                appData.theme = savedPrefs.theme || appData.theme;
+                appData.themeMode = savedPrefs.themeMode || appData.themeMode;
+                appData.settings = {
+                    ...appData.settings,
+                    ...(savedPrefs.settings || {})
+                };
+            }
+        } catch {
+            // Повреждённые локальные настройки просто игнорируются.
+        }
 
         if (!appData.daysData) {
             appData.daysData = {};
@@ -1438,6 +1193,53 @@
            INIT
            ============================================================ */
 
+        async function loadServerData() {
+            try {
+                const response = await fetch('/api/data', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Не удалось загрузить данные.');
+                }
+
+                const data = await response.json();
+
+                appData.daysData =
+                    data && data.daysData && typeof data.daysData === 'object'
+                        ? data.daysData
+                        : {};
+
+                timetableData =
+                    data && data.timetableData && typeof data.timetableData === 'object'
+                        ? data.timetableData
+                        : {};
+
+                return true;
+            } catch {
+                appData.daysData = {};
+                timetableData = {};
+                return false;
+            }
+        }
+
+        async function persistPreferences() {
+            try {
+                localStorage.setItem(
+                    'vityaPlannerPreferences',
+                    JSON.stringify({
+                        theme: appData.theme,
+                        themeMode: appData.themeMode,
+                        settings: appData.settings
+                    })
+                );
+            } catch {
+                // Локальные настройки необязательны.
+            }
+        }
+
         async function init() {
             applyTheme(appData.theme);
             applyThemeMode(appData.themeMode);
@@ -1445,6 +1247,9 @@
 
             // Состояние администратора определяет только сервер.
             await refreshAuthState();
+
+            // Общие данные расписания/заметок/задач приходят с сервера.
+            await loadServerData();
 
             renderHeaderDate();
             renderDaysPanel();
@@ -1489,8 +1294,39 @@
             applyPermissions();
         }
 
-        function saveData() {
-            localStorage.setItem('vityaPlannerData', JSON.stringify(appData));
+        async function saveData() {
+            // Настройки интерфейса можно хранить локально.
+            await persistPreferences();
+
+            // Общие данные никогда не сохраняются в localStorage.
+            // Сервер сам проверяет права администратора.
+            if (!isAdmin) {
+                return false;
+            }
+
+            try {
+                const response = await fetch('/api/data', {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        daysData: appData.daysData,
+                        timetableData
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Сервер отказал в сохранении.');
+                }
+
+                return true;
+            } catch {
+                alert('Не удалось сохранить изменения на сервере.');
+                return false;
+            }
         }
 
         function getDateKey(date) {
@@ -1966,6 +1802,16 @@
             return weekSchedule[dayOfWeek] || [];
         }
 
+        function getDayNote(date) {
+            const monday = getMonday(date);
+            const mondayStr = getDateKey(monday);
+            const weekSchedule = timetableData[mondayStr];
+            if (!weekSchedule || !weekSchedule._notes) return '';
+            let dayOfWeek = date.getDay();
+            if (dayOfWeek === 0) dayOfWeek = 7;
+            return weekSchedule._notes[String(dayOfWeek)] || '';
+        }
+
         function setScheduleView(view) {
             currentScheduleView = view;
 
@@ -2024,22 +1870,12 @@
                     getDateKey(selectedDate);
 
                 if (classes.length === 0) {
-
+                    const note = getDayNote(selectedDate);
                     container.innerHTML = `
                         <div class="text-center py-12 bg-white dark:bg-cardDark rounded-3xl shadow-soft">
-
-                            <i
-                                data-lucide="coffee"
-                                class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3">
-                            </i>
-
-                            <h3 class="text-lg font-medium text-slate-500">
-                                Занятий нет!
-                            </h3>
-
-                            <p class="text-sm text-slate-400">
-                                Отличный день для отдыха или самоподготовки.
-                            </p>
+                            <i data-lucide="${note ? 'calendar-off' : 'coffee'}" class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3"></i>
+                            <h3 class="text-lg font-medium text-slate-500">${escapeHtml(note || 'Занятий нет!')}</h3>
+                            <p class="text-sm text-slate-400">${note ? 'По официальному расписанию.' : 'Отличный день для отдыха или самоподготовки.'}</p>
                         </div>
                     `;
 
@@ -2202,8 +2038,9 @@
 
                     if (classes.length === 0) {
 
+                        const note = getDayNote(iterDate);
                         classesHtml =
-                            `<p class="text-sm text-slate-400 italic py-2">Занятий нет</p>`;
+                            `<p class="text-sm ${note ? 'font-semibold text-amber-600' : 'text-slate-400 italic'} py-2">${escapeHtml(note || 'Занятий нет')}</p>`;
 
                     } else {
 
@@ -3532,42 +3369,50 @@
            IMPORT / EXPORT
            ============================================================ */
 
-        function exportData() {
+        async function exportData() {
 
             if (!isAdmin) {
                 alert('Экспорт доступен только администратору.');
                 return;
             }
 
-            const dataStr =
-                JSON.stringify(
-                    appData,
-                    null,
-                    2
-                );
+            try {
+                const response = await fetch('/api/export', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
 
-            const blob =
-                new Blob(
+                if (!response.ok) {
+                    alert('Экспорт доступен только администратору.');
+                    return;
+                }
+
+                const data = await response.json();
+
+                const dataStr = JSON.stringify(data, null, 2);
+
+                const blob = new Blob(
                     [dataStr],
-                    {
-                        type: 'application/json'
-                    }
+                    { type: 'application/json' }
                 );
 
-            const url =
-                URL.createObjectURL(blob);
+                const url = URL.createObjectURL(blob);
 
-            const a =
-                document.createElement('a');
+                const a = document.createElement('a');
+                a.href = url;
+                a.download =
+                    `vitya-planner-backup-${new Date().toISOString().slice(0, 10)}.json`;
 
-            a.href = url;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
 
-            a.download =
-                `Планнер_БГО101_Бэкап_${new Date().toLocaleDateString('ru-RU')}.json`;
+                URL.revokeObjectURL(url);
 
-            a.click();
-
-            URL.revokeObjectURL(url);
+            } catch {
+                alert('Не удалось выполнить экспорт.');
+            }
         }
 
         function importData(event) {
@@ -3578,91 +3423,211 @@
                 return;
             }
 
-            const file =
-                event.target.files[0];
+            const file = event.target.files[0];
 
             if (!file) {
                 return;
             }
 
-            const reader =
-                new FileReader();
+            const reader = new FileReader();
 
-            reader.onload =
-                function(e) {
+            reader.onload = async function(e) {
 
-                    try {
+                try {
+                    const imported = JSON.parse(e.target.result);
 
-                        const imported =
-                            JSON.parse(
-                                e.target.result
-                            );
-
-                        if (
-                            imported &&
-                            (
-                                imported.daysData ||
-                                imported.subjectsData
-                            )
-                        ) {
-
-                            appData =
-                                imported;
-
-                            if (!appData.daysData) {
-                                appData.daysData = {};
-                            }
-
-                            if (!appData.settings) {
-                                appData.settings = {
-                                    showWidget: true,
-                                    compactTasks: false
-                                };
-                            }
-
-                            if (!appData.themeMode) {
-                                appData.themeMode =
-                                    'classic';
-                            }
-
-                            saveData();
-
-                            applyTheme(
-                                appData.theme
-                            );
-
-                            applyThemeMode(
-                                appData.themeMode
-                            );
-
-                            applySettingsToUI();
-
-                            renderDaysPanel();
-                            renderSchedule();
-
-                            alert(
-                                'Данные успешно загружены!'
-                            );
-
-                        } else {
-
-                            alert(
-                                'Неверный формат файла.'
-                            );
-                        }
-
-                    } catch (err) {
-
-                        alert(
-                            'Ошибка чтения файла.'
-                        );
+                    if (
+                        !imported ||
+                        typeof imported !== 'object' ||
+                        typeof imported.daysData !== 'object' ||
+                        typeof imported.timetableData !== 'object'
+                    ) {
+                        alert('Неверный формат файла.');
+                        return;
                     }
-                };
+
+                    const response = await fetch('/api/data/import', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            daysData: imported.daysData,
+                            timetableData: imported.timetableData
+                        })
+                    });
+
+                    if (!response.ok) {
+                        alert('Импорт отклонён сервером.');
+                        return;
+                    }
+
+                    appData.daysData = imported.daysData;
+                    timetableData = imported.timetableData;
+
+                    if (imported.theme) {
+                        appData.theme = imported.theme;
+                    }
+
+                    if (imported.themeMode) {
+                        appData.themeMode = imported.themeMode;
+                    }
+
+                    if (imported.settings) {
+                        appData.settings = {
+                            ...appData.settings,
+                            ...imported.settings
+                        };
+                    }
+
+                    await persistPreferences();
+
+                    applyTheme(appData.theme);
+                    applyThemeMode(appData.themeMode);
+                    applySettingsToUI();
+
+                    renderDaysPanel();
+                    renderSchedule();
+
+                    alert('Данные успешно загружены!');
+
+                } catch {
+                    alert('Ошибка чтения файла.');
+                } finally {
+                    event.target.value = '';
+                }
+            };
 
             reader.readAsText(file);
-
-            event.target.value = '';
         }
+
+        /* ============================================================
+           МЕНЮ И ПАНЕЛЬ АДМИНИСТРАТОРА
+           ============================================================ */
+
+        function toggleMainMenu() {
+            document.getElementById('main-menu').classList.toggle('hidden');
+            lucide.createIcons();
+        }
+
+        function openAdminPanel() {
+            if (!isAdmin) return alert('Доступ только для администратора.');
+            document.getElementById('admin-modal').classList.remove('hidden');
+            const key = getDateKey(selectedDate);
+            document.getElementById('admin-date').value = key;
+            document.getElementById('attendance-date').value = key;
+            adminLoadSelectedClass();
+            adminLoadUsers();
+            adminLoadAttendanceClasses();
+            lucide.createIcons();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        function adminGetDate() { return document.getElementById('admin-date').value; }
+        function adminGetPair() { return Number(document.getElementById('admin-pair').value); }
+
+        function adminFindClass(date, pair) {
+            const d = new Date(date + 'T12:00:00');
+            const monday = getMonday(d);
+            const week = timetableData[getDateKey(monday)];
+            if (!week) return null;
+            const day = d.getDay() === 0 ? 7 : d.getDay();
+            return (week[String(day)] || []).find(c => c.start === ['','09:00','10:40','12:40','14:20','16:00','17:40'][pair]);
+        }
+
+        function adminLoadSelectedClass() {
+            const date = adminGetDate(); if (!date) return;
+            const pair = adminGetPair();
+            const cls = adminFindClass(date, pair);
+            document.getElementById('admin-subject').value = cls?.name || '';
+            document.getElementById('admin-type').value = cls?.type || '';
+            document.getElementById('admin-room').value = (cls?.room || '').replace(/^Ауд\.\s*/,'');
+            document.getElementById('admin-teacher').value = cls?.teacher || '';
+            const d = new Date(date + 'T12:00:00');
+            document.getElementById('admin-day-note').value = getDayNote(d);
+        }
+
+        async function adminSaveClass() {
+            if (!isAdmin) return;
+            const date = adminGetDate(); const pair = adminGetPair();
+            const name = document.getElementById('admin-subject').value.trim();
+            if (!date || !name) return alert('Укажи дату и предмет.');
+            const d = new Date(date + 'T12:00:00'); const monday = getMonday(d); const wk = getDateKey(monday); const day = d.getDay() === 0 ? 7 : d.getDay();
+            if (!timetableData[wk]) timetableData[wk] = {};
+            if (!Array.isArray(timetableData[wk][String(day)])) timetableData[wk][String(day)] = [];
+            const times = {1:['09:00','10:30'],2:['10:40','12:10'],3:['12:40','14:10'],4:['14:20','15:50'],5:['16:00','17:30'],6:['17:40','19:10']}[pair];
+            timetableData[wk][String(day)] = timetableData[wk][String(day)].filter(c => !(c.start === times[0] && c.end === times[1]));
+            timetableData[wk][String(day)].push({
+                id: 'admin_' + Date.now(), subjectId: 'custom', name,
+                type: document.getElementById('admin-type').value.trim() || 'Занятие',
+                room: 'Ауд. ' + (document.getElementById('admin-room').value.trim() || '—'),
+                teacher: document.getElementById('admin-teacher').value.trim() || '—', start: times[0], end: times[1]
+            });
+            timetableData[wk][String(day)].sort((a,b)=>a.start.localeCompare(b.start));
+            if (await saveData()) { renderDaysPanel(); renderSchedule(); updateNextClassWidget(); adminLoadSelectedClass(); alert('Занятие сохранено.'); }
+        }
+
+        async function adminDeleteClass() {
+            if (!isAdmin) return;
+            const date = adminGetDate(); const pair = adminGetPair();
+            const d = new Date(date + 'T12:00:00'); const wk = getDateKey(getMonday(d)); const day = d.getDay() === 0 ? 7 : d.getDay();
+            if (!timetableData[wk]?.[String(day)]) return;
+            const times = {1:['09:00','10:30'],2:['10:40','12:10'],3:['12:40','14:10'],4:['14:20','15:50'],5:['16:00','17:30'],6:['17:40','19:10']}[pair];
+            timetableData[wk][String(day)] = timetableData[wk][String(day)].filter(c => !(c.start === times[0] && c.end === times[1]));
+            await saveData(); renderDaysPanel(); renderSchedule(); updateNextClassWidget(); adminLoadSelectedClass();
+        }
+
+        async function adminSaveDayNote() {
+            if (!isAdmin) return;
+            const date = adminGetDate(); if (!date) return;
+            const d = new Date(date + 'T12:00:00'); const wk = getDateKey(getMonday(d)); const day = d.getDay() === 0 ? 7 : d.getDay();
+            if (!timetableData[wk]) timetableData[wk] = {};
+            if (!timetableData[wk]._notes) timetableData[wk]._notes = {};
+            const note = document.getElementById('admin-day-note').value.trim();
+            if (note) timetableData[wk]._notes[String(day)] = note; else delete timetableData[wk]._notes[String(day)];
+            await saveData(); renderSchedule();
+        }
+
+        async function adminCreateUser() {
+            const name = document.getElementById('admin-user-name').value.trim(); const email = document.getElementById('admin-user-email').value.trim(); const password = document.getElementById('admin-user-password').value;
+            const r = await fetch('/api/users',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password})});
+            if (!r.ok) { alert('Не удалось создать пользователя. Проверь email и пароль (минимум 8 символов).'); return; }
+            document.getElementById('admin-user-name').value=''; document.getElementById('admin-user-email').value=''; document.getElementById('admin-user-password').value='';
+            await adminLoadUsers(); alert('Пользователь создан.');
+        }
+
+        async function adminLoadUsers() {
+            if (!isAdmin) return;
+            const r = await fetch('/api/users',{credentials:'include'}); if (!r.ok) return; const data = await r.json();
+            const box = document.getElementById('admin-users-list');
+            box.innerHTML = (data.users||[]).map(u => `<div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800"><div><div class="font-semibold">${escapeHtml(u.name || 'Без имени')}</div><div class="text-xs text-slate-500">${escapeHtml(u.email)}</div></div><button onclick="adminDeleteUser('${encodeURIComponent(u.email)}')" class="text-red-500 text-sm font-semibold">Удалить</button></div>`).join('') || '<p class="text-sm text-slate-400">Пользователей пока нет.</p>';
+        }
+
+        async function adminDeleteUser(email) {
+            if (!confirm('Удалить этого пользователя?')) return;
+            const r = await fetch('/api/users/'+email,{method:'DELETE',credentials:'include'}); if (!r.ok) return alert('Не удалось удалить пользователя.'); await adminLoadUsers();
+        }
+
+        function adminLoadAttendanceClasses() {
+            const date = document.getElementById('attendance-date').value; if (!date) return;
+            const classes = getScheduleForDate(new Date(date+'T12:00:00')); const select=document.getElementById('attendance-class');
+            select.innerHTML = classes.map(c=>`<option value="${escapeHtml(c.id)}">${escapeHtml(c.start+' — '+c.name)}</option>`).join('') || '<option value="">Нет занятий</option>';
+        }
+
+        async function adminSaveAttendance() {
+            const date=document.getElementById('attendance-date').value; const classId=document.getElementById('attendance-class').value; const status=document.getElementById('attendance-status').value;
+            if(!date||!classId) return alert('Выбери дату и занятие.');
+            const r=await fetch('/api/attendance',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({date,classId,status})});
+            if(!r.ok) return alert('Не удалось сохранить посещаемость.');
+            alert('Посещаемость сохранена.');
+        }
+
+        document.getElementById('attendance-date')?.addEventListener('change', adminLoadAttendanceClasses);
 
         /* ============================================================
            SECURITY / HTML ESCAPE
@@ -3680,6 +3645,11 @@
         /* ============================================================
            EVENTS
            ============================================================ */
+
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('main-menu');
+            if (menu && !menu.parentElement.contains(e.target)) menu.classList.add('hidden');
+        });
 
         window.addEventListener(
             'DOMContentLoaded',
